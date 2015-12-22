@@ -17,6 +17,6 @@ class Controller_Dashboard extends Core\Controller
     }
     function action_start()
     {
-        $this->view->generate('Main_view.php', 'Tmp_view.php');
+        $this->view->generate();
     }
 }

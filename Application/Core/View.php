@@ -12,11 +12,11 @@ class View
 {
     //public $template_view; // здесь можно указать общий вид по умолчанию.
 
-    function generate($content_view, $template_view, $data = null){
+    function generate($content_view='Blocks_view.php', $auth_view='AuthForm_view.php', $template_view='Tmp_view.php', $data = null){
         include 'Application/Views/'.$template_view;
     }
 
-    function display($content_view,$data)
+    function display($content_view,$data = null)
     {
         include 'Application/Views/'.$content_view;
     }

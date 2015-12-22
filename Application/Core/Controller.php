@@ -18,4 +18,9 @@ class Controller {
         $this->view = new View();
         $this->auth_model = new Models\Model_Auth();
     }
+    protected function security_variable($variable){
+        $variable=htmlentities($variable);
+        $variable=strip_tags($variable);
+        return $variable;
+    }
 }

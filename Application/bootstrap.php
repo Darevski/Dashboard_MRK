@@ -22,7 +22,7 @@ Try{
     $Route->start();
 }
 catch (Exceptions\UFO_Except $error){
-    $error->classificate_error($error);
+    $error->classification_error($error);
 }
 catch (Exceptions\SQL_Except $error){
         echo "Произошла ошибка при работе с базой данных";

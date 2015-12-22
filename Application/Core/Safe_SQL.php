@@ -72,6 +72,7 @@
  *
  */
 namespace Application\Core;
+use Application\Exceptions;
 class Safe_SQL
 {
     private $conn;

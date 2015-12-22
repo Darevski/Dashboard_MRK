@@ -10,7 +10,7 @@
 namespace Application\Exceptions;
 use Application\Controllers;
 
-class UFO_Except extends \Exception
+class UFO_Except extends Main_Except
 {
     function classificate_error(UFO_except $error){
         $code = $error->code;

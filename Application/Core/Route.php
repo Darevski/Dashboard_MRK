@@ -22,17 +22,8 @@ class Route extends Exceptions\UFO_Except
 
 
         // Добавление префиксов
-        $model_name = 'Model_'.$this->correct_name($this->controller_name);
         $controller_name = 'Controller_'.$this->correct_name($this->controller_name);;
         $action_name = 'action_'.$this-> action_name;
-
-        // Загрузка файла модели при ее наличии
-
-        $model_file = $model_name.'.php';
-        $model_path = "Application/Models/".$model_file;
-
-        if(file_exists($model_path))
-            include "Application/Models/".$model_file;
 
 
         // Загрзука файла контроллера
@@ -42,9 +33,8 @@ class Route extends Exceptions\UFO_Except
         if(file_exists($controller_path))
             require_once "Application/Controllers/".$controller_file;
         else
-        {
             throw new Exceptions\UFO_Except("Controller $controller_name does not exist", 404);
-        }
+
 
         // Создание Контроллера
         $controller_name = 'Application\\Controllers\\'.$controller_name;
@@ -55,9 +45,7 @@ class Route extends Exceptions\UFO_Except
         if(method_exists($controller, $action))
             $controller->$action();
         else
-        {
             throw new Exceptions\UFO_Except("Action $action in $controller_name controller does not exist",404);
-        }
     }
 
     private function Exploding_URI(){

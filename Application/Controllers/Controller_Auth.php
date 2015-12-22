@@ -24,10 +24,12 @@ class Controller_Auth extends Controller
             if ($result === false)
                 throw new UFO_Except("Не верный пароль",403);
             else{
-                $_SESSION['login'] = $login;
-                $_SESSION['hash'] = $result;
-                $host =  $_SERVER['HTTP_HOST'];
-                header("Location: http://$host");
+                if (isset ($_POST['catch'])){
+                    $_SESSION['login'] = $login;
+                    $_SESSION['hash'] = $result;
+                    $host =  $_SERVER['HTTP_HOST'];
+                    header("Location: http://$host");
+                }
             }
         }
     }

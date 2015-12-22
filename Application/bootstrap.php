@@ -28,5 +28,10 @@ $loader->addNamespace('Application\Controllers',$_SERVER['DOCUMENT_ROOT'].'Appli
 $loader->addNamespace('Application\Exceptions',$_SERVER['DOCUMENT_ROOT'].'Application/Exceptions');
 $loader->addNamespace('Application\Models',$_SERVER['DOCUMENT_ROOT'].'Application/Models');
 
-$Route = new Core\Route();
-$Route->start();
+Try{
+    $Route = new Core\Route();
+    $Route->start();
+}
+catch (Exceptions\UFO_Except $error){
+    $error->classificate_error($error);
+}

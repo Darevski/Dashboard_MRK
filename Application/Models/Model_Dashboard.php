@@ -11,6 +11,13 @@ use Application\Core;
 
 class Model_Dashboard extends Core\Model
 {
-    public $data;
+    /**
+     * Получает список всех групп (курс группы).
+     * @return array с номер группы и курсом
+     */
+    function get_list_group(){
+        $result=$this->database->getALL("SELECT group_number,grade FROM groups_list");
+        return $result;
+    }
 
 }

@@ -78,7 +78,6 @@ class Model_Dashboard extends Core\Model
         return $result;
     }
 
-
     /**
      * Получает список всех групп (курс группы).
      * @return array с номер группы и курсом
@@ -134,40 +133,70 @@ class Model_Dashboard extends Core\Model
      * название пары
      * имя преподавателя
      * аудитория
-     * состояние пары (прошла пара или нет).
+     * состояние пары (идет сейчас пара/перемена(следующая пара становится активной) или пары кончились/прошли ).
      */
     private function parse_timetable($dashboard,$isweek = false){
 
         for ($i=1;$i<=7;$i++)   // Всего 7 пар
             $result[$i]=null;
-
-        foreach ($dashboard as $value){
-            $num=$value['lesson_number'];
+        $lesson_exist=false;
+        foreach ($dashboard as $value) {
+            $num = $value['lesson_number'];
             $result[$num]['lesson_name'] = $value['lesson_name'];
-            $result[$num]['professor']=$value['professor'];
-            if ($isweek == false){
-                $result[$num]['classroom']=$value['classroom'];
-                //Определяет прошла ли пара в реальном времени
-                $result[$num]['state']=$this->lesson_state($num);
+            $result[$num]['professor'] = $value['professor'];
+
+            if ($isweek == false) {         // если рассписание не на неделю требуется состояние пар
+                $result[$num]['classroom'] = $value['classroom'];
+                //Определяет идет ли сейчас пара
+                $is_lesson_going = $this->is_lesson_going($num);
+                $result[$num]['state'] = $is_lesson_going;
+
+                if ($is_lesson_going == true) // если существует пара которая в данный момент идет
+                    $lesson_exist = true;
             }
         }
+        if ($lesson_exist == false & $isweek == false)                // если пары на текуший момент времени не существует
+            foreach ($dashboard as $value){        // Пары на сегодня прошли || сейчас перемена
+                $num = $value['lesson_number'];
+                $result[$num]['state'] = $this->is_rest($num);
+            }
         return $result;
     }
 
     /**
-     * Определяет прошла ли пара, или нет
+     * Определяет идет пара или нет
      * @param $lesson_number - номер пары
-     * @return bool true - пары не было
-     *              false - пара прошла
+     * @return bool true - пара сейчас идет
+     *              false - пара не идет (прошла/будет)
      */
-    private function lesson_state($lesson_number){
+    private function is_lesson_going($lesson_number){
         $result=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number);
         $end_of_lesson=$result['end'];
+        $start_of_lesson = $result['start'];
         $now_time = date("G:i:s");
-        if ($end_of_lesson<=$now_time)
-            return false;
-        else
+        if ($end_of_lesson>=$now_time & $start_of_lesson<=$now_time)
             return true;
+        else
+            return false;
+    }
+    /**
+     * Определяет сейчас перемена
+     * @param $lesson_number - номер пары
+     * @return bool true - сейчас перемена
+     *              false - пара идет/ пары закончились
+     */
+    private function is_rest($lesson_number){
+        $time_of_lesson=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number);
+        $start_of_lesson = $time_of_lesson['start'];
+        $now_time = date("G:i:s");
+        if ($lesson_number == 0 & $start_of_lesson >= $now_time)
+            return true;
+        $previous_time_of_lesson=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number-1);
+        $end_of_previous_lesson = $previous_time_of_lesson['end'];
+        if ($start_of_lesson >= $now_time & $now_time>=$end_of_previous_lesson)
+            return true;
+        else
+            return false;
     }
 
     /**

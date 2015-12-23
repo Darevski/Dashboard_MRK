@@ -12,11 +12,13 @@ use Application\Exceptions;
 class Route extends Exceptions\UFO_Except
 {
     // default controller and him action
-    private $controller_name = 'Dashboard';
-    private $action_name = 'start';
+    private $controller_name;
+    private $action_name ;
 
     function start()
     {
+        //Установка значений контроллера и действия по умолчанию
+        $this->starting_Values();
         // Разбор Запроса
         $this->Exploding_URI();
 
@@ -26,7 +28,7 @@ class Route extends Exceptions\UFO_Except
         $action_name = 'action_'.$this-> action_name;
 
 
-        // Загрзука файла контроллера
+        // Проверка на наличие файла контроллера
         $controller_file = $controller_name.'.php';
         $controller_path = "Application/Controllers/".$controller_file;
 
@@ -48,6 +50,31 @@ class Route extends Exceptions\UFO_Except
             throw new Exceptions\UFO_Except("Action $action in $controller_name controller does not exist",404);
     }
 
+    /**
+     * Установка контроллера и экшена в соответсвии с привелегиями пользователя
+     * @throws UFO_Except
+     */
+    private function starting_Values(){
+        $controller = new Controller();
+        //Получение привелегии пользователя
+        $auth_state=$controller->state_authorization();
+        $this->action_name = 'start';
+        if ($auth_state == false)
+            $this->controller_name = 'Dashboard';
+        else
+            switch ($auth_state){
+                case 'Admin':
+                    $this->controller_name = 'Admin';
+                    break;
+                default:
+                    $this->controller_name = 'Dashboard';
+            }
+    }
+
+    /**Разбор Запроса
+     * На имя контроллера и действие
+     * @throws Exceptions\UFO_Except
+     */
     private function Exploding_URI(){
 
         if (preg_match('/\.\w+$/',$_SERVER['REQUEST_URI']))
@@ -62,8 +89,11 @@ class Route extends Exceptions\UFO_Except
         if ( !empty($routes[2]) )
             $this->action_name = $routes[2];
     }
-
-    // преобразование к виду Большаябукваоставшийсямелкийтекст
+    /**
+     * Преобразование полученной строки к виду Большаябукваоставшийсямелкийтекст
+     * @param $name
+     * @return string
+     */
     private function correct_name($name){
         $first_letter = substr($name,0,1);
         $remaining_letters = substr($name,1,strlen($name)-1);

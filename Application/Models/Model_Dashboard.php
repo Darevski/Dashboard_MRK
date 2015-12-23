@@ -95,7 +95,7 @@ class Model_Dashboard extends Core\Model
     function get_list_group(){
         $result=$this->database->getALL("SELECT group_number,grade FROM groups_list");
         //сортировка полученного списка в соответсвии с их номером по возрастанию
-        uasort($result,array($this,'Groups_Sort_CallBack'));
+        usort($result,array($this,'Groups_Sort_CallBack'));
         return $result;
     }
 

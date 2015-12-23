@@ -78,12 +78,24 @@ class Model_Dashboard extends Core\Model
         return $result;
     }
 
+    /** Callback функция для сортировки списка групп по их номеру */
+
+    private function Groups_Sort_CallBack($a, $b) {
+        if ($a['group_number'] == $b['group_number']) {
+            return 0;
+        }
+        return ($a['group_number'] < $b['group_number']) ? -1 : 1;
+    }
+
     /**
      * Получает список всех групп (курс группы).
+     * Сортирует его согласно номер групп по возрастанию
      * @return array с номер группы и курсом
      */
     function get_list_group(){
         $result=$this->database->getALL("SELECT group_number,grade FROM groups_list");
+        //сортировка полученного списка в соответсвии с их номером по возрастанию
+        uasort($result,array($this,'Groups_Sort_CallBack'));
         return $result;
     }
 

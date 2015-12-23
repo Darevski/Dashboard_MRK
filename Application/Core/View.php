@@ -20,6 +20,6 @@ class View
         include 'Application/Views/'.$content_view;
     }
     function output_json($json){
-        include 'Application/Views/Json_view.php';
+        echo $json;
     }
 }

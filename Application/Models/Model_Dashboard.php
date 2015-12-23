@@ -44,7 +44,7 @@ class Model_Dashboard extends Core\Model
      * }
      */
     private function week_timetable($group_number,$numerator){
-        $query = "SELECT * FROM groups WHERE group_number=?s AND (numerator=?s OR numerator='all') ";
+        $query = "SELECT * FROM groups,professors WHERE groups.professor_id=professors.id AND group_number=?s AND (numerator=?s OR numerator='all') ";
         $query_week = $this->database->getAll($query,$group_number,$numerator);
 
         for ($i=1;$i<=6;$i++)
@@ -54,11 +54,28 @@ class Model_Dashboard extends Core\Model
             $day = $value['day_number'];
             $week[$day][]=$value;
         }
-        foreach($week as &$value) {
+        foreach($week as &$value)
             $value = $this->parse_timetable($value, true); // приведение списка к пронумерованному виду пар
 
-        }
+        $max_min =$this->week_max_min($week);
+        $week['max'] =$max_min['max'];
+        $week['min'] = $max_min['min'];
         return $week;
+    }
+
+    private function week_max_min($week)
+    {
+        $max = 1;
+        $min = 7;
+        foreach ($week as $days)
+            foreach ($days as $key => $lesson_num)
+                if ($lesson_num != null) {
+                    $max = max($max, $key);
+                    $min = min($min, $key);
+                }
+        $result['max']=$max;
+        $result['min']=$min;
+        return $result;
     }
 
 
@@ -89,7 +106,7 @@ class Model_Dashboard extends Core\Model
         $day= date('w'); //получение номера дня в неделе
         $numerator = $this->get_week_numerator(); // получение значения нумератора для текущей недели
 
-        $query = "SELECT * FROM groups WHERE group_number=?s AND day_number=?s AND (numerator=?s or numerator='all')";
+        $query = "SELECT * FROM groups,professors WHERE groups.professor_id=professors.id AND group_number=?s AND day_number=?s AND (numerator=?s or numerator='all')";
 
         if ($day ==0)
             $day=6;
@@ -114,7 +131,6 @@ class Model_Dashboard extends Core\Model
      * полученный из базы данных
      * @param bool|false $isweek - при рассписании на неделю не отображает состояние пар и аудитории
      * @return mixed - массив приведенный к виду отображаемому в приложении
-     * номер пары
      * название пары
      * имя преподавателя
      * аудитория
@@ -127,7 +143,6 @@ class Model_Dashboard extends Core\Model
 
         foreach ($dashboard as $value){
             $num=$value['lesson_number'];
-            $result[$num]['lesson_number']=$num;
             $result[$num]['lesson_name'] = $value['lesson_name'];
             $result[$num]['professor']=$value['professor'];
             if ($isweek == false){

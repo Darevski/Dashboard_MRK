@@ -37,11 +37,24 @@ class Controller_Dashboard extends Core\Controller
         $_POST['group_number']='32494';
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
-
             $dashboard = $this->model->get_actual_dashboard($group_number);
-            $dashboard = json_encode($dashboard);
+            $dashboard = json_encode($dashboard,JSON_UNESCAPED_UNICODE);
             $this->view->output_json($dashboard);
         }
 
+    }
+
+    /**
+     * Получение рассписания на неделю (числитель + знаменатель) для указанной группы
+     * и вывод в виде json строки
+     */
+    function action_week_dashboard(){
+        $_POST['group_number']='32494';
+        if (isset($_POST['group_number'])){
+            $group_number = $this->security_variable($_POST['group_number']);
+            $dashboard = $this->model->get_week_timetable($group_number);
+            $dashboard = json_encode($dashboard,JSON_UNESCAPED_UNICODE);
+            $this->view->output_json($dashboard);
+        }
     }
 }

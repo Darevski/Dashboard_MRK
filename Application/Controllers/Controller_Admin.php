@@ -15,7 +15,7 @@ class Controller_Admin extends Core\Controller{
     function __construct(){
         parent::__construct();
         $this->validate();
-        $this->model = new Models\Model_Dashboard();
+        $this->model = new Models\Model_Admin();
     }
 
     /**
@@ -30,6 +30,6 @@ class Controller_Admin extends Core\Controller{
             throw new UFO_Except ('У вас не достаточно прав для просмотра данного контента', 403);
     }
     public function action_start(){
-       echo 'Теперь вы диктуете правила!';
+       //$this->model->group_add(32494,'ch',1,2,'apanasevich','oaip');
     }
 }

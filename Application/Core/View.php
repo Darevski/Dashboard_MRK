@@ -16,8 +16,10 @@ class View
         include 'Application/Views/'.$template_view;
     }
 
-    function display($content_view,$data = null)
-    {
+    function display($content_view,$data = null){
         include 'Application/Views/'.$content_view;
+    }
+    function output_json($json){
+        include 'Application/Views/Json_view.php';
     }
 }

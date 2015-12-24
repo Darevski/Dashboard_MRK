@@ -118,9 +118,9 @@ class Model_Professors extends Model_Dashboard
                 $result["classroom"] = $value["classroom"];
             }
         }
-        if ($difference_between_lessons_number == 7){ // если начальное значение не изменилось - пар сегодня уже нет/ не было
+        if ($min_dif == 7){ // если начальное значение не изменилось - пар сегодня уже нет/ не было
             $result["state"] = "false";
-            return $result["state"];
+            return $result;
         }
         else
             return $result;

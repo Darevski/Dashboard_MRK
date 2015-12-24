@@ -1,5 +1,6 @@
 var CHECK_stop = false; /*	Создает и устанавливает значение необходимости остановки опроса изменения значний у сервера	*/
 var TIME_difference;
+var professor_loader_start;
 /*** --- Выполняет проверку необходимости обновления блока расписания
 Input:
 	none
@@ -39,15 +40,13 @@ function LOAD_Shedule(answer)
 	else
 		{
 			setCookie("inprogress_shedule", "1");
-			var loader = CreateLoader(500,250);
 			var block = document.getElementById("ActualShedule");
+            var loader = CreateLoader(block);
 			document.getElementById("switch1").style.opacity = "0";
 			document.getElementById("switch2").style.opacity = "0";
-			block.style.opacity = "0";
+			loader.style.opacity = "1";
 			document.body.appendChild(loader);
 			setTimeout( function() {
-				loader.style.opacity = "1";
-				block.style.opacity = "1";
 				document.getElementById("switch1").style.display = "none";
 				document.getElementById("switch2").style.display = "none";
 				block.innerHTML = "";
@@ -100,20 +99,18 @@ function LOAD_Shedule(answer)
 									temp_ul.appendChild(temp_li);
 								}
 					div_shedule_next.appendChild(temp_ul);
-					block.style.opacity = "0";
-					loader.style.opacity = "0";
 					document.getElementById("switch1").style.display = "";
 					document.getElementById("switch2").style.display = "";
 					setTimeout(function()
 							  {							
-						setCookie("shedule", answer.md5);
-						block.appendChild(div_shedule_now);
-						block.appendChild(div_shedule_next);
-						block.style.opacity = "";
-						Open_Shedule("today");
-						document.getElementById("switch1").style.opacity = "";
-						document.getElementById("switch2").style.opacity = "";
-						setTimeout(function() { deleteCookie("inprogress_shedule"); loader.remove(); }, 500);
+                                setCookie("shedule", answer.md5);
+                                block.appendChild(div_shedule_now);
+                                block.appendChild(div_shedule_next);
+                                Open_Shedule("today");
+                                document.getElementById("switch1").style.opacity = "";
+                                document.getElementById("switch2").style.opacity = "";
+                                loader.style.opacity = "";
+                                setTimeout(function() { deleteCookie("inprogress_shedule"); loader.remove(); }, 500);
 					}, 600);
 				}, 600);
 			}, 600);
@@ -157,50 +154,88 @@ function LOAD_Professor_BASIC(lesson_num)
 			if (!getCookie("inprogress_basic"))
 				{
 					setCookie("inprogress_basic", "1");
-					var loader = CreateLoader(840,175);
 					var block = document.getElementById("ProfessorNow");
+                    var loader = CreateLoader(block);
 					block.className = "inline-block-main";
-					block.style.opacity = "0";
-					document.body.appendChild(loader);
-					setTimeout( function() {
-						loader.style.opacity = "1";
-						block.style.opacity = "1";
-						block.innerHTML = "";
-						setTimeout(function() {
-						NewXHR("/Dashboard/get_lesson_info","group_number=" + getCookie("group") + "&lesson_number=" + lesson_num, function(ResponseText) {
-                            if (ResponseText.check != false) {
-								var answer = JSON.parse(ResponseText);
-								var div_info = document.createElement("div");
-								div_info.id = "professor-info";
-								div_info.appendChild(CreateElem("div", "professor-name", null, null, answer.professor));
-								div_info.appendChild(CreateElem("div", "professor-department", null, null, answer.department));
-								var pdiv = CreateElem("div", "pdiv", null, null, null);
-								pdiv.appendChild(CreateElem("p", null, null, null, answer.lesson_name));
-								div_info.appendChild(CreateElem("div", "time", null, null, answer.time));
-								div_info.appendChild(pdiv);
-								div_info.appendChild(CreateElem("div", "classroom", null, null, "Аудитория " + answer.classroom));
-								var photo = CreateElem("div", "professor-photo", null, "LOAD_Professors(" + answer.professor_id + ")", null);
-								var img = document.createElement("img");
-								img.setAttribute("src", answer.photo_url);
-								photo.appendChild(img);
-								block.style.opacity = "0";
-								loader.style.opacity = "0";
-								setTimeout(function()
-										  {
-									block.appendChild(div_info);
-									block.appendChild(photo);
-									block.style.opacity = "";
-									setTimeout(function() { deleteCookie("inprogress_basic"); loader.remove(); }, 500);
-								}, 600);
-                            }
-                            else
-                                {
-                                    //exception handler
-                                    CreateEx("Обнаружена ошибка: " + ResponseText.status);
+                    if (professor_loader_start == null)
+					   document.body.appendChild(loader);
+                    setTimeout( function() {
+                        loader.style.opacity = "1";
+                        setTimeout( function() {
+                            block.innerHTML = "";
+                            setTimeout(function() {
+                            NewXHR("/Dashboard/get_lesson_info","group_number=" + getCookie("group") + "&lesson_number=" + lesson_num, function(ResponseText) {
+                                if (ResponseText.check != false) {
+                                    var answer = JSON.parse(ResponseText);
+                                    var div_info = document.createElement("div");
+                                    div_info.id = "professor-info";
+                                    var professor_list = "";
+                                    if (answer.multiple)
+                                        div_info.style.width = "100%";
+                                    if (answer.multiple)
+                                        for (var i=0; i< answer.professor.length; i++)
+                                            {
+                                                professor_list += '<a onclick="LOAD_Professors(' + answer.professor_id[i] + ')">' + answer.professor[i] + '</a>';
+                                                if (i + 1 != answer.professor.length)
+                                                    professor_list += ", ";
+                                            }
+                                    else
+                                        professor_list = answer.professor;
+                                    console.log(professor_list);
+                                    div_info.appendChild(CreateElem("div", "professor-name", null, null, professor_list));
+                                    div_info.appendChild(CreateElem("div", "professor-department", null, null, answer.department));
+                                    var pdiv = CreateElem("div", "pdiv", null, null, null);
+
+                                    var classroom_list = "";
+                                    if (answer.multiple)
+                                        for (var i=0; i< answer.classroom.length; i++)
+                                            {
+                                                classroom_list += answer.classroom[i];
+                                                if (i + 1 != answer.classroom.length)
+                                                    classroom_list += ", ";
+                                            }
+                                    else
+                                        {
+                                            if (answer.classroom)
+                                                classroom_list = answer.classroom;
+                                        }
+                                    console.log(classroom_list);
+                                    pdiv.appendChild(CreateElem("p", null, null, null, answer.lesson_name));
+                                    div_info.appendChild(CreateElem("div", "time", null, null, answer.time));
+                                    div_info.appendChild(pdiv);
+                                    div_info.appendChild(CreateElem("div", "classroom", null, null, "Аудитории: " +  classroom_list));
+                                    var photo = CreateElem("div", "professor-photo", null, "LOAD_Professors(" + answer.professor_id + ")", null);
+                                    
+                                    if (!answer.multiple)
+                                        {
+                                            var img = document.createElement("img");
+                                            img.setAttribute("src", answer.photo_url);
+                                            photo.appendChild(img);
+                                        }
+                                    setTimeout(function()
+                                              {
+                                        block.appendChild(div_info);
+                                        if (!answer.multiple)
+                                            block.appendChild(photo);
+                                        loader.style.opacity = "";
+                                        if (professor_loader_start == null)
+                                            setTimeout(function() { deleteCookie("inprogress_basic"); loader.remove(); }, 500);
+                                        else
+                                            {
+                                                professor_loader_start.style.opacity = "";
+                                                setTimeout(function() { deleteCookie("inprogress_basic"); professor_loader_start.remove(); professor_loader_start = null; }, 500);
+                                            }
+                                    }, 600);
                                 }
-						});
-						}, 600);
-					}, 600);
+                                else
+                                    {
+                                        //exception handler
+                                        CreateEx("Обнаружена ошибка: " + ResponseText.status);
+                                    }
+                            });
+                            }, 600);
+                        }, 600);
+					}, 500);
 				}
 		}
 }
@@ -241,14 +276,12 @@ Output:
 function LOAD_alerts(answer)
 {
     setCookie("inprogress_alerts", "1");
-	var loader = CreateLoader(160,335);
 	var block = document.getElementById("Alerts");
-	block.style.opacity = "0";
+    var loader = CreateLoader(block);
 	document.body.appendChild(loader);
+    loader.style.opacity = "1";
 	setTimeout( function() {
 		block.innerHTML = "";
-        loader.style.opacity = "1";
-        block.style.opacity = "1";
         setTimeout(function() {
 			var p_block = CreateElem("p", null, null, null, "Уведомления");
 			var temp_ul = CreateElem("ul");
@@ -261,13 +294,11 @@ function LOAD_alerts(answer)
 					i++;
 				}
 			setCookie("alerts", answer.md5);
-			block.style.opacity = "0";
-			loader.style.opacity = "0";
 			setTimeout(function()
 					  {
 				block.appendChild(p_block);
 				block.appendChild(temp_ul);
-				block.style.opacity = "";
+                loader.style.opacity = "";
 				setTimeout(function() { deleteCookie("inprogress_alerts"); loader.remove(); }, 500);
 			}, 600);
         }, 600);
@@ -340,6 +371,9 @@ Output:
 ***/
 function Dashboard_CHECK()
 {
+    professor_loader_start = CreateLoader(document.getElementById("ProfessorNow"));
+    document.body.appendChild(professor_loader_start);
+    professor_loader_start.style.opacity = "1";
 	deleteCookie("shedule");
 	deleteCookie("alerts");
 	deleteCookie("inprogress_alerts");
@@ -379,10 +413,8 @@ function LOAD_fullShedule()
 {
 	var body = document.body;
     body.style.opacity = "0";
-    var loader = CreateLoader(0,0);
+    var loader = CreateLoader(body, 1);
 	loader.style.opacity = "1";
-    loader.style.left = "calc( 50% - 10px )";
-    loader.style.top = "calc( 50% - 10px )";
     
 	setTimeout(function(){
 		ClearBody();
@@ -509,58 +541,61 @@ function LOAD_Professors(id)
 	deleteCookie("inprogress_professor");
 	CHECK_stop = true;
     body.style.opacity = "0";
-    var loader = CreateLoader(0,0);
-    loader.style.left = "calc( 50% - 10px )";
-    loader.style.top = "calc( 50% - 10px )";
+    var loader = CreateLoader(body, 1);
 	setTimeout(function () {
 		ClearBody();
-		body.appendChild(loader);
-		loader.style.opacity = "1";
-		
-		var div_button = CreateElem("div", "button-close", null, "Dashboard_Load()", null); //!!!!!!
-		var header = CreateElem("div", "header", null, null, "Информация о преподавателе"); //!!!!!!
-		var screen = CreateElem("div", "screen"); //!!!!!!
-		screen.style.overflowY = "hidden";
-		var div_left = CreateElem("div", "left-side");
-		var temp_ul = CreateElem("ul");
-		NewXHR("/Dashboard/get_list_professors", null, function (ResponseText){
-			if (ResponseText.check != false) {
-                var answer = JSON.parse(ResponseText);
-                var i =0;
-                while (answer[i] != null)
-                    {
-						var temp_li = CreateElem("li", null, null, null, answer[i].professor);
-						temp_li.setAttribute("number", answer[i].id);
-                        temp_ul.appendChild(temp_li);
-                        i++;
-                    }
-                var div_right = CreateElem("div", "right-side");
-				div_left.appendChild(temp_ul);
-				screen.appendChild(div_left);
-				screen.appendChild(div_right);
-                if ((id == undefined) || (id == null))
-                    id = answer[0].id;
-                setTimeout(function() {
-                    loader.style.opacity = "";
-                    loader.remove();
-                    body.appendChild(div_button);
-					body.appendChild(header);
-					body.appendChild(screen);
-                    body.style.opacity = "";
-                    LOAD_Professor(id);
-                    for (i = 0; i< document.getElementsByTagName("ul").length; i++)
+        body.style.opacity = "";
+		body.appendChild(loader);		
+        loader.style.opacity = "1";
+        setTimeout(function () {
+            var div_button = CreateElem("div", "button-close", null, "Dashboard_Load()", null); //!!!!!!
+            var header = CreateElem("div", "header", null, null, "Информация о преподавателе"); //!!!!!!
+            var screen = CreateElem("div", "screen"); //!!!!!!
+            screen.style.overflowY = "hidden";
+            var div_left = CreateElem("div", "left-side");
+            var temp_ul = CreateElem("ul");
+            NewXHR("/Dashboard/get_list_professors", null, function (ResponseText){
+                if (ResponseText.check != false) {
+                    var answer = JSON.parse(ResponseText);
+                    var i =0;
+                    while (answer[i] != null)
                         {
-                            document.getElementsByTagName("ul")[i].onclick = function(e) { if (e.target.getAttribute("number") != null) LOAD_Professor(e.target.getAttribute("number")); };
+                            var temp_li = CreateElem("li", null, null, null, answer[i].professor);
+                            temp_li.setAttribute("number", answer[i].id);
+                            temp_ul.appendChild(temp_li);
+                            i++;
                         }
-                    setTimeout( function () { body.style.opacity = "";}, 1000 );
-                },600);
-            }
-            else
-                {
-                    //exception handler
-                    CreateEx("Обнаружена ошибка: " + ResponseText.status);
+                    var div_right = CreateElem("div", "right-side");
+                    div_left.appendChild(temp_ul);
+                    screen.appendChild(div_left);
+                    screen.appendChild(div_right);
+                    if ((id == undefined) || (id == null))
+                        id = answer[0].id;
+                    setTimeout(function() {
+                        loader.style.opacity = "";
+                        body.style.opacity = "0";
+                        setTimeout(function () {
+                            loader.remove();
+                            body.appendChild(div_button);
+                            body.appendChild(header);
+                            body.appendChild(screen);
+                            body.style.opacity = "";
+                            LOAD_Professor(id);
+                            for (i = 0; i< document.getElementsByTagName("ul").length; i++)
+                                {
+                                    document.getElementsByTagName("ul")[i].onclick = function(e) { if (e.target.getAttribute("number") != null) LOAD_Professor(e.target.getAttribute("number")); };
+                                }
+                            setTimeout( function () { body.style.opacity = "";}, 1000 );
+                        },600);
+                    },600);
                 }
-		});
+                else
+                    {
+                        //exception handler
+                        CreateEx("Обнаружена ошибка: " + ResponseText.status);
+                    }
+            });
+	   }, 600);
 	}, 600);
 }
 
@@ -575,20 +610,21 @@ function LOAD_Professor(id)
 	if (!getCookie("inprogress_professor"))
 		{
 			setCookie("inprogress_professor", "1");
-			var loader = CreateLoader(0,0);
-			loader.style.left = "calc( 50% + 150px )";
-			loader.style.top = "calc( (100% - 40px) / 2)";
-			loader.style.opacity = "0";
 			var block = document.getElementById("right-side");
+            var loader = CreateLoader(block, 1);
+            loader.style.opacity = "0";
 			block.style.transition = "0.5s";
 			block.style.opacity = "0";
 			setTimeout(function () {
 				block.innerHTML = "";
-				document.body.appendChild(loader);
+                loader.style.top = "50px";
+                loader.style.backgroundColor = "transparent";
+				document.getElementById("screen").appendChild(loader);
 				loader.style.opacity = "1";
 				NewXHR("Dashboard/get_professor_state", "professor_id=" + id, function (ResponseText) {
                     if (ResponseText.check != false)
 					{
+                        setTimeout(function () {
 							var answer = JSON.parse(ResponseText);
 
 							var teacher_photo = CreateElem("div", "teacher-photo");
@@ -697,7 +733,8 @@ function LOAD_Professor(id)
 								CreateEx("Обнаружена ошибка: " + ResponseText.status);
 						   }
 							});
-                        }
+                        }, 600);
+                    }
                     else
                         {
                             //exception handler
@@ -719,10 +756,8 @@ function AuthLoad()
     CHECK_stop = true;
     var body = document.body;
     body.style.opacity = "0";
-    var loader = CreateLoader(0,0);
+    var loader = CreateLoader(body, 1);
 	loader.style.opacity = "1";
-    loader.style.left = "calc( 50% - 10px )";
-    loader.style.top = "calc( 50% - 10px )";
     deleteCookie("inprogress_Auth");
 	setTimeout(function(){
 		ClearBody();

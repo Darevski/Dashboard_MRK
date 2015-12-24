@@ -209,6 +209,15 @@ body {
     background-position: center center;
     background-size: 110px;
 }
+#professor-name a:hover {
+    color: #03a9f4;
+    transition: 0.25s;
+    cursor: pointer;
+}
+#professor-name a {
+    color: black;
+    transition: 0.25s;
+}
 #professor-name {
     line-height: 100px;
     height: 60px;
@@ -239,7 +248,7 @@ body {
     vertical-align: middle;
 }
 #classroom {
-    font-size: 1.8em;
+    font-size: 1.6em;
     font-style: italic;
     line-height: 80px;
     width: 320px;
@@ -611,7 +620,7 @@ body {
 }
 #AuthForm #AuthButton:hover {
     transition: .5s;
-    box-shadow: 0 0 30px rgba(0, 0, 0, .4);
+    box-shadow: 0 0 20px rgba(0, 0, 0, .4);
 }
 #AuthForm #AuthButton {
     line-height: 40px;
@@ -622,7 +631,7 @@ body {
     transition: .5s;
     text-align: center;
     background-color: #03a9f4;
-    box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+    box-shadow: 0 0 0 transparent;
 }
 #AuthForm #button-close {
     top: 10px;

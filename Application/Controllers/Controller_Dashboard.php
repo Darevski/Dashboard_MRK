@@ -110,7 +110,7 @@ class Controller_Dashboard extends Core\Controller
 
     /**
      * Вывод Json строки, содежащей список групп + их курс
-     * {integer group_number,integer grade}
+     * integer grade { integer group_number }
      *
      * @api
      */
@@ -128,13 +128,12 @@ class Controller_Dashboard extends Core\Controller
      *
      * integer lesson_number{
      * - string lesson_name,
-     * - string professor_id,
-     * - integer classroom,
+     * - string professor,
      * - bool true|false state : пара идет(следующая на очереди)/пары кончились } } }
      *
      * @api
      */
-    function action_actual_dashboard(){
+    function action_get_actual_dashboard(){
         $_POST['group_number']='32494';
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
@@ -158,7 +157,7 @@ class Controller_Dashboard extends Core\Controller
      * } } }
      * @api
      */
-    function action_week_dashboard(){
+    function action_get_week_dashboard(){
         $_POST['group_number']='32494';
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
@@ -167,4 +166,28 @@ class Controller_Dashboard extends Core\Controller
         }
     }
 
+    /**
+     * По ввведеным данным(номер группы, номер пары), выводит информацию о паре
+     *
+     * Входной параметр через integer POST['group_number'] & POST['lesson_number']
+     *
+     * Структура: {
+     * - classroom,
+     * - lesson_name,
+     * - department - кафдера преподавателя,
+     * - professor - фио преподавателя,
+     * - photo_url - url фото преподавателя,
+     * - time - время в которое идет пара}
+     * @api
+     */
+    function action_get_lesson_info(){
+        $_POST['group_number']=32494;
+        $_POST['lesson_number']=3;
+        if (isset($_POST['group_number']) & isset($_POST['lesson_number'])){
+            $number_group=$this->security_variable($_POST['group_number']);
+            $lesson_number=$this->security_variable($_POST['lesson_number']);
+            $result=$this->timetable_model->get_lesson_info_by($number_group,$lesson_number);
+            $this->view->output_json($result);
+        }
+    }
 }

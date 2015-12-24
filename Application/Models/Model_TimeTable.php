@@ -17,6 +17,35 @@ namespace Application\Models;
 class Model_TimeTable extends Model_Dashboard
 {
     /**
+     * По ввведеным данным(номер группы, номер пары), выводит информацию о паре
+     * @param integer $number_group
+     * @param integer $lesson_number
+     * Содердит
+     * - кабинет,
+     * - название пары,
+     * - кафедру,
+     * - ФИО преподаваеля,
+     * - url фото преподавателя,
+     * - время пары
+     */
+    function get_lesson_info_by($number_group,$lesson_number){
+        $today = date("w");
+        $numerator = $this->get_week_numerator();
+        $query = "SELECT * FROM groups,professors,departments_list WHERE groups.professor_id=professors.id AND
+        professors.department_id = departments_list.id AND group_number=?s AND day_number=?s AND lesson_number=?s
+        AND (numerator='all' or numerator=?s)";
+        $result_of_query = $this->database->getRow($query,$number_group,$today,$lesson_number,$numerator);
+        $result['classroom'] = $result_of_query['classroom'];
+        $result['lesson_name'] = $result_of_query['lesson_name'];
+        $result['department'] = $result_of_query['depart_name'];
+        $result['professor'] = $result_of_query['professor'];
+        $result['photo_url'] = $result_of_query['photo_url'];
+        $start_end_time=$this->lesson_begin_end_time($lesson_number);
+        $result['time']=date('G:i',strtotime($start_end_time['start_time'])).' - '.date('G:i',strtotime($start_end_time['end_time']));
+        return $result;
+    }
+
+    /**
      * Возвращает массив с уведомлениями для выбранной группы
      * состояние уведомления
      * Сортировка по дате, в начале новейшие
@@ -65,9 +94,13 @@ class Model_TimeTable extends Model_Dashboard
      * @return array номер группы + курс
      */
     function get_list_group(){
-        $result=$this->database->getALL("SELECT group_number,grade FROM groups_list");
+        $result_query=$this->database->getALL("SELECT group_number,grade FROM groups_list");
         //сортировка полученного списка в соответсвии с их номером по возрастанию
-        usort($result,array($this,'Groups_Sort_CallBack'));
+        usort($result_query,array($this,'Groups_Sort_CallBack'));
+        foreach ($result_query as $value){
+            $grade = $value['grade'];
+            $result[$grade][] = $value['group_number'];
+        }
         return $result;
     }
 
@@ -146,8 +179,7 @@ class Model_TimeTable extends Model_Dashboard
      * @param bool|false $isweek - при рассписании на неделю не отображает состояние пар и аудитории
      * @return mixed - массив приведенный к виду отображаемому в приложении
      *
-     * название пары,
-     * уникальный индентификатор преподавателя,
+     * название пары,ФИО преподавателя
      * аудитория,
      * состояние пары (идет сейчас пара/перемена(следующая пара становится активной) или пары кончились/прошли ).
      */
@@ -156,14 +188,13 @@ class Model_TimeTable extends Model_Dashboard
         for ($i=1;$i<=7;$i++)   // Всего 7 пар
             $result[$i]=null;
         $lesson_exist=false;
+        usort($dashboard,array($this,'lessons_number_sort_CallBack')); // сортировка ноперов пар по возрастанию
+        // проверка на то что пара сейчас идет
         foreach ($dashboard as $value) {
             $num = $value['lesson_number'];
             $result[$num]['lesson_name'] = $value['lesson_name'];
             $result[$num]['professor'] = $value['professor'];
-            $result[$num]['professor_id'] = $value['professor_id'];
-            
             if ($isweek == false) {         // если рассписание не на неделю, требуется состояние пар
-                $result[$num]['classroom'] = $value['classroom'];
                 //Определяет идет ли сейчас пара
                 $is_lesson_going = $this->is_lesson_going($num);
                 $result[$num]['state'] = $is_lesson_going;
@@ -172,12 +203,33 @@ class Model_TimeTable extends Model_Dashboard
                     $lesson_exist = true;
             }
         }
+        // проверка на время перед парами
+        if ($lesson_exist == false & $isweek == false & count($dashboard)>0){
+            $lesson_number = $dashboard[0]['lesson_number'];
+            $start_lesson_time = $this->lesson_begin_end_time($lesson_number);
+            if ($start_lesson_time['start_time']>=date("H:i:s")){
+                $result[$lesson_number]['state'] = true;
+                $lesson_exist = true;
+            }
+
+        }
+        // проверка на перемены перед парами
         if ($lesson_exist == false & $isweek == false)  // если пары на текуший момент времени не существует возможны 2 варианта
             foreach ($dashboard as $value){             // Пары на сегодня прошли || сейчас перемена
                 $num = $value['lesson_number'];
                 $result[$num]['state'] = $this->is_rest($num);
             }
         return $result;
+    }
+
+    /**
+     * Callback функция для сортировки пар по возрастанию
+     * @param array $a ячейка пары
+     * @param array $b ячейка пары
+     * @return int результат сравнения пар
+     */
+    private function lessons_number_sort_CallBack($a, $b) {
+        return ($a['lesson_number'] < $b['lesson_number']) ? -1 : 1;
     }
 
     /**

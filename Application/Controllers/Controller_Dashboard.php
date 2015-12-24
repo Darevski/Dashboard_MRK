@@ -38,6 +38,22 @@ class Controller_Dashboard extends Core\Controller
     }
 
     /**
+     * Выводит Json строку содержающую информацию о рассписании преподавателя на неделю
+     * Со следующей структурой
+     * even/uneven{
+     *  day{
+     *      lesson_num{
+     *          group_number
+     *          lesson_name
+     *      }
+     * }
+     */
+    function action_get_professor_timetable($professor_id=7){
+        $professor_timetable=$this->professor_model->get_professor_timetable($professor_id);
+        $this->view->output_json($professor_timetable);
+    }
+
+    /**
      * Получение списка преподавателей уникальный id,professor(ФИО),depart_name(кафедра)
      * вывод в виде json строки
      */

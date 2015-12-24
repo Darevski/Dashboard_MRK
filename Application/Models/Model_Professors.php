@@ -45,9 +45,14 @@ class Model_Professors extends Model_Dashboard
 
     /**
      * Возвращает рассписание преподавателя на неделю
-     * @param int $professor_id
+     * @param $professor_id
+     * @return array mixed
      */
-    function get_professor_timetable($professor_id){}
+    function get_professor_timetable($professor_id){
+        $result["even"] =$this->week_professor_parse($professor_id,'ch');
+        $result["uneven"] =$this->week_professor_parse($professor_id,'zn');
+        return $result;
+    }
 
     /**Поиск совпадений между парами преподавателя и текущей парой
      * При отсутствии совпадений вывод ближайшей на сегодня
@@ -112,4 +117,20 @@ class Model_Professors extends Model_Dashboard
         return $result;
     }
 
+    private function week_professor_parse($professor_id,$numerator){
+        $query = "SELECT * FROM groups WHERE professor_id=?s and (numerator = 'all' or numerator= ?s)";
+        $result_of_query=$this->database->getAll($query,$professor_id,$numerator);
+
+        for ($i=1;$i<=6;$i++)
+            $result[$i]=array();
+
+        foreach ($result_of_query as $value) {
+            $day = $value['day_number'];
+            $lesson_number = $value['lesson_number'];
+            $result[$day][$lesson_number]["lesson_name"] = $value["lesson_name"];
+            $result[$day][$lesson_number]["group_number"] = $value["group_number"];
+        }
+        return $result;
+
+    }
 }

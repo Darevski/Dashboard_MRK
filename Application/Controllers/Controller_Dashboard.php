@@ -25,8 +25,13 @@ class Controller_Dashboard extends Core\Controller
      */
     function action_get_list_group(){
         $list_group=$this->model->get_list_group();
-        $list_group=json_encode($list_group);
         $this->view->output_json($list_group);
+    }
+
+    /** Получение списка преподавателей уникальный id + фио + кафедра вывод в виде json строки */
+    function action_get_list_professors(){
+        $list_professors =$this->model->get_professors_list();
+        $this->view->output_json($list_professors);
     }
 
     /**
@@ -38,7 +43,6 @@ class Controller_Dashboard extends Core\Controller
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
             $dashboard = $this->model->get_actual_dashboard($group_number);
-            $dashboard = json_encode($dashboard,JSON_UNESCAPED_UNICODE);
             $this->view->output_json($dashboard);
         }
 
@@ -53,8 +57,8 @@ class Controller_Dashboard extends Core\Controller
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
             $dashboard = $this->model->get_week_timetable($group_number);
-            $dashboard = json_encode($dashboard,JSON_UNESCAPED_UNICODE);
             $this->view->output_json($dashboard);
         }
     }
+
 }

@@ -13,7 +13,8 @@ class Controller_Dashboard extends Core\Controller
 {
     function __construct(){
         $this->view = new Core\View();
-        $this->model = new Models\Model_Dashboard();
+        $this->professor_model = new Models\Model_Professors();
+        $this->timetable_model = new Models\Model_TimeTable();
     }
 
     function action_start()
@@ -21,23 +22,36 @@ class Controller_Dashboard extends Core\Controller
         $this->view->generate();
     }
 
-    function action_get_professor_state($id=7){
-        $result_professor = $this->model->get_professor_state($id);
+    /**
+     * Возвращает Json строку содержающую информацию о местонахождении преподавателя на текущее время
+     * name,department,lesson_num,
+     * state = now/next/false
+     * now - на текущий момент времени идет пара
+     * next - возвращена следующая пара
+     * false - пар на сегодня нету
+     * group_number, lesson_name, classroom
+     * @param int $professor_id - уникальный номер преподавателя
+     */
+    function action_get_professor_state($professor_id=7){
+        $result_professor = $this->professor_model->get_professor_state($professor_id);
         $this->view->output_json($result_professor);
+    }
+
+    /**
+     * Получение списка преподавателей уникальный id,professor(ФИО),depart_name(кафедра)
+     * вывод в виде json строки
+     */
+    function action_get_list_professors(){
+        $list_professors =$this->professor_model->get_professors_list();
+        $this->view->output_json($list_professors);
     }
 
     /**
      * Получение списка всех групп (курса группы) и вывод в виде json строки
      */
     function action_get_list_group(){
-        $list_group=$this->model->get_list_group();
+        $list_group=$this->timetable_model->get_list_group();
         $this->view->output_json($list_group);
-    }
-
-    /** Получение списка преподавателей уникальный id + фио + кафедра вывод в виде json строки */
-    function action_get_list_professors(){
-        $list_professors =$this->model->get_professors_list();
-        $this->view->output_json($list_professors);
     }
 
     /**
@@ -48,10 +62,9 @@ class Controller_Dashboard extends Core\Controller
         $_POST['group_number']='32494';
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
-            $dashboard = $this->model->get_actual_dashboard($group_number);
+            $dashboard = $this->timetable_model->get_actual_dashboard($group_number);
             $this->view->output_json($dashboard);
         }
-
     }
 
     /**
@@ -62,7 +75,7 @@ class Controller_Dashboard extends Core\Controller
         $_POST['group_number']='32494';
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
-            $dashboard = $this->model->get_week_timetable($group_number);
+            $dashboard = $this->timetable_model->get_week_timetable($group_number);
             $this->view->output_json($dashboard);
         }
     }

@@ -37,10 +37,13 @@ class View
     }
 
     /**
-     * Вывод Json данных на страницу
+     * Вывод Json данных на страницу + добавление md5 json строки
      * @param array $value
      */
     function output_json($value){
+        $json=json_encode($value,JSON_UNESCAPED_UNICODE );
+        $md5 = md5($json);
+        $value['md5']=$md5;
         $json=json_encode($value,JSON_UNESCAPED_UNICODE );
         echo $json;
     }

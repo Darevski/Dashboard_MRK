@@ -29,7 +29,7 @@ class Model_TimeTable extends Model_Dashboard
      * - время пары
      */
     function get_lesson_info_by($number_group,$lesson_number){
-        $today = date("w");
+        $today = $this->get_day()['today'];
         $numerator = $this->get_week_numerator();
         $query = "SELECT * FROM groups,professors,departments_list WHERE groups.professor_id=professors.id AND
         professors.department_id = departments_list.id AND group_number=?s AND day_number=?s AND lesson_number=?s
@@ -38,6 +38,7 @@ class Model_TimeTable extends Model_Dashboard
         $result['classroom'] = $result_of_query['classroom'];
         $result['lesson_name'] = $result_of_query['lesson_name'];
         $result['department'] = $result_of_query['depart_name'];
+        $result['professor_id']=$result_of_query['professor_id'];
         $result['professor'] = $result_of_query['professor'];
         $result['photo_url'] = $result_of_query['photo_url'];
         $start_end_time=$this->lesson_begin_end_time($lesson_number);
@@ -109,6 +110,7 @@ class Model_TimeTable extends Model_Dashboard
      * @param int $group_number номер группы
      * @return mixed -
      * сегодня,завтра {
+     *  название дня недели,
      *  номер пары {
      *      название пары,
      *      имя преподавателя,
@@ -118,25 +120,26 @@ class Model_TimeTable extends Model_Dashboard
      * }
      */
     function get_actual_dashboard($group_number){
-        $day= date('w'); //получение номера дня в неделе
         $numerator = $this->get_week_numerator(); // получение значения нумератора для текущей недели
 
         $query = "SELECT * FROM groups,professors WHERE groups.professor_id=professors.id AND group_number=?s AND day_number=?s AND (numerator=?s or numerator='all')";
 
-        if ($day ==0)
-            $day=6;
+        //Получение дней на сегодня и завтра
+        $day=$this->get_day();
+        $today = $day['today'];
+        $tomorrow = $day['tomorrow'];
 
-        $result_today=$this->database->getAll($query,$group_number,$day,$numerator);
-
-        if ($day==6 || $day == 0)
-            $day=1;
-        else
-            $day++;
-
-        $result_tomorrow = $this->database->getAll($query,$group_number,$day,$numerator);
-
+        $result_today=$this->database->getAll($query,$group_number,$today,$numerator);
         $result['today']=$this->parse_timetable($result_today);
+
+        $result['today']['day_name'] = $this->get_name_day($today); // Получение названия дня
+
+        $result_tomorrow = $this->database->getAll($query,$group_number,$tomorrow,$numerator);
+
         $result['tomorrow']=$this->parse_timetable($result_tomorrow);
+
+        $result['tomorrow']['day_name'] = $this->get_name_day($tomorrow); // Получение названия дня
+
         return $result;
     }
 

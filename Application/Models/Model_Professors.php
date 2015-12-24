@@ -28,14 +28,21 @@ class Model_Professors extends Model_Dashboard
      * group_number, lesson_name, classroom,start_time,end_time
      */
     function get_professor_state($professor_id){
-        $lesson_number = $this->get_lesson_number_by_time(date("H:i:s")); // определяет какая по счету идет пара/ пар нету
-        if ($lesson_number === false)
-            $result["state"] = "false";
+        $day = $this->get_day()['today'];
+        // Если сегодня воскресенье
+        if ($day == false){
+            $result['weekend']='true';
+        }
         else{
-            $result = $this->find_professor_day_conformity_with_lesson_number($professor_id,$lesson_number);
-            $start_end_time= $this->lesson_begin_end_time($lesson_number);
-            $result['start_time']=$start_end_time['start_time'];
-            $result['end_time']=$start_end_time['end_time'];
+            $lesson_number = $this->get_lesson_number_by_time(date("H:i:s")); // определяет какая по счету идет пара/ пар нету
+            if ($lesson_number === false)
+                $result["state"] = "false";
+            else{
+                $result = $this->find_professor_day_conformity_with_lesson_number($professor_id,$lesson_number,$day);
+                $start_end_time= $this->lesson_begin_end_time($lesson_number);
+                $result['start_time']=$start_end_time['start_time'];
+                $result['end_time']=$start_end_time['end_time'];
+            }
         }
 
         $prof_info=$this->get_professor_info($professor_id);
@@ -43,8 +50,6 @@ class Model_Professors extends Model_Dashboard
         $result['photo_url']=$prof_info['photo_url'];
         $result['department']=$prof_info['depart_name'];
         $result['name']=$prof_info['professor'];
-
-
 
         return $result;
     }
@@ -75,11 +80,10 @@ class Model_Professors extends Model_Dashboard
      * при отсутсвиии пар у преподавателя - false
      * @param integer $professor_id
      * @param integer $lesson_number
+     * @param integer $day день недели
      * @return array
      */
-    private function find_professor_day_conformity_with_lesson_number($professor_id,$lesson_number){
-
-        $day = date("w");
+    private function find_professor_day_conformity_with_lesson_number($professor_id,$lesson_number,$day){
         $week_numerator = $this->get_week_numerator();
 
         $min_dif = 7; // минимальная разница между следующей и текущей парой

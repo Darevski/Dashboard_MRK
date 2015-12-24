@@ -11,7 +11,80 @@ use Application\Core;
 
 class Model_Dashboard extends Core\Model
 {
-    /** Возвращает список преподавателей уникальный id + фио + кафедра вывод в виде json строки */
+    /**
+     * Возвращает информацию о выбранном преподавателе
+     */
+    function get_professor_state($professor_id){
+        $lesson_number = $this->get_lesson_number_by_time(date("G:i:s"));
+        $day = date("w");
+        $week_numerator = $this->get_week_numerator();
+
+        $prof_info = $this->get_professor_info($professor_id);
+        $result['name'] = $prof_info["professor"];
+        $result['department'] = $prof_info["depart_name"];
+        if ($lesson_number == false){
+            $result["state"] = "false";
+            return $result["state"];
+        }
+        else {
+            $min_dif = 7;
+
+            $query = "SELECT group_number, lesson_number,lesson_name,classroom FROM groups WHERE
+                  professor_id=?s and day_number=?s and (numerator='all' or numerator =?s)";
+            $result_of_query = $this->database->getAll($query, $professor_id, $day, $week_numerator);
+
+            foreach ($result_of_query as $value){
+                if ($value["lesson_number"] == $lesson_number) {
+
+                    $result["lesson_num"] = $lesson_number;
+
+                    if ($this->is_rest($lesson_number) == true)
+                        $result["state"] = "next";
+                    else
+                        $result["state"] = "now";
+                    $result["group_number"] = $value["group_number"];
+                    $result["lesson_name"] = $value["lesson_name"];
+                    $result["classroom"] = $value["classroom"];
+                    return $result;
+                }
+                $difference_between_lessons_number = $value["lesson_number"] - $lesson_number;
+                if ($difference_between_lessons_number > 0 & $min_dif > $difference_between_lessons_number){
+                    $min_dif = $difference_between_lessons_number;
+                    $result["lesson_num"] = $value["lesson_number"];
+                    $result["state"] = "next";
+                    $result["group_number"] = $value["group_number"];
+                    $result["lesson_name"] = $value["lesson_name"];
+                    $result["classroom"] = $value["classroom"];
+                }
+            }
+            if ($difference_between_lessons_number == 7){
+                $result["state"] = "false";
+                return $result["state"];
+            }
+            else
+                return $result;
+
+        }
+
+    }
+
+    /**
+     * Возвращает рассписание преподавателя на неделю
+     */
+    function get_professor_timetable($professor_id){
+
+    }
+
+    /**
+     * Возвращает информацию об указанном преподавателе ФИО + кафедра
+     */
+    private function get_professor_info($professor_id){
+        $query = "SELECT prof.professor,list.depart_name FROM professors as prof,departments_list as list WHERE prof.department_id = list.id and prof.id=?s";
+        $result=$this->database->getRow($query,$professor_id);
+        return $result;
+    }
+
+    /** Возвращает список преподавателей уникальный id + фио + кафедра */
     function get_professors_list(){
         $query = "SELECT prof.id,prof.professor,list.depart_name FROM professors as prof,departments_list as list WHERE prof.department_id = list.id";
         $result=$this->database->getALL($query);
@@ -164,7 +237,7 @@ class Model_Dashboard extends Core\Model
             $result[$num]['lesson_name'] = $value['lesson_name'];
             $result[$num]['professor'] = $value['professor'];
 
-            if ($isweek == false) {         // если рассписание не на неделю требуется состояние пар
+            if ($isweek == false) {         // если рассписание не на неделю, требуется состояние пар
                 $result[$num]['classroom'] = $value['classroom'];
                 //Определяет идет ли сейчас пара
                 $is_lesson_going = $this->is_lesson_going($num);
@@ -174,8 +247,8 @@ class Model_Dashboard extends Core\Model
                     $lesson_exist = true;
             }
         }
-        if ($lesson_exist == false & $isweek == false)                // если пары на текуший момент времени не существует
-            foreach ($dashboard as $value){        // Пары на сегодня прошли || сейчас перемена
+        if ($lesson_exist == false & $isweek == false)  // если пары на текуший момент времени не существует возможны 2 варианта
+            foreach ($dashboard as $value){             // Пары на сегодня прошли || сейчас перемена
                 $num = $value['lesson_number'];
                 $result[$num]['state'] = $this->is_rest($num);
             }
@@ -190,28 +263,29 @@ class Model_Dashboard extends Core\Model
      */
     private function is_lesson_going($lesson_number){
         $result=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number);
-        $end_of_lesson=$result['end'];
-        $start_of_lesson = $result['start'];
+        $end_of_lesson=$result['end_time'];
+        $start_of_lesson = $result['start_time'];
         $now_time = date("G:i:s");
         if ($end_of_lesson>=$now_time & $start_of_lesson<=$now_time)
             return true;
         else
             return false;
     }
+
     /**
-     * Определяет сейчас перемена
-     * @param $lesson_number - номер пары
+     * Определяет идет ли переменна перед выбранной парой.
+     * @param $lesson_number - номер следующей пары
      * @return bool true - сейчас перемена
      *              false - пара идет/ пары закончились
      */
     private function is_rest($lesson_number){
         $time_of_lesson=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number);
-        $start_of_lesson = $time_of_lesson['start'];
+        $start_of_lesson = $time_of_lesson['start_time'];
         $now_time = date("G:i:s");
-        if ($lesson_number == 0 & $start_of_lesson >= $now_time)
+        if ($lesson_number == 0 & $start_of_lesson >= $now_time) // время перед 1 парой считаем как перемену
             return true;
         $previous_time_of_lesson=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number-1);
-        $end_of_previous_lesson = $previous_time_of_lesson['end'];
+        $end_of_previous_lesson = $previous_time_of_lesson['end_time'];
         if ($start_of_lesson >= $now_time & $now_time>=$end_of_previous_lesson)
             return true;
         else
@@ -231,4 +305,28 @@ class Model_Dashboard extends Core\Model
         return $result;
     }
 
+    /**
+     * Возвращает номер пары по указанному времени
+     * @param $time - Gis
+     * @return mixed  - int номер текущей или следующей пары(перемена)
+     *                - bool false - пар нету
+     */
+    private function get_lesson_number_by_time($time){
+        $query = "SELECT num_lesson FROM timetable WHERE start_time <= ?s and end_time >= ?s";
+        $result =  $this->database->getCol($query,$time,$time);
+
+        if (count($result) > 0)     // Если сейчас идет какая-то пара то возвращаем ее номер
+            return $result[0];
+        else{                       //Возможно идет перемена или пар нету
+            $result = $this->database->getAll("SELECT * FROM timetable");
+            for ($i = 0; $i<6;$i++) {
+                if ($i = 0 & $result[$i]["start_time"] >= $time)  // считаем время перед первой парой переменой
+                    return $result[$i]["num_lesson"];
+                if ($result[$i]["end_time"] <= $time & $result[$i+1]["start_time"] >= $time)
+                    return $result[$i+1]["num_lesson"];
+            }
+            return false;           // Пар на сегодня нету
+        }
+
+    }
 }

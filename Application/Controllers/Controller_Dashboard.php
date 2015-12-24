@@ -15,9 +15,15 @@ class Controller_Dashboard extends Core\Controller
         $this->view = new Core\View();
         $this->model = new Models\Model_Dashboard();
     }
+
     function action_start()
     {
         $this->view->generate();
+    }
+
+    function action_get_professor_state($id=7){
+        $result_professor = $this->model->get_professor_state($id);
+        $this->view->output_json($result_professor);
     }
 
     /**

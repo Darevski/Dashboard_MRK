@@ -22,6 +22,36 @@ use Application\Core;
 class Model_Dashboard extends Core\Model
 {
     /**
+     * Возвращает название дня по его номеру
+     * @param int $day
+     * @return string
+     */
+    protected function get_name_day($day){
+        $day_name = array("Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота");
+        return $day_name[$day];
+    }
+
+    /**
+     * Возвращает день недели на сегодня/завтра
+     * Если день 6 (суббота) - возвращается 1(понедельник) для следующего дня и 6 для сегодняшнего
+     * Если воскресенье - возврашается 1(понедельник) для текущего дня и 2 (вторник) для следующего
+     *
+     * @return mixed $date [today,tomorrow]
+     */
+    protected  function get_day(){
+        $day = (int)date('w');
+        $date['today']=$day;
+        if ($day == 0){
+            $date['today']=1;
+            $date['tomorrow']=2;
+        }
+        else if ($day == 6)
+            $date['tomorrow']=1;
+        else
+            $date['tomorrow']=$day+1;
+        return $date;
+    }
+    /**
      * Определяет идет пара или нет
      * @param integer $lesson_number номер пары
      * @return bool true - пара сейчас идет
@@ -48,8 +78,6 @@ class Model_Dashboard extends Core\Model
         $time_of_lesson=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number);
         $start_of_lesson = $time_of_lesson['start_time'];
         $now_time = date("H:i:s");
-        if ($lesson_number == 0 & $start_of_lesson >= $now_time) // время перед 1 парой считаем как перемену
-            return true;
         $previous_time_of_lesson=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number-1);
         $end_of_previous_lesson = $previous_time_of_lesson['end_time'];
         if ($start_of_lesson >= $now_time & $now_time>=$end_of_previous_lesson)

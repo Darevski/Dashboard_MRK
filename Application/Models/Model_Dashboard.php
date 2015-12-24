@@ -48,8 +48,6 @@ class Model_Dashboard extends Core\Model
         $time_of_lesson=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number);
         $start_of_lesson = $time_of_lesson['start_time'];
         $now_time = date("H:i:s");
-        if ($lesson_number == 0 & $start_of_lesson >= $now_time) // время перед 1 парой считаем как перемену
-            return true;
         $previous_time_of_lesson=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number-1);
         $end_of_previous_lesson = $previous_time_of_lesson['end_time'];
         if ($start_of_lesson >= $now_time & $now_time>=$end_of_previous_lesson)

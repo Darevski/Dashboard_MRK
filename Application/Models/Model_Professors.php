@@ -4,22 +4,27 @@
  * User: darevski
  * Date: 26.11.15
  * Time: 17:57
+ * @author Darevski
  */
 
 namespace Application\Models;
 
-
+/**
+ * Класс логики связанный с отображением информации о преподавателях, их рассписание, и т.д.
+ * Class Model_Professors
+ * @package Application\Models
+ */
 class Model_Professors extends Model_Dashboard
 {
     /**
      * Возвращает массив с набором данных о текущем местоположении/статусе преподавателя
-     * @param int $professor_id - уникальный номер преподавателя
-     * @return array mixed
-     * name,department,lesson_num,
-     * state = now/next/false
-     * now - на текущий момент времени идет пара
-     * next - возвращена следующая пара
-     * false - пар на сегодня нету
+     * @param integer $professor_id уникальный номер преподавателя
+     * @return array
+     * name, department, lesson_num, state = now/next/false
+     * - now на текущий момент времени идет пара
+     * - next возвращена следующая пара
+     * - false пар на сегодня нету
+     *
      * group_number, lesson_name, classroom
      */
     function get_professor_state($professor_id){
@@ -35,7 +40,7 @@ class Model_Professors extends Model_Dashboard
     }
 
     /** Получение списка преподавателей
-     * @return mixed уникальный id,professor(ФИО),depart_name(кафедра)
+     * @return array уникальный id,professor(ФИО),depart_name(кафедра)
      */
     function get_professors_list(){
         $query = "SELECT prof.id,prof.professor,list.depart_name FROM professors as prof,departments_list as list WHERE prof.department_id = list.id";
@@ -45,8 +50,8 @@ class Model_Professors extends Model_Dashboard
 
     /**
      * Возвращает рассписание преподавателя на неделю
-     * @param $professor_id
-     * @return array mixed
+     * @param integer $professor_id уникальный индентификатор преподавателя
+     * @return array even/uneven { day { lesson_num { group_number,lesson_name } }
      */
     function get_professor_timetable($professor_id){
         $result["even"] =$this->week_professor_parse($professor_id,'ch');
@@ -54,12 +59,13 @@ class Model_Professors extends Model_Dashboard
         return $result;
     }
 
-    /**Поиск совпадений между парами преподавателя и текущей парой
-     * При отсутствии совпадений вывод ближайшей на сегодня
+    /**
+     * Поиск совпадений между парами преподавателя и текущей парой
+     * При отсутствии совпадений вывод ближайшей пары преподавателя, которую он ведет сегодня
      * при отсутсвиии пар у преподавателя - false
-     * @param $professor_id
-     * @param $lesson_number
-     * @return array mixed
+     * @param integer $professor_id
+     * @param integer $lesson_number
+     * @return array
      */
     private function find_professor_day_conformity_with_lesson_number($professor_id,$lesson_number){
 
@@ -108,7 +114,7 @@ class Model_Professors extends Model_Dashboard
 
     /**
      * Возвращает информацию об указанном преподавателе
-     * @param $professor_id - уникальный индефикатор преподавателя
+     * @param integer $professor_id - уникальный индефикатор преподавателя
      * @return array [professor] [depart_name]
      */
     private function get_professor_info($professor_id){
@@ -117,6 +123,12 @@ class Model_Professors extends Model_Dashboard
         return $result;
     }
 
+    /**
+     * Создание рассписания преподавателя на неделю с учетом нумератора недели
+     * @param integer $professor_id
+     * @param string $numerator
+     * @return array
+     */
     private function week_professor_parse($professor_id,$numerator){
         $query = "SELECT * FROM groups WHERE professor_id=?s and (numerator = 'all' or numerator= ?s)";
         $result_of_query=$this->database->getAll($query,$professor_id,$numerator);

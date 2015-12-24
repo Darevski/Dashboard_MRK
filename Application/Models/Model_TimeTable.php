@@ -4,18 +4,24 @@
  * User: darevski
  * Date: 27.11.15
  * Time: 1:10
+ * @author Darevski
  */
 
 namespace Application\Models;
 
-
+/**
+ * Класс логики связанный с отображением рассписания, уведомлений и т.д. занятий выбранных групп
+ * Class Model_TimeTable
+ * @package Application\Models
+ */
 class Model_TimeTable extends Model_Dashboard
 {
     /**
      * Возвращает массив с уведомлениями для выбранной группы
-     * состояние уведомления (critical / warning ...){
-     *  first_text,second_text....
-     * }
+     * состояние уведомления
+     *
+     * @param integer $number_group
+     * @return array {string 'state' critical|warning|info , string text}
      */
     function get_notification_for_group($number_group){
         $query = "SELECT * FROM notification WHERE group_number=?s or group_number=0";
@@ -26,30 +32,32 @@ class Model_TimeTable extends Model_Dashboard
         }
         return $result;
     }
+
     /**
      * Возвращает рассписание на 2 недели (числитель + знаменатель + all)
-     * @param $group_number
-     * @return mixed
-     * числитель,знаменатель{
-     *  дни недели{
-     *      номер пары{
-     *          название пары
-     *          имя преподавателя
-     *      }
-     *  }
-     * }
+     * Возвращаемая структура {string 'even'/'uneven' {
+     *
+     * @param integer $number_group
+     * @return array
+     * integer day {
+     *
+     * integer lesson_number | null {
+     * - string lesson_name
+     * - string professor_name
+     * } } }
+     *
      */
-    function get_week_timetable($group_number)
+    function get_week_timetable($number_group)
     {
-        $timetable['even']=$this->week_timetable($group_number,'ch');
-        $timetable['uneven']=$this->week_timetable($group_number,'zn');
+        $timetable['even']=$this->week_timetable($number_group,'ch');
+        $timetable['uneven']=$this->week_timetable($number_group,'zn');
         return $timetable;
     }
 
     /**
      * Получает список всех групп (курс группы).
      * Сортирует его согласно номеру групп по возрастанию
-     * @return array с номер группы и курсом
+     * @return array номер группы + курс
      */
     function get_list_group(){
         $result=$this->database->getALL("SELECT group_number,grade FROM groups_list");
@@ -62,17 +70,16 @@ class Model_TimeTable extends Model_Dashboard
      * возвращает рассписание на сегодня и на след учебный день
      * @param int $group_number номер группы
      * @return mixed -
-     * сегодня,завтра{
-     *  номер пары{
-     *      название пары
-     *      имя преподавателя
-     *      аудитория
+     * сегодня,завтра {
+     *  номер пары {
+     *      название пары,
+     *      имя преподавателя,
+     *      аудитория,
      *      состояние пары
      *  }
      * }
      */
     function get_actual_dashboard($group_number){
-
         $day= date('w'); //получение номера дня в неделе
         $numerator = $this->get_week_numerator(); // получение значения нумератора для текущей недели
 
@@ -130,6 +137,7 @@ class Model_TimeTable extends Model_Dashboard
     /**
      * Поиск максимальной и минимальной пары на неделе
      * @param array $week - массив рассписания занятий на неделюы
+     * @result array max,min максимальная и минимальная пара на неделе
      */
     private function week_max_min($week)
     {
@@ -152,9 +160,10 @@ class Model_TimeTable extends Model_Dashboard
      * полученный из базы данных
      * @param bool|false $isweek - при рассписании на неделю не отображает состояние пар и аудитории
      * @return mixed - массив приведенный к виду отображаемому в приложении
-     * название пары
-     * имя преподавателя
-     * аудитория
+     *
+     * название пары,
+     * имя преподавателя,
+     * аудитория,
      * состояние пары (идет сейчас пара/перемена(следующая пара становится активной) или пары кончились/прошли ).
      */
     private function parse_timetable($dashboard,$isweek = false){
@@ -187,6 +196,9 @@ class Model_TimeTable extends Model_Dashboard
 
     /**
      * Callback функция для сортировки списка групп по их номеру
+     * @param array $a ячейка группы
+     * @param array $b ячейка группы
+     * @return int результат сравнения номера группы
      */
     private function Groups_Sort_CallBack($a, $b) {
         if ($a['group_number'] == $b['group_number']) {

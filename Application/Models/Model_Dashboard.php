@@ -4,17 +4,26 @@
  * User: darevski
  * Date: 22.09.15
  * Time: 14:29
+ * @author Darevski
  */
 
 namespace Application\Models;
 use Application\Core;
 
+/**
+ * Класс связанный с базовым функционалом рассписанием
+ *
+ * Class Model_Dashboard
+ * @package Application\Models
+ * @see Application\Models\Model_Professors 1 наследник Model_Professors
+ * @see Application\Models\Model_Timetable 2 наследник Model_Timetable
+ *
+ */
 class Model_Dashboard extends Core\Model
 {
-
     /**
      * Определяет идет пара или нет
-     * @param $lesson_number - номер пары
+     * @param integer $lesson_number номер пары
      * @return bool true - пара сейчас идет
      *              false - пара не идет (прошла/будет)
      */
@@ -31,7 +40,7 @@ class Model_Dashboard extends Core\Model
 
     /**
      * Определяет идет ли переменна перед выбранной парой.
-     * @param $lesson_number - номер следующей пары
+     * @param integer $lesson_number номер пары
      * @return bool true - сейчас перемена
      *              false - пара идет/ пары закончились
      */
@@ -64,9 +73,8 @@ class Model_Dashboard extends Core\Model
 
     /**
      * Возвращает номер пары по указанному времени
-     * @param $time - Gis
-     * @return mixed  - int номер текущей или следующей пары(перемена)
-     *                - bool false - пар нету
+     * @param string $time - Gis
+     * @return mixed integer | bool номер текущей или следующей пары(перемена) | false - пар нету
      */
     protected function get_lesson_number_by_time($time){
         $query = "SELECT num_lesson FROM timetable WHERE start_time <= ?s and end_time >= ?s";

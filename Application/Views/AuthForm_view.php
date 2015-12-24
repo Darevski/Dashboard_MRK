@@ -4,6 +4,7 @@
  * User: darevski
  * Date: 24.10.15
  * Time: 19:59
+ * @author Darevski
  */
 ?>
 <form id="login-form" action="/Auth/Enter" class="icon-user" method="post" onsubmit="return false;">

@@ -75,4 +75,14 @@ class Controller {
         else
             return false;
     }
+
+    /**
+     * Выводит json строку со временем на сервере
+     * string now_time
+     */
+    public function action_get_time(){
+        $date['now_time'] = date("H:i");
+        $this->view->output_json($date);
+    }
+
 }

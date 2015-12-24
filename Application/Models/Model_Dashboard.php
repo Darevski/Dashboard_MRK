@@ -22,6 +22,36 @@ use Application\Core;
 class Model_Dashboard extends Core\Model
 {
     /**
+     * Возвращает название дня по его номеру
+     * @param int $day
+     * @return string
+     */
+    protected function get_name_day($day){
+        $day_name = array("Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота");
+        return $day_name[$day];
+    }
+
+    /**
+     * Возвращает день недели на сегодня/завтра
+     * Если день 6 (суббота) - возвращается 1(понедельник) для следующего дня и 6 для сегодняшнего
+     * Если воскресенье - возврашается 1(понедельник) для текущего дня и 2 (вторник) для следующего
+     *
+     * @return mixed $date [today,tomorrow]
+     */
+    protected  function get_day(){
+        $day = (int)date('w');
+        $date['today']=$day;
+        if ($day == 0){
+            $date['today']=1;
+            $date['tomorrow']=2;
+        }
+        else if ($day == 6)
+            $date['tomorrow']=1;
+        else
+            $date['tomorrow']=$day+1;
+        return $date;
+    }
+    /**
      * Определяет идет пара или нет
      * @param integer $lesson_number номер пары
      * @return bool true - пара сейчас идет

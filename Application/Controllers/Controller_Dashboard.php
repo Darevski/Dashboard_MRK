@@ -45,7 +45,7 @@ class Controller_Dashboard extends Core\Controller
      * @api
      */
     function action_get_notifications_by_group(){
-        $_POST['group_number']=32494;
+        //$_POST['group_number']=32494;
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
             $notification = $this->timetable_model->get_notification_for_group($group_number);
@@ -69,7 +69,7 @@ class Controller_Dashboard extends Core\Controller
      * @api
      */
     function action_get_professor_state(){
-       $_POST['professor_id']=7;
+      // $_POST['professor_id']=7;
         if (isset($_POST['professor_id'])) {
             $professor_id=$this->security_variable($_POST['professor_id']);
             $result_professor = $this->professor_model->get_professor_state($professor_id);
@@ -88,7 +88,7 @@ class Controller_Dashboard extends Core\Controller
      * @api
      */
     function action_get_professor_timetable(){
-        $_POST['professor_id']=7;
+        //$_POST['professor_id']=7;
         if (isset($_POST['professor_id'])) {
             $professor_id = $this->security_variable($_POST['professor_id']);
             $professor_timetable = $this->professor_model->get_professor_timetable($professor_id);
@@ -125,7 +125,7 @@ class Controller_Dashboard extends Core\Controller
      * Входной параметр через integer POST['group_number']
      *
      * Структура: {string today/tomorrow {
-     *
+     * string day_name,
      * integer lesson_number{
      * - string lesson_name,
      * - string professor,
@@ -134,7 +134,7 @@ class Controller_Dashboard extends Core\Controller
      * @api
      */
     function action_get_actual_dashboard(){
-        $_POST['group_number']='32494';
+        //$_POST['group_number']='32494';
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
             $dashboard = $this->timetable_model->get_actual_dashboard($group_number);
@@ -158,7 +158,7 @@ class Controller_Dashboard extends Core\Controller
      * @api
      */
     function action_get_week_dashboard(){
-        $_POST['group_number']='32494';
+        //$_POST['group_number']='32494';
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
             $dashboard = $this->timetable_model->get_week_timetable($group_number);
@@ -181,8 +181,8 @@ class Controller_Dashboard extends Core\Controller
      * @api
      */
     function action_get_lesson_info(){
-        $_POST['group_number']=32494;
-        $_POST['lesson_number']=3;
+        //$_POST['group_number']=32494;
+        //$_POST['lesson_number']=5;
         if (isset($_POST['group_number']) & isset($_POST['lesson_number'])){
             $number_group=$this->security_variable($_POST['group_number']);
             $lesson_number=$this->security_variable($_POST['lesson_number']);

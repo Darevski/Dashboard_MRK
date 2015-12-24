@@ -20,22 +20,32 @@ class Model_Professors extends Model_Dashboard
      * Возвращает массив с набором данных о текущем местоположении/статусе преподавателя
      * @param integer $professor_id уникальный номер преподавателя
      * @return array
-     * name, department, lesson_num, state = now/next/false
+     * name,photo_url, department, lesson_num, state = now/next/false
      * - now на текущий момент времени идет пара
      * - next возвращена следующая пара
      * - false пар на сегодня нету
      *
-     * group_number, lesson_name, classroom
+     * group_number, lesson_name, classroom,start_time,end_time
      */
     function get_professor_state($professor_id){
-        $lesson_number = $this->get_lesson_number_by_time(date("G:i:s")); // определяет какая по счету идет пара/ пар нету
-        $prof_info = $this->get_professor_info($professor_id);
+        $lesson_number = $this->get_lesson_number_by_time(date("H:i:s")); // определяет какая по счету идет пара/ пар нету
         if ($lesson_number === false)
             $result["state"] = "false";
-        else
+        else{
             $result = $this->find_professor_day_conformity_with_lesson_number($professor_id,$lesson_number);
-        $result['name'] = $prof_info["professor"];
-        $result['department'] = $prof_info["depart_name"];
+            $start_end_time= $this->lesson_begin_end_time($lesson_number);
+            $result['start_time']=$start_end_time['start_time'];
+            $result['end_time']=$start_end_time['end_time'];
+        }
+
+        $prof_info=$this->get_professor_info($professor_id);
+
+        $result['photo_url']=$prof_info['photo_url'];
+        $result['department']=$prof_info['depart_name'];
+        $result['name']=$prof_info['professor'];
+
+
+
         return $result;
     }
 
@@ -115,10 +125,10 @@ class Model_Professors extends Model_Dashboard
     /**
      * Возвращает информацию об указанном преподавателе
      * @param integer $professor_id - уникальный индефикатор преподавателя
-     * @return array [professor] [depart_name]
+     * @return array [professor] [depart_name] [photo_url]
      */
     private function get_professor_info($professor_id){
-        $query = "SELECT prof.professor,list.depart_name FROM professors as prof,departments_list as list WHERE prof.department_id = list.id and prof.id=?s";
+        $query = "SELECT prof.professor,list.depart_name,photo_url FROM professors as prof,departments_list as list WHERE prof.department_id = list.id and prof.id=?s";
         $result=$this->database->getRow($query,$professor_id);
         return $result;
     }
@@ -142,6 +152,9 @@ class Model_Professors extends Model_Dashboard
             $result[$day][$lesson_number]["lesson_name"] = $value["lesson_name"];
             $result[$day][$lesson_number]["group_number"] = $value["group_number"];
         }
+        $max_min = $this->week_max_min($result);
+        $result['max']=$max_min['max'];
+        $result['min']=$max_min['min'];
         return $result;
 
     }

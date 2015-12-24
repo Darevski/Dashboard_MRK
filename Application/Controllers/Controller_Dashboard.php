@@ -59,12 +59,12 @@ class Controller_Dashboard extends Core\Controller
      * Входной параметр через integer POST['professor_id']
      *
      * Структура:
-     * name,department,lesson_num,
+     * lesson_num,name,department
      * state = now/next/false
      * now - на текущий момент времени идет пара
      * next - возвращена следующая пара
      * false - пар на сегодня нету
-     * group_number, lesson_name, classroom
+     * group_number, lesson_name, classroom,start_time,end_time
      *
      * @api
      */

@@ -110,7 +110,7 @@ class Controller_Dashboard extends Core\Controller
 
     /**
      * Вывод Json строки, содежащей список групп + их курс
-     * {integer group_number,integer grade}
+     * integer grade { integer group_number }
      *
      * @api
      */

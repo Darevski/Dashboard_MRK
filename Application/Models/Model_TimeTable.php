@@ -94,9 +94,13 @@ class Model_TimeTable extends Model_Dashboard
      * @return array номер группы + курс
      */
     function get_list_group(){
-        $result=$this->database->getALL("SELECT group_number,grade FROM groups_list");
+        $result_query=$this->database->getALL("SELECT group_number,grade FROM groups_list");
         //сортировка полученного списка в соответсвии с их номером по возрастанию
-        usort($result,array($this,'Groups_Sort_CallBack'));
+        usort($result_query,array($this,'Groups_Sort_CallBack'));
+        foreach ($result_query as $value){
+            $grade = $value['grade'];
+            $result[$grade][] = $value['group_number'];
+        }
         return $result;
     }
 

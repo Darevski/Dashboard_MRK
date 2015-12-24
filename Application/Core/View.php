@@ -19,7 +19,9 @@ class View
     function display($content_view,$data = null){
         include 'Application/Views/'.$content_view;
     }
-    function output_json($json){
+    
+    function output_json($value){
+        $json=json_encode($value,JSON_UNESCAPED_UNICODE );
         echo $json;
     }
 }

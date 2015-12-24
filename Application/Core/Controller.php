@@ -4,6 +4,7 @@
  * User: darevski
  * Date: 14.09.15
  * Time: 22:40
+ * @author Darevski
  */
 namespace Application\Core;
 use Application\Models;
@@ -20,26 +21,47 @@ class Controller {
      * @var $model
      */
     protected $model;
+    /**
+     * переменная хранящая объект вида
+     * @var $view
+     */
     protected $view;
+
+    /**
+     * переменная хранящая авторизационную модель данных
+     * @var
+     */
     protected $auth_model;
-    
+
+    /**
+     * Записывает объекты моделей в переменные
+     * @see $auth_model - объект модели авторизации
+     * @see $view - объект вида
+     * @see $model - объект базовой модели
+     */
     function __construct()
     {
-        $this->model= new Model();
+        $this->model = new Model();
+        $this->auth_model= new Models\Model_Auth();
         $this->view = new View();
-        $this->auth_model = new Models\Model_Auth();
     }
+
+    /**
+     * Удаление из строки спецсимволов, тэгов и т.д.
+     * @param string $variable входное значение строки
+     * @return string $result результат преобразования
+     */
     protected function security_variable($variable){
-        $variable=htmlentities($variable);
-        $variable=strip_tags($variable);
-        return $variable;
+        $result=htmlentities($variable);
+        $result=strip_tags($result);
+        return $result;
     }
 
     /**
      * Проверка на сущуствование сессии для пользователя
      * Проверка хэша пользователя, при не совпадении хэша очистка сессии в бд и на стороне клинета
-     * @return bool|string
-     * @throws UFO_Except
+     * @return bool|string сессия не существует / значение привелегии
+     * @throws UFO_Except При не совпадении хэша, вброс исключения, очистка сессии, очистка хэша в БД
      */
     public function state_authorization(){
         if (isset($_SESSION['login']) & isset($_SESSION['hash'])) {

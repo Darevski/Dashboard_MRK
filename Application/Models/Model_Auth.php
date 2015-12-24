@@ -4,6 +4,7 @@
  * User: darevski
  * Date: 29.09.15
  * Time: 23:27
+ * @author Darevski
  */
 
 namespace Application\Models;
@@ -11,10 +12,23 @@ namespace Application\Models;
 
 use Application\Core\Model;
 
+/**
+ * Класс связанный с авторизацией пользователей
+ * Class Model_Auth
+ * @package Application\Models
+ */
 class Model_Auth extends Model{
+    /**
+     * Переменная хранящая имя таблицы используемой для пользователей в БД
+     * @var string
+     */
     private $table;
 
     // установка имени таблицы по умолчанию
+    /**
+     * @internal Application\Core\Controller::__construct()
+     * @param string $table наименование таблицы пользователей в БД
+     */
     public function __construct($table= 'users'){
         parent::__construct();
         $this->table = $table;
@@ -22,9 +36,9 @@ class Model_Auth extends Model{
 
     /**
      * Проверяет вводимый логин и пароль, при совпадении генерирует хэщ, который записывается в бд
-     * @param $login
-     * @param $password
-     * @return mixed $new_hash || false
+     * @param string $login
+     * @param string $password
+     * @return mixed $new_hash|false новый хэш при входе/ false - при несовпадении пароля+логин
      */
     public function check_password($login,$password){
         $password= md5($password);
@@ -55,9 +69,10 @@ class Model_Auth extends Model{
 
     /**
      * Возвращает привелегии при существовании хэша
-     * @param $login
-     * @param $hash
-     * @return string || bool - привеления, при существующей паре логин - хэш || false
+     * @param string $login
+     * @param string $hash записанный в БД
+     * @return string|bool привеления, при существующей паре логин - хэш || false - не существует результата
+     * для пары hash+login
      */
 
     public function take_privilege($login,$hash){
@@ -70,7 +85,7 @@ class Model_Auth extends Model{
 
     /**
      * Сброс хэша указанного пользователя
-     * @param $login
+     * @param string $login
      */
     public function clear_hash($login){
         $request = "UPDATE $this->table SET hash=?s WHERE login=?s";

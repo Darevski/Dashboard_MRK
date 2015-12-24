@@ -19,7 +19,7 @@ class Model
      * Переменная хранящая объект для работы с БД
      * @var Safe_SQL
      */
-    public $database;
+    protected $database;
     // Загрузука конфига С параметрами базы данных
 
     /**

@@ -4,19 +4,31 @@
  * User: darevski
  * Date: 15.09.15
  * Time: 9:21
+ * @author Darevski
  */
 namespace Application\Controllers;
 use Application\Core;
 use Application\Models;
 
+/**
+ * Контроллер базовых функций рассписания
+ * Class Controller_Dashboard
+ * @package Application\Controllers
+ */
 class Controller_Dashboard extends Core\Controller
 {
+    /**
+     * Подключение моделей рассписания + преподавателей
+     */
     function __construct(){
         $this->view = new Core\View();
         $this->professor_model = new Models\Model_Professors();
         $this->timetable_model = new Models\Model_TimeTable();
     }
 
+    /**
+     * Стартовое действие (по-умолчанию)
+     */
     function action_start()
     {
         $this->view->generate();
@@ -24,47 +36,72 @@ class Controller_Dashboard extends Core\Controller
 
     /**
      * Выводит Json строку содежащую уведомления для указанной группы
+     *
+     * Входной параметр через integer POST['group_number']
+     *
+     * Структура:
+     * {string 'state' critical|warning|info , string text}
+     *
+     * @api
      */
     function action_get_notifications_by_group(){
-        $group_number=32494;
-        $notification = $this->timetable_model->get_notification_for_group($group_number);
-        $this->view->output_json($notification);
+        $_POST['group_number']=32494;
+        if (isset($_POST['group_number'])){
+            $group_number = $this->security_variable($_POST['group_number']);
+            $notification = $this->timetable_model->get_notification_for_group($group_number);
+            $this->view->output_json($notification);
+        }
     }
 
     /**
      * Выводит Json строку содержающую информацию о местонахождении преподавателя на текущее время
+     *
+     * Входной параметр через integer POST['professor_id']
+     *
+     * Структура:
      * name,department,lesson_num,
      * state = now/next/false
      * now - на текущий момент времени идет пара
      * next - возвращена следующая пара
      * false - пар на сегодня нету
      * group_number, lesson_name, classroom
-     * @param int $professor_id - уникальный номер преподавателя
+     *
+     * @api
      */
-    function action_get_professor_state($professor_id=7){
-        $result_professor = $this->professor_model->get_professor_state($professor_id);
-        $this->view->output_json($result_professor);
+    function action_get_professor_state(){
+       $_POST['professor_id']=7;
+        if (isset($_POST['professor_id'])) {
+            $professor_id=$this->security_variable($_POST['professor_id']);
+            $result_professor = $this->professor_model->get_professor_state($professor_id);
+            $this->view->output_json($result_professor);
+        }
     }
 
     /**
      * Выводит Json строку содержающую информацию о рассписании преподавателя на неделю
-     * Со следующей структурой
-     * even/uneven{
-     *  day{
-     *      lesson_num{
-     *          group_number
-     *          lesson_name
-     *      }
-     * }
+     *
+     * Входной параметр через integer POST['professor_id']
+     *
+     * Со следующей структурой:
+     * even/uneven { day { lesson_num { group_number,lesson_name } }
+     *
+     * @api
      */
-    function action_get_professor_timetable($professor_id=7){
-        $professor_timetable=$this->professor_model->get_professor_timetable($professor_id);
-        $this->view->output_json($professor_timetable);
+    function action_get_professor_timetable(){
+        $_POST['professor_id']=7;
+        if (isset($_POST['professor_id'])) {
+            $professor_id = $this->security_variable($_POST['professor_id']);
+            $professor_timetable = $this->professor_model->get_professor_timetable($professor_id);
+            $this->view->output_json($professor_timetable);
+        }
     }
 
     /**
-     * Получение списка преподавателей уникальный id,professor(ФИО),depart_name(кафедра)
-     * вывод в виде json строки
+     * Вывод Json строки, содержающей списко преподавателей
+     *
+     * Cо следующей структурой: уникальный id,professor(ФИО),depart_name(кафедра)
+     *
+     * @api
      */
     function action_get_list_professors(){
         $list_professors =$this->professor_model->get_professors_list();
@@ -72,7 +109,10 @@ class Controller_Dashboard extends Core\Controller
     }
 
     /**
-     * Получение списка всех групп (курса группы) и вывод в виде json строки
+     * Вывод Json строки, содежащей список групп + их курс
+     * {integer group_number,integer grade}
+     *
+     * @api
      */
     function action_get_list_group(){
         $list_group=$this->timetable_model->get_list_group();
@@ -80,8 +120,19 @@ class Controller_Dashboard extends Core\Controller
     }
 
     /**
-     * Получение рассписания на сегодня/следующий учебный день для указанной группы
-     * и вывод в виде json строки
+     * Вывод Json строки, содержащий рассписание на учебный/следующий день для указанной группы
+     *
+     * Входной параметр через integer POST['group_number']
+     *
+     * Структура: {string today/tomorrow {
+     *
+     * integer lesson_number{
+     * - string lesson_name,
+     * - string professor_id,
+     * - integer classroom,
+     * - bool true|false state : пара идет(следующая на очереди)/пары кончились } } }
+     *
+     * @api
      */
     function action_actual_dashboard(){
         $_POST['group_number']='32494';
@@ -93,8 +144,19 @@ class Controller_Dashboard extends Core\Controller
     }
 
     /**
-     * Получение рассписания на неделю (числитель + знаменатель) для указанной группы
-     * и вывод в виде json строки
+     * Вывод рассписания Json строкой для выбранной группы на неделю (числитель + знаменатель) для указанной группы
+     *
+     * Входной параметр через integer POST['group_number']
+     *
+     * Структура: {string 'even'/'uneven' {
+     *
+     * integer day {
+     *
+     * integer lesson_number | null {
+     * - string lesson_name
+     * - string professor_name
+     * } } }
+     * @api
      */
     function action_week_dashboard(){
         $_POST['group_number']='32494';

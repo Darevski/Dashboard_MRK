@@ -27,6 +27,7 @@ class Model_TimeTable extends Model_Dashboard
      * - ФИО преподаваеля,
      * - url фото преподавателя,
      * - время пары
+     * - bool multiple при наличии нескольких преподавателей ведущих пары одновременно у одной группы - true
      */
     function get_lesson_info_by($number_group,$lesson_number){
         $today = $this->get_day()['today'];
@@ -34,13 +35,32 @@ class Model_TimeTable extends Model_Dashboard
         $query = "SELECT * FROM groups,professors,departments_list WHERE groups.professor_id=professors.id AND
         professors.department_id = departments_list.id AND group_number=?s AND day_number=?s AND lesson_number=?s
         AND (numerator='all' or numerator=?s)";
-        $result_of_query = $this->database->getRow($query,$number_group,$today,$lesson_number,$numerator);
-        $result['classroom'] = $result_of_query['classroom'];
-        $result['lesson_name'] = $result_of_query['lesson_name'];
-        $result['department'] = $result_of_query['depart_name'];
-        $result['professor_id']=$result_of_query['professor_id'];
-        $result['professor'] = $result_of_query['professor'];
-        $result['photo_url'] = $result_of_query['photo_url'];
+        $result_of_query = $this->database->getALL($query,$number_group,$today,$lesson_number,$numerator);
+
+        //Разбор полученного запроса (преподаватели, которые ведут у группы одновремеенно)
+        foreach($result_of_query as $value){
+            // одинаковые поля у всех преподавателей
+            $result['lesson_name'] = $value['lesson_name'];
+            $result['department'] = $value['depart_name'];
+
+            // поля, различные у разных преподавателей
+            // если преподавателей больше 2 выводится массивы из соответствующих параметров
+            if (count($result_of_query)>1){
+                $result['professor_id'][]=$value['professor_id'];
+                $result['classroom'][] = $value['classroom'];
+                $result['professor'][] = $value['professor'];
+                $result['multiple'] = true;
+            }
+            else{
+                // если преподавателей = 1 или 0 то выводится его параметры или null для всех свойств
+                $result['professor_id']=$value['professor_id'];
+                $result['classroom'] = $value['classroom'];
+                $result['professor'] = $value['professor'];
+                $result['photo_url'] = $value['photo_url'];
+                $result['multiple'] = false;
+            }
+
+        }
         $start_end_time=$this->lesson_begin_end_time($lesson_number);
         $result['time']=date('G:i',strtotime($start_end_time['start_time'])).' - '.date('G:i',strtotime($start_end_time['end_time']));
         return $result;

@@ -1,285 +1,633 @@
-/* --- FONTS --- */
-
-@font-face {
-    font-family: "SegoeUIRegular";
-    src: url("./fonts/SegoeUIRegular.eot");
-    src: url("./fonts/SegoeUIRegular.eot?#iefix")format("embedded-opentype"),
-    url("./fonts/SegoeUIRegular.woff") format("woff"),
-    url("./fonts/SegoeUIRegular.ttf") format("truetype");
-    font-style: normal;
-    font-weight: normal;
-} /* SEGOE UI REGULAT */
-
-@font-face {
-    font-family: "SegoeUILight";
-    src: url("./fonts/SegoeUILight.eot");
-    src: url("./fonts/SegoeUILight.eot?#iefix")format("embedded-opentype"),
-    url("./fonts/SegoeUILight.woff") format("woff"),
-    url("./fonts/SegoeUILight.ttf") format("truetype");
-    font-style: normal;
-    font-weight: normal;
-} /* SEGOE UI LIGHT */
-
-/* ICONS */
-
-.icon-user
-{
-	background-image: url("./icons/user.png");
-	background-repeat: no-repeat;
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
-
-.icon-electronic
-{
-	background-image: url("./icons/electronic.png");
-	background-repeat: no-repeat;
-}
-
-.icon-screen
-{
-	background-image: url("./icons/screen.png");
-	background-repeat: no-repeat;
-}
-
-/* --- BODY STYLE --- */
-
-body
-{
-	padding: 0px;
-	margin: 0px;
-    font-family: "SegoeUILight";
-	font-size: 1.15em;	
-	background-color: #E8ECEB;
-    background-color: #F4F5F6;
+body {
+    font-family: 'HelveticaLight';
+    font-weight: 300;
+    position: absolute;
+    z-index: 0;
     overflow: hidden;
-}
-
-/* --- TOP STYLE --- */
-
-#top-wrapper
-{
-	height: 50px;
-    width: 1000px;
-	margin-top: 2%;
-	margin-left: calc((100% - 1000px) / 2 );
-    background-color: #1EAAF1;
-    box-shadow: 1px 2px 4px rgba(30,170,241,0.8);
-}
-
-#logo-top
-{
-    height: 50px;
-	width: 150px;
-	margin-left: 10px;
-    padding-left: 45px;
-    display: inline-block;
-    background-position: left center;
-    background-size: 40px;
-	line-height: 50px;
-    text-align: center;      
-}
-
-#qsearch-top
-{
-	height: 30px;
-	width:  498px;
-    position: relative;
-    top: -2px;
-    left: 169px;
-	display: inline-block;    
-}
-
-#qsearch-top input
-{
-    height: 30px;
-	width: 498px;
-    padding: 0px 10px 0px 10px;
-	border: 0;
-    background-color: #188BC4;
-    box-sizing: padding-box;
-    color: white;
-    line-height: 30px;
-	z-index: 0;
-}
-
-/* --- CONTAINER STYLE --- */
-
-#main-container
-{
-    height: 515px;
-    width: 1000px;
-    margin-top: 5%;
-    margin-left: calc((100% - 1000px) / 2);
-    overflow: hidden;
-}
-
-#block-container
-{
-    height: 515px;	
-	padding-left: 110px;
-    background-color: rgba(0,0,0,0);
-	transition: 0.6s;
-    overflow: hidden;
-}
-
-.info-block
-{
-    height: 240px;
-	width: 240px;
-    margin: 10px 0px 0px 10px;
-	display: inline-block;
-	background-color: #FFF;
-    background-position: center top;
-    background-size: 200px;
-	border: 2px solid rgba(239,240,241,1);
-    text-align: center;
-    line-height: 430px;
-    transition: 0.4s;
-}
-
-.info-block:hover
-{
-	background-color: #DEDEDE;
-    transition: 0.4s;
-}
-
-#button-back
-{
-    height: 50px;
     width: 100%;
-	margin-top: 1px;
-    background-color: #1EAAF1;
-	box-shadow: 0px 2px 4px rgba(0,0,0,0.2);	
-    color: #0C435E;
-    line-height: 50px;
-    text-align: center;	
-    transition: 0.4s;    
-	overflow: hidden;
-}
-
-#button-back:hover
-{
-    background-color: #1990C9;
-    transition: 0.4s;
-}
-
-#get-info-block
-{
-    height: 500px;
-    background-color: white;
-}
-
-/* LOGIN BOX && MULTIUSE STYLE */
-
-#login-box
-{
-	height: 50px;
-    width: 50px;
-	left: calc(100% - 50px);
-	position: fixed;
-    background-color: #1EAAF1;
-    background-image: url("./icons/user.png");
-    background-position: center center;
-    background-size: 40px;
-    background-repeat: no-repeat;
-    box-shadow: 1px 1px 5px rgba(30,170,241,0.8);
-    border: 0;	
-    transition: 0.4s;
-}
-
-#login-box:hover
-{
-    background-color: #1990C9;
-    box-shadow: 1px 1px 5px rgba(20,160,231,0.8);
-    transition: 0.4s;
-}
-
-#multiuse-container
-{
     height: 100%;
-	width: 256px;
-	top: 0%;
-    left: calc(100% + 100px);	
+    margin: 0;
+    padding: 0;
+    transition: .5s;
+    background-color: #f5f5f5;
+}
+.info {
+    background-image: url('icons/alert-main.png');
+}
+.note {
+    background-image: url('icons/alert-noncritical.png');
+}
+.button {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    transition: .5s;
+    border: 2px solid rgba(160, 160, 160, .2);
+    background-color: #ebebeb;
+}
+.alert {
+    background-image: url('icons/alert-critical.png');
+}
+.more-info {
+    position: absolute;
+    z-index: 2;
+    left: 5%;
+    display: none;
+    width: auto;
+    min-width: 80%;
+    height: auto;
+    padding: 7px 10px;
+    text-align: center;
+    color: #fff;
+    border-radius: 5px;
+    background-color: #03a9f4;
+    box-shadow: 0 0 8px rgba(0, 0, 0, .4);
+}
+.more-info:before {
+    position: absolute;
+    z-index: 2;
+    bottom: -7px;
+    left: 50%;
+    display: block;
+    margin-left: -7px;
+    content: '';
+    border-top: 7px solid #03a9f4;
+    border-right: 7px solid transparent;
+    border-left: 7px solid transparent;
+}
+#header {
+    line-height: 30px;
+    width: 100%;
+    height: 30px;
+    cursor: pointer;
+    text-align: center;
+    background-color: #03a9f4;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .4);
+}
+#main-container {
+    position: relative;
+    z-index: 1;
+    top: calc((100% - 500px) / 2);
+    left: calc((100% - 1000px) / 2);
+    width: 1000px;
+    height: 500px;
+    cursor: pointer;
+}
+.inline-block-main {
+    position: absolute;
+    width: 320px;
+    height: 500px;
+    transition: .5s;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .4);
+}
+.inline-block-main:hover {
+    transition: .5s;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, .4);
+}
+#time {
+    font-size: 1.2em;
+    line-height: 50px;
+    width: 320px;
+    height: 50px;
+}
+#AllShedule,
+#AllProfessors {
+    line-height: 260px;
+    width: 150px;
+    height: 150px;
+    text-align: center;
+}
+#AllShedule {
+    background-image: url('icons/calendar.png');
+    background-repeat: no-repeat;
+    background-position: 50% 30%;
+    background-size: 100px;
+}
+#AllProfessors {
+    left: 170px;
+    background-image: url('icons/professor.png');
+    background-repeat: no-repeat;
+    background-position: 50% 30%;
+    background-size: 100px;
+}
+#ActualShedule {
+    left: 340px;
+    overflow: hidden;
+}
+#Shedule-now,
+#Shedule-next {
+    display: block;
+    width: 320px;
+    height: 500px;
+    cursor: default;
+    transition: .8s;
+    vertical-align: top;
+}
+#Shedule-now p,
+#Shedule-next p {
+    line-height: 30px;
+    height: 30px;
+    margin-top: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    background-color: #03a9f4;
+}
+#Shedule-now ul,
+#Shedule-next ul {
+    overflow-y: auto;
+    height: 445px;
+    padding: 0;
+    list-style: none;
+}
+#Shedule-now ul li,
+#Shedule-next ul li {
+    display: table;
+    width: 308px;
+    height: 60px;
+    margin-top: 30px;
+    padding-right: 5px;
+    padding-left: 5px;
+    transition: .5s;
+    text-align: justify;
+    text-align-last: left;
+    border-left: 2px solid transparent;
+}
+#Shedule-now ul li:hover,
+#Shedule-next ul li:hover {
+    width: 308px;
+    transition: .5s;
+    border-left: 2px solid #03a9f4;
+}
+#Shedule-now ul li span,
+#Shedule-next ul li span {
+    display: table-cell;
+    vertical-align: middle;
+}
+.li-now {
+    background-color: #ebebeb;
+}
+#ProfessorNow {
+    left: 680px;
+    height: 350px;
+    cursor: default;
+}
+.NothingNow {
+    background-color: cadetblue;
+    background-image: url('icons/electronic.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 80px;
+}
+#professor-info {
+    display: inline-block;
+    width: 200px;
+    height: 120px;
+    text-align: center;
+    vertical-align: top;
+}
+#professor-photo img {
+    width: 120px;
+    height: 120px;
+    border: 0;
+}
+#professor-photo {
+    display: inline-block;
+    width: 120px;
+    height: 120px;
+    background-image: url('icons/professor.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 110px;
+}
+#professor-name {
+    line-height: 100px;
+    height: 60px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border-bottom: 1px solid black;
+}
+#professor-department {
+    font-style: italic;
+    line-height: 40px;
+    height: 60px;
+}
+#professor-info #pdiv {
+    display: table;
+    width: 320px;
+    height: 64px;
+    margin-top: 5px;
+    margin-bottom: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #03a9f4;
+}
+#professor-info #pdiv p {
+    display: table-cell;
+    height: 74px;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+#classroom {
+    font-size: 1.8em;
+    font-style: italic;
+    line-height: 80px;
+    width: 320px;
+    height: 80px;
+}
+#SendReport {
+    font-size: 1.3em;
+    line-height: 130px;
+    top: 370px;
+    left: 680px;
+    width: 305px;
+    height: 130px;
+    padding-left: 15px;
+    text-align: center;
+    background-color: #ffa500;
+    background-image: url('icons/warn.png');
+    background-repeat: no-repeat;
+    background-position: 5px 50%;
+    background-size: 70px;
+}
+#Alerts {
+    top: 170px;
+    height: 330px;
+}
+#Alerts p {
+    line-height: 30px;
+    height: 30px;
+    margin: 0;
+    padding: 5px 0;
+    text-align: center;
+    background-color: #03a9f4;
+}
+#Alerts ul {
+    overflow-y: auto;
+    height: 280px;
+    margin: 10px 0 0 0;
+    padding: 0;
+    list-style: none;
+}
+#Alerts ul li {
+    line-height: 25px;
+    height: 25px;
+    margin-top: 3px;
+    padding-left: 25px;
+    background-repeat: no-repeat;
+    background-position: 3px 50%;
+    background-size: 15px;
+}
+#switch1 {
+    top: 45px;
+    left: 610px;
+}
+#switch2 {
+    top: 45px;
+    left: 635px;
+}
+#switch1:hover,
+#switch2:hover {
+    transition: .5s;
+    background-color: #03a9f4;
+}
+#container-gr {
+    position: relative;
+    left: 10%;
+    width: 80%;
+    margin-top: 8%;
+}
+.grade-list {
+    display: inline-block;
+    width: calc((100% - 60px) / 4);
+    height: 350px;
+    margin-top: 20px;
+    margin-right: 20px;
+    cursor: pointer;
+    transition: .5s;
+    vertical-align: top;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .4);
+}
+.grade-list:hover {
+    transition: .5s;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, .4);
+}
+.grade-list:last-child {
+    margin-right: 0;
+}
+.grade-list p {
+    line-height: 25px;
+    height: 25px;
+    text-align: center;
+}
+.grade-list ul {
+    overflow-y: auto;
+    height: 285px;
+    margin-right: 5px;
+    margin-left: 5px;
+    padding: 0;
+}
+.grade-list ul li {
+    line-height: 25px;
+    height: 25px;
+    margin-top: 5px;
+    list-style-type: none;
+    transition: .5s;
+    text-align: center;
+    border-bottom: 2px solid transparent;
+}
+.grade-list ul li:hover {
+    transition: .5s;
+    border-bottom: 2px solid #03a9f4;
+}
+#screen {
+    position: absolute;
+    top: 40px;
+    overflow-y: auto;
+    width: 100%;
+    height: calc(100% - 40px);
+}
+.table-full {
+    width: 98%;
+    margin-top: 50px;
+    margin-left: 1%;
+    border-spacing: 0;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .4);
+}
+.table-full caption {
+    margin-bottom: 5px;
+}
+.table-full thead {
+    text-align: center;
+}
+.table-full tr {
+    width: 100%;
+    min-height: 50px;
+}
+.table-full tr:hover {
+    background-color: #ebebeb;
+}
+.table-full tr td {
+	min-height: 50px;
+    position: relative;
+    padding: 5px 5px 5px 8px;
+    padding-left: 8px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(160, 160, 160, .2);
+}
+.table-full tr td:first-child {
+    min-width: 120px;
+    text-align: left;
+}
+.table-full tr td:hover .more-info {
+    display: block;
+    animation: fade-in .25s linear;
+}
+#teacher-photo,
+#teacher-info {
+    display: inline-block;
+    height: 200px;
+    margin-top: 10px;
+    vertical-align: top;
+}
+#teacher-photo {
+    width: 200px;
+    margin-left: 10px;
+    background-color: brown;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .4);
+}
+#teacher-info {
+    width: calc(100% - 240px);
+    margin-left: 20px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .4);
+}
+#teacher-name,
+#teacher-dep,
+#teacher-now {
+    margin: 0;
+    padding: 0;
+}
+#teacher-name {
+    font-size: 40px;
+    line-height: 75px;
+    height: 75px;
+    margin: 0;
+    padding: 0;
+}
+#teacher-dep {
+    font-size: 25px;
+    font-style: italic;
+    line-height: 75px;
+    height: 75px;
+}
+#teacher-now {
+    line-height: 50px;
+    height: 50px;
+    padding-left: 20px;
+    text-align: left;
+}
+#button-close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    /*background-color: #0275a8;*/
+    /*background-color: rgba(0,0,0,0.25);*/
+    
+    background-image: url('./icons/close.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 20px;
+}
+#left-side {
+    display: inline-block;
+    width: 280px;
+    height: calc( 100% - 20px);
+    margin: 10px 10px 0 10px;
+    cursor: pointer;
+    vertical-align: top;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .4);
+}
+#right-side table td:first-child {
+    text-align: left;
+}
+#right-side table tr td {
+    text-align: center;
+}
+#right-side {
+    display: inline-block;
+    overflow-y: auto;
+    width: calc(100% - 300px);
+    height: 100%;
+}
+#left-side ul {
+    overflow-y: auto;
+    width: 280px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+#left-side ul li:hover {
+    transition: .3s;
+    border-bottom: 2px solid #03a9f4;
+}
+#left-side ul li {
+    height: 25px;
+	line-height: 30px;
+    margin: 10px 20px 0 20px;
+    padding: 5px 15px;
+    transition: .3s;
+    border-bottom: 2px solid transparent;
+}
+.js-ex {
     position: fixed;
-	display: inline-block;
-	background-color: #37474E;
-	color: #A6ADB0;
-    transition: 1s;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: .5s;
+    background-color: rgba(0, 0, 0, .4);
+}
+.js-ex-text {
+    line-height: 150px;
+    position: fixed;
+    top: calc( 50% - 75px);
+    left: calc( 50% - 200px);
+    width: 400px;
+    height: 150px;
+    transition: .5s;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .4);
+}
+.js-ex-close:hover {
+    transition: .5s;
+    background-color: rgba(160, 160, 160, .2);
+}
+.js-ex-close {
+    line-height: 35px;
+    position: fixed;
+    top: calc( 50% + 30px);
+    left: calc( 50% + 140px);
+    width: 50px;
+    height: 35px;
+    transition: .5s;
+    text-align: center;
+    color: #03a9f4;
+}
+#time-now {
+    font-size: 16px;
+    line-height: 30px;
+    position: absolute;
+    top: -30px;
+    left: 950px;
+    width: 50px;
+    height: 30px;
+    text-align: center;
+}
+#change-group:hover, #change-user:hover {
+    transition: .5s;
+    background-color: rgba(160, 160, 160, .2);
+}
+#change-group, #change-user {
+    font-size: 16px;
+    line-height: 30px;
+    position: absolute;
+    top: -35px;
+    width: 150px;
+    height: 30px;
+    transition: .5s;
+    text-align: center;
+    background-color: transparent;
+}
+#AuthForm {
+    position: absolute;
+    top: calc(50% - 200px);
+    left: calc(50% - 150px);
+    overflow: hidden;
+    width: 300px;
+    height: 400px;
+    margin: 0;
+    padding: 0;
+    transition: .5s;
+    background-color: #fff;
+    background-image: url('./icons/electronic.png');
+    background-repeat: no-repeat;
+    background-position: 50% 50px;
+    background-size: 140px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .4);
+}
+#AuthForm #AuthAnswer {
+    line-height: 40px;
+    position: absolute;
+    width: 300px;
+    height: 40px;
+    margin-top: -40px;
+    transition: .5s;
+    text-align: center;
+    background-color: #FF9800;
+    z-index: 2;
+}
+#AuthForm form {
+    width: 300px;
+    height: 100px;
+    margin-top: 220px;
+    transition: .5s;
+}
+#AuthForm form input:hover,
+#AuthForm form input:focus {
+    transition: .5s;
+    border-bottom: 2px solid #03a9f4;
+    outline: none;
+}
+#AuthForm form input {
+    width: 260px;
+    height: 28px;
+    margin: 10px 20px;
+    padding-left: 10px;
+    transition: .5s;
+    border: 0;
+    border-bottom: 2px solid #a0a0a0;
+    background-color: transparent;
+}
+#AuthForm #AuthButton:hover {
+    transition: .5s;
+    box-shadow: 0 0 30px rgba(0, 0, 0, .4);
+}
+#AuthForm #AuthButton {
+    line-height: 40px;
+    width: 260px;
+    height: 40px;
+    margin-top: 20px;
+    margin-left: 20px;
+    transition: .5s;
+    text-align: center;
+    background-color: #03a9f4;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+}
+#AuthForm #button-close {
+    top: 10px;
     z-index: 1;
 }
-
-#multi-close
-{
-    height: 100%;
-	width: calc(100% - 256px);
-    top: 0%;
-	position: fixed;
-    display: none;
-    opacity: 0;
-}
-
-/* --- MULTIUSE FORM STYLE --- */
-
-#multiuse-container form
-{
-	position: relative;
-	top: 25%;
-	padding-top: 180px;
-	background-size: 150px;
-	background-position: top center;
-}
-
-#login-form input
-{
-	height: 30px;
-	width: 150px;
-	left: 53px;
-	margin-bottom: 15px;
-	padding: 5px 10px 5px 20px;
-	position: relative;	
-	background-color: #263237;
-	background-position: left;
-	background-size: 20px;
-	border: 0;
-	color: white;
-	transition: 0.5s;
-}
-
-#login-form input:focus, #login-form input:hover
-{
-	width: 236px;
-	left: 10px;
-}
-
-#login-error-state
-{
-	height: 0px;
-	width: 256px;	
-	left: 0px;
-	position: relative;
-	background-color: #FF4040;
-	text-align: center;
-	line-height: 40px;
-	font-family: "SegoeUIRegular";
-	color: white;
-	transition: 0.6s;
-}
-
-#login-button
-{
-	height: 40px;
-	width: 236px;
-	margin-top: 5px;
-	left: 10px;
-	background-color: #37474E;
-	position: relative;
-	line-height: 40px;
-	text-align: center;	
-	color: white;
-	transition: 0.5s;
-}
-
-#login-button:hover
-{
-	background-color: #263237;
-	transition: 0.5s;
+#change-user {
+    top: 510px;
 }

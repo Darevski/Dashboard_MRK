@@ -12,6 +12,21 @@ namespace Application\Models;
 class Model_TimeTable extends Model_Dashboard
 {
     /**
+     * Возвращает массив с уведомлениями для выбранной группы
+     * состояние уведомления (critical / warning ...){
+     *  first_text,second_text....
+     * }
+     */
+    function get_notification_for_group($number_group){
+        $query = "SELECT * FROM notification WHERE group_number=?s or group_number=0";
+        $result_of_query = $this->database->getAll($query,$number_group);
+        foreach ($result_of_query as $value){
+            $state_of_notification =$value["state"];
+            $result[$state_of_notification][]=$value["text"];
+        }
+        return $result;
+    }
+    /**
      * Возвращает рассписание на 2 недели (числитель + знаменатель + all)
      * @param $group_number
      * @return mixed

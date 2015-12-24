@@ -23,7 +23,16 @@ class Controller_Dashboard extends Core\Controller
     }
 
     /**
-     * Возвращает Json строку содержающую информацию о местонахождении преподавателя на текущее время
+     * Выводит Json строку содежащую уведомления для указанной группы
+     */
+    function action_get_notifications_by_group(){
+        $group_number=32494;
+        $notification = $this->timetable_model->get_notification_for_group($group_number);
+        $this->view->output_json($notification);
+    }
+
+    /**
+     * Выводит Json строку содержающую информацию о местонахождении преподавателя на текущее время
      * name,department,lesson_num,
      * state = now/next/false
      * now - на текущий момент времени идет пара

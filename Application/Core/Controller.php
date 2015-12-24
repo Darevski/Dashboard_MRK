@@ -8,14 +8,24 @@
 namespace Application\Core;
 use Application\Models;
 use Application\Exceptions\UFO_Except;
+
+/**
+ * Базовый класс контролера используется для расширения наследованием
+ * Class Controller
+ * @package Application\Core
+ */
 class Controller {
-
-    public $model;
-    public $view;
-    public $auth_model;
-
+    /**
+     * переменная хранящая модель, под определенный класс
+     * @var $model
+     */
+    protected $model;
+    protected $view;
+    protected $auth_model;
+    
     function __construct()
     {
+        $this->model= new Model();
         $this->view = new View();
         $this->auth_model = new Models\Model_Auth();
     }

@@ -5,9 +5,15 @@
  * User: darevski
  * Date: 21.09.15
  * Time: 11:41
+ * @author PHPFIG
+ * @link http://www.php-fig.org/psr/psr-4/ru/
  */
-namespace application\Core;
-
+namespace Application\Core;
+/**
+ * Автоматические Загрузчик Классов
+ * Class Psr4AutoloaderClass
+ * @package Application\Core
+ */
 class Psr4AutoloaderClass
 {
     /**

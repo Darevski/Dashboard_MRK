@@ -4,6 +4,7 @@
  * User: darevski
  * Date: 29.09.15
  * Time: 18:43
+ * @author Darevski
  */
 
 namespace Application\Controllers;
@@ -11,35 +12,38 @@ use Application\Core;
 use Application\Exceptions\UFO_Except;
 use Application\Models;
 
+/**
+ * Контроллер Администратора обеспечивает действия связанные с привелегией "администратор"
+ * Class Controller_Admin
+ * @package Application\Controllers
+ */
 class Controller_Admin extends Core\Controller{
+
+    /**
+     * Проверка разрешения на доступ к данной информации по индефикатору пользователя
+     * @throws UFO_Except при не совпадении индификатора пользователя вброс исключения с ошибкой доступа
+     */
     function __construct(){
         parent::__construct();
         $this->validate();
-        $this->model = new Models\Model_Dashboard();
+        $this->model = new Models\Model_Admin();
     }
 
     /**
-     * Проверка на соответствие пользователя следующим критериям
-     * 1) Пользователь входил в систему. В сессиях весит хэш и логин
-     * 2) Хэш совпадает с хэшом в бд
-     * 3) Пользователь имеет необходимые привелегии
-     * В противном случае выбрасывается исключение
-     * @throws UFO_Except
+     * Проверка наличия индификатора пользователя, проверка на соответсвиие индификатора значению Admin
+     * @throws UFO_Except - при не совпадении вброс исключения, с сообщением о недоступности
      */
     private function validate(){
-        if (isset($_SESSION['login']) & isset($_SESSION['hash'])){
-            $result=$this->auth_model->take_privilege($_SESSION['login'],$_SESSION['hash']);
-            if ($result == false) { // при не совпадении очистка сесии
-                $this->auth_model->clear_hash($_SESSION['login']);
-                throw new UFO_Except ('Доступ заблокирован, несовпадение контрольного хэша, перезайдите в систему', 601);
-            }
-            if ($result !== 'Admin')
-                throw new UFO_Except ('У вас не достаточно прав для просмотра данного контента', 403);
-        }
-        else
-            throw new UFO_Except ('Доступ запрещен в раздел запрещен не авторизированным пользоваталям, войдите в систему',401);
+        // Получение значения привелегии
+        $result = $this->state_authorization();
+        if ($result !== 'Admin')
+            throw new UFO_Except ('У вас не достаточно прав для просмотра данного контента', 403);
     }
+
+    /**
+     * Базовое действие контроллера
+     */
     public function action_start(){
-       echo 'Теперь вы диктуете правила!';
+       //$this->model->group_add(32494,'ch',1,2,'apanasevich','oaip');
     }
 }

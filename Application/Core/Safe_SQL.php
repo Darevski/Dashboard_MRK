@@ -8,6 +8,12 @@
  *
  * @author col.shrapnel@gmail.com
  * @link http://phpfaq.ru/safemysql
+ */
+namespace Application\Core;
+use Application\Exceptions;
+
+/**
+ * Класс для связи и работы с Базой Данных
  *
  * Safe and convenient way to handle SQL queries utilizing type-hinted placeholders.
  *
@@ -50,29 +56,9 @@
  *
  * $db = new SafeMySQL(['mysqli' => $mysqli]);
  *
- * Some examples:
- *
- * $name = $db->getOne('SELECT name FROM table WHERE id = ?i',$_GET['id']);
- * $data = $db->getInd('id','SELECT * FROM ?n WHERE id IN ?a','table', array(1,2));
- * $data = $db->getAll("SELECT * FROM ?n WHERE mod=?s LIMIT ?i",$table,$mod,$limit);
- *
- * $ids  = $db->getCol("SELECT id FROM tags WHERE tagname = ?s",$tag);
- * $data = $db->getAll("SELECT * FROM table WHERE category IN (?a)",$ids);
- *
- * $data = array('offers_in' => $in, 'offers_out' => $out);
- * $sql  = "INSERT INTO stats SET pid=?i,dt=CURDATE(),?u ON DUPLICATE KEY UPDATE ?u";
- * $db->query($sql,$pid,$data,$data);
- *
- * if ($var === NULL) {
- *     $sqlpart = "field is NULL";
- * } else {
- *     $sqlpart = $db->parse("field = ?s", $var);
- * }
- * $data = $db->getAll("SELECT * FROM table WHERE ?p", $bar, $sqlpart);
- *
+ * Class Safe_SQL
+ * @package Application\Core
  */
-namespace Application\Core;
-use Application\Exceptions;
 class Safe_SQL
 {
     private $conn;

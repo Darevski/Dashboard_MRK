@@ -5,13 +5,23 @@
  * User: darevski
  * Date: 15.09.15
  * Time: 17:49
+ * @author Darevski
  */
 
 namespace Application\Exceptions;
 use Application\Controllers;
 
+/**
+ * Обработка исключений связанных с несуществующими страницами,ошибками доступа и т.д., вывод страниц ошибок
+ * Class UFO_Except
+ * @package Application\Exceptions
+ */
 class UFO_Except extends Main_Except
 {
+    /**
+     * Определение кода ошибки, вывод соответсвующей страницы
+     * @param UFO_Except $error полученнное исключенение
+     */
     function classification_error(UFO_except $error){
         $code = $error->code;
         switch ($code) {
@@ -39,6 +49,5 @@ class UFO_Except extends Main_Except
         }
         $controller = new Controllers\Controller_UFO();
         $controller->display($data);
-
     }
 }

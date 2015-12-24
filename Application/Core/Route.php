@@ -4,19 +4,41 @@
  * User: darevski
  * Date: 14.09.15
  * Time: 22:37
+ * @author Darevski
  */
 namespace Application\Core;
 use Application\Controllers;
 use Application\Exceptions;
 
-class Route extends Exceptions\UFO_Except
+/**
+ * Класс преобразования URL запросов в управляющие команды
+ *
+ * Class Route
+ * @package Application\Core
+ */
+class Route
 {
-    // default controller and him action
-    private $controller_name = 'Dashboard';
-    private $action_name = 'start';
+    /**
+     * Переменная храняшая имя контролера
+     * @var string $controller_name
+     * @see starting_Values
+     */
+    private $controller_name;
+    /**
+     * Переменная хранящая действие контроллера
+     * @var string $action_name
+     */
+    private $action_name ;
 
+    /**
+     * Получение имени контроллера и его действия из URL запроса
+     * @throws Exceptions\UFO_Except при отсутсвии контроллера указанного в URL вбрасывается исключение
+     * отсутсвия страницы (404)
+     */
     function start()
     {
+        //Установка значений контроллера и действия по умолчанию
+        $this->starting_Values();
         // Разбор Запроса
         $this->Exploding_URI();
 
@@ -26,7 +48,7 @@ class Route extends Exceptions\UFO_Except
         $action_name = 'action_'.$this-> action_name;
 
 
-        // Загрзука файла контроллера
+        // Проверка на наличие файла контроллера
         $controller_file = $controller_name.'.php';
         $controller_path = "Application/Controllers/".$controller_file;
 
@@ -43,11 +65,41 @@ class Route extends Exceptions\UFO_Except
         $action = $action_name;
         // Проверка наличия в контроллере экшена
         if(method_exists($controller, $action))
+            // Запуск действия контроллера при его наличии
             $controller->$action();
         else
             throw new Exceptions\UFO_Except("Action $action in $controller_name controller does not exist",404);
     }
 
+    /**
+     * Установка значений по умолчанию для контроллера и действия контроллера
+     * @see $controller_name устаналиваемое свойство - имя контроллера
+     * @see $action_name устанавливаемое свойство - имя действия контроллера
+     * @throws Exceptions\UFO_Except
+     */
+    private function starting_Values(){
+        $controller = new Controller();
+        //Получение привелегии пользователя
+        $auth_state=$controller->state_authorization();
+        $this->action_name = 'start';
+        if ($auth_state == false)
+            $this->controller_name = 'Dashboard';
+        else
+            switch ($auth_state){
+                case 'Admin':
+                    $this->controller_name = 'Admin';
+                    break;
+                default:
+                    $this->controller_name = 'Dashboard';
+            }
+    }
+
+    /**
+     * Разбор URI запроса на имя контроллера и действия
+     * @see $controller_name устанавливаемое свойство - имя контролера
+     * @see $action_name устанавливаемое свойсво - действие контроллера
+     * @throws Exceptions\UFO_Except при обращениии к несуществующему файлу вброс 404 исключения
+     */
     private function Exploding_URI(){
 
         if (preg_match('/\.\w+$/',$_SERVER['REQUEST_URI']))
@@ -63,7 +115,11 @@ class Route extends Exceptions\UFO_Except
             $this->action_name = $routes[2];
     }
 
-    // преобразование к виду Большаябукваоставшийсямелкийтекст
+    /**
+     * Преобразование строки к виду Большаябукваоставшийсямелкийтекст
+     * @param string $name
+     * @return string
+     */
     private function correct_name($name){
         $first_letter = substr($name,0,1);
         $remaining_letters = substr($name,1,strlen($name)-1);

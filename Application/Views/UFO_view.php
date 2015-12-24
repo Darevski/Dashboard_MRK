@@ -4,6 +4,7 @@
  * User: darevski
  * Date: 16.09.15
  * Time: 11:58
+ * @author Darevski
  */
 http_response_code($data['Code']);
 ?>

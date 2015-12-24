@@ -140,26 +140,6 @@ class Model_TimeTable extends Model_Dashboard
     }
 
     /**
-     * Поиск максимальной и минимальной пары на неделе
-     * @param array $week - массив рассписания занятий на неделюы
-     * @result array max,min максимальная и минимальная пара на неделе
-     */
-    private function week_max_min($week)
-    {
-        $max = 1;
-        $min = 7;
-        foreach ($week as $days)
-            foreach ($days as $key => $lesson_num)
-                if ($lesson_num != null) {
-                    $max = max($max, $key);
-                    $min = min($min, $key);
-                }
-        $result['max']=$max;
-        $result['min']=$min;
-        return $result;
-    }
-
-    /**
      * Формирует массив с пронумерованными парами и содержаем внутри их
      * @param $dashboard - массив с рассписание группы на выбранный день
      * полученный из базы данных
@@ -167,7 +147,7 @@ class Model_TimeTable extends Model_Dashboard
      * @return mixed - массив приведенный к виду отображаемому в приложении
      *
      * название пары,
-     * имя преподавателя,
+     * уникальный индентификатор преподавателя,
      * аудитория,
      * состояние пары (идет сейчас пара/перемена(следующая пара становится активной) или пары кончились/прошли ).
      */
@@ -180,7 +160,8 @@ class Model_TimeTable extends Model_Dashboard
             $num = $value['lesson_number'];
             $result[$num]['lesson_name'] = $value['lesson_name'];
             $result[$num]['professor'] = $value['professor'];
-
+            $result[$num]['professor_id'] = $value['professor_id'];
+            
             if ($isweek == false) {         // если рассписание не на неделю, требуется состояние пар
                 $result[$num]['classroom'] = $value['classroom'];
                 //Определяет идет ли сейчас пара

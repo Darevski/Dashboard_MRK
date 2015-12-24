@@ -31,7 +31,7 @@ class Model_Dashboard extends Core\Model
         $result=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number);
         $end_of_lesson=$result['end_time'];
         $start_of_lesson = $result['start_time'];
-        $now_time = date("G:i:s");
+        $now_time = date("H:i:s");
         if ($end_of_lesson>=$now_time & $start_of_lesson<=$now_time)
             return true;
         else
@@ -47,7 +47,7 @@ class Model_Dashboard extends Core\Model
     protected function is_rest($lesson_number){
         $time_of_lesson=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number);
         $start_of_lesson = $time_of_lesson['start_time'];
-        $now_time = date("G:i:s");
+        $now_time = date("H:i:s");
         if ($lesson_number == 0 & $start_of_lesson >= $now_time) // время перед 1 парой считаем как перемену
             return true;
         $previous_time_of_lesson=$this->database->getRow("SELECT * FROM timetable WHERE num_lesson=?s",$lesson_number-1);
@@ -73,7 +73,7 @@ class Model_Dashboard extends Core\Model
 
     /**
      * Возвращает номер пары по указанному времени
-     * @param string $time - Gis
+     * @param string $time - His
      * @return mixed integer | bool номер текущей или следующей пары(перемена) | false - пар нету
      */
     protected function get_lesson_number_by_time($time){
@@ -85,7 +85,7 @@ class Model_Dashboard extends Core\Model
         else{                       //Возможно идет перемена или пар нету
             $result = $this->database->getAll("SELECT * FROM timetable");
             for ($i = 0; $i<6;$i++) {
-                if ($i = 0 & $result[$i]["start_time"] >= $time)  // считаем время перед первой парой переменой
+                if ($i == 0 & $result[$i]["start_time"] >= $time)  // считаем время перед первой парой переменой
                     return $result[$i]["num_lesson"];
                 if ($result[$i]["end_time"] <= $time & $result[$i+1]["start_time"] >= $time)
                     return $result[$i+1]["num_lesson"];
@@ -93,5 +93,36 @@ class Model_Dashboard extends Core\Model
             return false;           // Пар на сегодня нету
         }
 
+    }
+
+    /**
+     * Поиск максимальной и минимальной пары на неделе
+     * @param array $week - массив рассписания занятий на неделюы
+     * @result array max,min максимальная и минимальная пара на неделе
+     */
+    protected function week_max_min($week)
+    {
+        $max = 1;
+        $min = 7;
+        foreach ($week as $days)
+            foreach ($days as $key => $lesson_num)
+                if ($lesson_num != null) {
+                    $max = max($max, $key);
+                    $min = min($min, $key);
+                }
+        $result['max']=$max;
+        $result['min']=$min;
+        return $result;
+    }
+
+    /**
+     * Возвращает время начала и конца выбранной пары
+     * @param integer $number_lesson
+     * @return array|FALSE
+     */
+    protected function lesson_begin_end_time($number_lesson){
+        $query = "SELECT start_time,end_time FROM timetable WHERE num_lesson=?s";
+        $result =  $this->database->getRow($query,$number_lesson);
+        return $result;
     }
 }

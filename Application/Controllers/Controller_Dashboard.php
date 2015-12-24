@@ -31,7 +31,7 @@ class Controller_Dashboard extends Core\Controller
      */
     function action_start()
     {
-        $this->view->generate();
+        $this->view->generate("Dashboard_View.php");
     }
 
     /**
@@ -176,6 +176,7 @@ class Controller_Dashboard extends Core\Controller
      * - lesson_name,
      * - department - кафдера преподавателя,
      * - professor - фио преподавателя,
+     * - professor_id - id преподавателя,
      * - photo_url - url фото преподавателя,
      * - time - время в которое идет пара}
      * @api

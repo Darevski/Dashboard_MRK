@@ -18,12 +18,9 @@ class View
     //public $template_view; // здесь можно указать общий вид по умолчанию.
     /**
      * Генерация вида страницы
-     * @param string $content_view
-     * @param string $auth_view
      * @param string $template_view
-     * @param null $data
      */
-    function generate($content_view='Blocks_view.php', $auth_view='AuthForm_view.php', $template_view='Tmp_view.php', $data = null){
+    function generate($template_view){
         include 'Application/Views/'.$template_view;
     }
 

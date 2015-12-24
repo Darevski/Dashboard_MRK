@@ -38,6 +38,7 @@ class Model_TimeTable extends Model_Dashboard
         $result['classroom'] = $result_of_query['classroom'];
         $result['lesson_name'] = $result_of_query['lesson_name'];
         $result['department'] = $result_of_query['depart_name'];
+        $result['professor_id']=$result_of_query['professor_id'];
         $result['professor'] = $result_of_query['professor'];
         $result['photo_url'] = $result_of_query['photo_url'];
         $start_end_time=$this->lesson_begin_end_time($lesson_number);

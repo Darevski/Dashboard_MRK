@@ -81,7 +81,7 @@ class Controller {
      * string now_time
      */
     public function action_get_time(){
-        $date['now_time'] = date("H:i");
+        $date['now_time'] = date("U");
         $this->view->output_json($date);
     }
 

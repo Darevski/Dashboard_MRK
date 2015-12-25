@@ -7,20 +7,49 @@ function LOAD_import_shedule()
 function UPDATE_shedule_from_load()
 {
     function upload(file) {
-        document.getElementById("fileupload").style.height = "200px";
-      var xhr = new XMLHttpRequest();
+		var xhr = new XMLHttpRequest();
+		var block = document.getElementById("fileupload");
+		var loader = CreateLoader(block, 1);
+		var body = document.body;
+		block.style.height = "200px";
+		body.appendChild(loader);
+		loader.style.opacity = "1";
       // обработчик для закачки
       xhr.upload.onprogress = function(event) {
-          document.getElementById("upload-status").style.width = ((event.loaded / event.total) * 400) + "px";
-          console.log(event.loaded + ' / ' + event.total);
-      }
+		  document.getElementById("upload-status").style.width = ((event.loaded / event.total) * 400) + "px";
+	  }
       // обработчики успеха и ошибки
       // если status == 200, то это успех, иначе ошибка
       xhr.onload = xhr.onerror = function() {
         if (this.status == 200) {
-          console.log("success");
+			try {
+					var answer = JSON.parse(xhr.responseText);	
+					loader.style.opacity = "";
+					setTimeout(function () {
+						block.style.height = "";
+						loader.remove();
+						if (answer.success)
+							CreateEx("Успешно");
+						else
+							CreateEx(answer.message);
+					}, 500);
+				}
+			catch (ex)
+				{
+					loader.style.opacity = "";
+					setTimeout(function () {
+						block.style.height = "";
+						loader.remove();
+						CreateEx("Произошла ошибка обработки");
+					}, 500);
+				}
         } else {
-          console.log("error " + this.status);
+			loader.style.opacity = "";
+			setTimeout(function () {
+				block.style.height = "";
+				loader.remove();
+				CreateEx("Произошла ошибка " + this.status);
+			}, 500);
         }
       };
       xhr.open("POST", "URL_TO_UPLOAD", true);

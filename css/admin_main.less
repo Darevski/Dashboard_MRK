@@ -1,0 +1,316 @@
+@color-body: #F5F5F5;
+@color-main: #03a9f4;
+@color-block: #FFF;
+@color-main-shadow: rgba(0,0,0,0.4);
+@color-delimeter: rgba(160, 160, 160, 0.4);
+@color-good: #c0ca33;
+@color-bad: #f4511e;
+@color-table-hover: #EEEEEE;
+
+body
+{
+    position: absolute;
+    background-color: @color-body;
+    left: ~"calc( 50% - 500px )";
+    top: ~"calc( 50% - 250px )";
+    width: 1000px;
+    height: 500px;
+}
+.main-block
+{
+    box-shadow: 0px 4px 10px @color-main-shadow;
+    background-color: @color-block;
+    position: absolute;
+    width: 300px;
+    height: 250px;
+    transition: 0.5s;
+}
+.main-block:hover
+{
+    box-shadow: 0px 4px 30px @color-main-shadow;
+    transition: 0.5s;
+}
+#import-export
+{
+    width: 160px;
+    height: 100px;
+    left: 0;
+    top: 0;
+}
+#import-export p
+{
+	height: 49px;
+	line-height: 50px;
+	width: 140px;
+	text-align: center;
+	margin: 0;
+	padding: 0;
+	margin-left: 10px;
+}
+#group-add
+{
+    width: 160px;
+    height: 100px;
+    left: 0;
+    top: 120px;
+}
+#message-sent
+{
+    width: 820px;
+    height: 50px;
+    left: 180px;
+    top: 0;
+}
+#swap
+{
+    width: 195px;
+    height: 150px;
+    left: 180px;
+    top: 70px;
+}
+#shedule-change
+{
+    width: 390px;
+    height: 150px;
+    left: 395px;
+    top: 70px;
+}
+#print
+{
+    width: 195px;
+    height: 150px;
+    left: 805px;
+    top: 70px;
+}
+#classroom
+{
+    width: 440px;
+    height: 260px;
+    left: 0;
+    top: 240px;
+}
+#bugreports
+{
+    width: 260px;
+    height: 260px;
+    left: 460px;
+    top: 240px;
+}
+#settings
+{
+    width: 260px;
+    height: 260px;
+    left: 740px;
+    top: 240px;
+}
+#message-more, #message-type, #message-to, #message-text, #message-push
+{
+    display: inline-block;
+    height: 50px;
+	vertical-align: top;
+}
+#message-more
+{
+    width: 50px;
+    background-color: orange;
+}
+#message-type p
+{
+	width: 70px;
+	margin-left: 15px;
+	border-bottom: 2px solid @color-delimeter;
+	text-align: center;
+	padding-bottom: 5px;
+}
+#message-type
+{
+    width: 100px;
+}
+#message-to-input
+{
+	margin-left: 10px;
+	width: 70px;
+	height: 18px;
+	margin-top: 11px;
+	outline: 0;
+	border: 0;
+	padding: 5px;
+	border-bottom: 2px solid @color-delimeter;
+	background-color: transparent;
+	text-align: center;
+}
+#message-to
+{
+    width: 100px;
+}
+#message-text
+{
+    width: 520px;
+}
+#message-push
+{
+    width: 50px;
+    background-color: chocolate;
+}
+#message-type-input
+{
+    box-shadow: 0px 4px 10px @color-main-shadow;
+	margin-top: -57px;
+	display: none;
+	width: 100px;
+	height: 150px;
+	position: absolute;
+	z-index: 50000;
+}
+.message-type-list
+{
+	width: 100px;
+	background-color: @color-block;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+}
+#message-type:hover #message-type-input
+{
+	display: block;
+}
+#message-text-input
+{
+	margin-left: 10px;
+	width: 490px;
+	height: 18px;
+	margin-top: 11px;
+	outline: 0;
+	border: 0;
+	padding: 5px;
+	border-bottom: 2px solid @color-delimeter;
+	background-color: transparent;
+}
+#shedule-change p {
+    width: 390px;
+    height: 40px;
+    line-height: 40px;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+#shedule-change-teacher
+{
+    display: inline-block;
+    width: 194px;
+    height: 100px;
+    background-image: url("icons/electronic.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 80px;    
+}
+#shedule-change-group
+{
+    display: inline-block;
+    width: 194px;
+    height: 100px;
+    background-image: url("icons/electronic.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 80px;    
+}
+.delimeter-div
+{
+    display: inline-block;
+    width: 2px;
+    background-color: @color-delimeter;
+}
+#classroom p {
+    width: 440px;
+    height: 80px;
+    line-height: 80px;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+#classroom-auto
+{
+    width: 219px;
+    height: 150px;
+    display: inline-block;
+    vertical-align: top;
+    background-image: url("icons/electronic.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 120px;
+}
+#classroom-manual
+{
+    width: 219px;
+    height: 150px;
+    display: inline-block;
+    vertical-align: top;
+    background-image: url("icons/electronic.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 120px;
+}
+#fileupload
+{
+    box-shadow: 0px 4px 10px @color-main-shadow;
+    position: fixed;
+    background-color: @color-block;
+    width: 400px;
+    left: ~"calc( 50% - 200px )";
+    top: ~"calc( 50% - 100px )";
+    height: 180px;
+    overflow: hidden;
+    transition: 0.5s;
+}
+#fileupload-text
+{
+    width: 360px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+#file-choose
+{
+    height: 100px;
+    width: 400px;
+}
+#file-choose-name
+{
+    display: inline-block;
+    vertical-align: top;
+    width: 0px;
+    height: 40px;
+    margin: 30px 0px;
+    line-height: 40px;
+    text-align: center;
+    overflow: hidden;
+}
+#file-choose-button
+{
+    display: inline-block;
+    width: 300px;
+    margin-left: 50px;
+    height: 80px;
+    background-color: @color-good;
+    overflow: hidden;
+}
+#filename
+{
+    padding: 0;
+    opacity: 0;
+    margin: 0;
+    width: 100px;
+    height: 100px;
+    font-size: 100px;
+    width: 100%;
+    height: 100%;
+}
+#upload-status
+{
+    height: 20px;
+    background-color: @color-main;
+    width: 0px;
+    margin: 10px 0 0;
+}

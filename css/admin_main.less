@@ -849,3 +849,69 @@ body
 	transition: 0.5s;
 	box-shadow: 2px 2px 10px @color-main-shadow;
 }
+#bugs-container
+{
+	margin: 20px 0 0 5%;
+	height: ~"calc( 100% - 50px )";
+	width: 90%;
+	overflow-y: auto;
+}
+#bugs-refresh-button:hover
+{
+	background-color: lighten(@color-main, 20%);
+}
+#bugs-refresh-button
+{
+	background-color: @color-main;
+	position: absolute;
+	right: 50px;
+	text-align: center;
+	height: 60px;
+	width: 60px;
+	bottom: 50px;
+	z-index: 4;
+	border-radius: 50%;
+	background-image: url("icons/electronic.png");
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 45px;
+	color: #FFF;
+	transition: 0.5s;
+	box-shadow: 2px 2px 10px @color-main-shadow;
+}
+.bug-line:hover
+{
+	background-color: #ebebeb;
+}
+.bug-line p
+{
+	display: inline-block;
+	margin: 0;
+	padding: 0 0 0 10px;
+	height: 40px;
+	width: ~"calc( 100% - 210px )";
+	vertical-align: top;
+}
+.bug-button:hover
+{
+	background-color: @color-delimeter;
+}
+.bug-button
+{
+	display: inline-block;
+	vertical-align: top;
+	height: 40xp;
+	width: 100px;
+	background-color: transparent;
+	transition: 0.5s;
+	text-align: center;
+}
+.bug-line
+{
+	width: 100%;
+	background-color: @color-block;
+	transition: 0.5s;
+	height: 40px;
+	line-height: 40px;
+	margin-top: 5px;
+}

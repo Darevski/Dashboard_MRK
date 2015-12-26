@@ -509,3 +509,124 @@ body
 	margin-top: 5px;
 	line-height: 30px;
 }
+#header {
+    line-height: 30px;
+    width: 100%;
+    height: 30px;
+    cursor: pointer;
+    text-align: center;
+    background-color: #03a9f4;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .4);
+}
+#button-close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    /*background-color: #0275a8;*/
+    /*background-color: rgba(0,0,0,0.25);*/
+    
+    background-image: url('./icons/close.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 20px;
+}
+.admin-table
+{
+	background-color: @color-block;
+	margin-top: ~"calc( 25% - 180px)";
+	width: 100%;
+	border-spacing: 0;
+}
+.admin-table thead {
+    text-align: center;
+}
+.admin-table tr {
+    width: 100%;
+    min-height: 50px;
+}
+.admin-table tr:hover {
+    background-color: #ebebeb;
+}
+.admin-table tr td input[type="text"]:focus {
+	outline: none;
+}
+.admin-table tr td input[type="text"]{
+	height: 40px;
+	line-height: 40px;
+	width: ~"calc( 100% - 10px )";
+	border: 0;
+	padding: 0 0 0 10px;
+	background-color: transparent;
+	margin: 0;
+}
+.admin-table tr td {
+	min-height: 50px;
+    position: relative;
+    padding: 5px 5px 5px 8px;
+    padding-left: 8px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(160, 160, 160, .2);
+}
+.admin-table tr td:first-child {
+    min-width: 120px;
+    text-align: left;
+	vertical-align: middle;
+}
+#group-shedule-edit
+{
+	margin-top: 10px;
+	height: ~"calc( 100% - 245px)";
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+#group-shedule-choice
+{
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	background-color: @color-block;
+	box-shadow: 0 0 10px @color-main-shadow;
+	width: 100%;
+	height: 200px;
+}
+#even-choice p:hover
+{
+	border-bottom: 3px solid @color-main;
+}
+#even-choice p
+{
+	height: 97px;
+	text-align: center;
+	line-height: 100px;
+	padding: 0;
+	width: 200px;
+	margin: 0 0 0 50px;
+	border-bottom: 3px solid transparent;
+	transition: 0.5s;
+}
+#even-choice
+{
+	display: inline-block;
+	height: 200px;
+	width: 300px;
+}
+.day-choice:hover
+{
+	border-bottom: 3px solid @color-main;
+}
+.day-choice
+{
+	vertical-align: top;
+	margin: 0;
+	padding: 0;
+	line-height: 200px;
+	display: inline-block;
+	height: 197px;
+	transition: 0.5s;
+	text-align: center;
+	border-bottom: 3px solid transparent;
+	width: ~"calc( ( 100% - 300px ) / 7)";
+}

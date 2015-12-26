@@ -18,7 +18,7 @@ body
 }
 .main-block
 {
-    box-shadow: 0px 4px 10px @color-main-shadow;
+    box-shadow: 0px 0px 3px @color-main-shadow;
     background-color: @color-block;
     position: absolute;
     width: 300px;
@@ -27,7 +27,7 @@ body
 }
 .main-block:hover
 {
-    box-shadow: 0px 4px 30px @color-main-shadow;
+    box-shadow: 0px 0px 20px @color-main-shadow;
     transition: 0.5s;
 }
 #import-export
@@ -724,4 +724,91 @@ body
 	margin: 26px 0 0 20px;
 	display: inline-block;
 	vertical-align: top;	
+}
+#print-chooser-today p, #print-chooser-term p
+{
+	margin: 0;
+	padding: 0;
+	height: 30px;
+	line-height: 30px;
+	margin-top: 150px;
+}
+#print-chooser-today, #print-chooser-term
+{
+	display: inline-block;
+	vertical-align: top;
+	height: 200px;
+	width: 198px;
+	text-align: center;
+	background-image: url("icons/calendar.png");
+	background-size: 100px;
+	background-repeat: no-repeat;
+	background-position: 50% 30%;
+}
+#print-chooser
+{
+	width: 400px;
+	height: 200px;
+	top: 150px;
+	left: 300px;
+}
+#group-creator
+{
+	width: 1000px;
+	height: 500px;
+}
+#group-creator-text
+{
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	height: 100px;
+	line-height: 100px;
+	font-size: 20px;
+}
+.input-p
+{
+	margin: 0;
+	padding: 0 0 0 20px;
+	width: 280px;
+	height: 40px;
+	line-height: 60px;
+	display: inline-block;
+	vertical-align: top;
+}
+.input-class:focus, .input-class:hover
+{
+	border-bottom: 2px solid @color-main;
+	outline: none;
+}
+.input-class
+{
+	transition: 1s;
+	display: inline-block;
+	vertical-align: top;	
+	height: 38px;
+	line-height: 40px;
+	width: 670px;
+	border: 0;
+	padding: 0 0 0 10px;
+	background-color: transparent;
+	border-bottom: 2px solid @color-delimeter;
+	margin: 0;
+}
+#group-creator-button:hover
+{
+	background-color: lighten(@color-main, 20%);
+}
+#group-creator-button
+{
+	position: absolute;
+	bottom: 20px;
+	width: 960px;
+	left: 20px;
+	background-color: @color-main;
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+	transition: 0.5s;
 }

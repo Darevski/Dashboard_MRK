@@ -630,3 +630,98 @@ body
 	border-bottom: 3px solid transparent;
 	width: ~"calc( ( 100% - 300px ) / 7)";
 }
+#swap-group-choice ul li:hover, #swap-day-choice ul li:hover
+{
+	border-bottom: 1px solid @color-main;
+}
+#swap-group-choice ul li, #swap-day-choice ul li
+{
+	transition: 0.2s;
+	text-align: center;
+	width: 320px;
+	margin: 10px 0 0 40px;
+	height: 19px;
+	line-height: 20px;
+	border-bottom: 1px solid transparent;
+}
+#swap-group-choice ul, #swap-day-choice ul
+{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	overflow-y: auto;
+	width: 400px;
+	height: 240px;
+}
+#swap-group-choice p, #swap-day-choice p
+{
+	padding: 0;
+	margin: 0;
+	height: 60px;
+	line-height: 60px;
+	text-align: center;
+}
+#swap-group-choice
+{
+	top: 0;
+	left: 50px;
+	width: 400px;
+	height: 300px;
+}
+#swap-day-choice
+{
+	height: 300px;
+	left: 500px;
+	width: 400px;
+	top: 0;
+}
+#swap-group-edit
+{
+	width: 850px;
+	height: 100px;
+	top: 350px;
+	left: 50px;
+}
+#lesson-to-swap:hover, #lesson-to-swap:focus
+{
+	outline: none;
+	border-bottom: 2px solid @color-main;
+}
+#lesson-to-swap
+{
+	height: 40px;
+	width: 200px;
+	border: 0;
+	border-bottom: 2px solid @color-delimeter;
+	transition: 1s;
+	background-color: transparent;
+	margin: 28px 0 0 20px;
+	display: inline-block;
+	vertical-align: top;
+}
+#lesson-new:hover, #lesson-new:focus
+{
+	border-bottom: 2px solid @color-main;
+	outline: none;
+}
+#lesson-new
+{
+	padding: 0 0 0 20px;
+	width: 510px;
+	height: 40px;
+	border: 0;
+	border-bottom: 2px solid @color-delimeter;
+	margin: 26px 0 0 20px;
+	display: inline-block;
+	vertical-align: top;
+	transition: 0.2s;
+}
+#swap-button-ok
+{
+	height: 42px;
+	width: 42px;
+	background-color: @color-main;
+	margin: 26px 0 0 20px;
+	display: inline-block;
+	vertical-align: top;	
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--Import main.css-->
+    <meta charset="utf-8">
+    <link rel="stylesheet/less" type="text/css" href="./css/admin_main.less">
+    <link rel="stylesheet" type="text/css" href="./css/fonts.css">
+    <link rel="stylesheet" type="text/css" href="./css/loader.css">
+    <script src="./js/less.min.js"></script>
+    <script src="./js/handler-admin.js"></script>
+    <title>Расписание МГВРК</title>
+</head>
+<body>
+    <div class="main-block" id="import-export">
+        <p style="border-bottom: 2px solid rgba(160, 160, 160, 0.4)" onclick="LOAD_import_shedule()">Импорт расписания</p>
+        <p>Экспорт расписания</p>
+    </div>
+    <div class="main-block" id="group-add">Добавить группу</div>
+    <div class="main-block" id="message-sent"><!--
+        --><div id="message-more"></div><!--
+        --><div id="message-type">
+        <p>Важно</p>
+        <div id="message-type-input">
+            <div class="message-type-list">Важно</div>
+            <div class="message-type-list">Внимание</div>
+            <div class="message-type-list">Инфо</div>
+        </div>
+        </div><!--
+        --><div id="message-to"><input type="text" id="message-to-input"></div><!--
+        --><div id="message-text"><input id="message-text-input" type="text"></div><!--
+        --><div id="message-push"></div><!--
+    --></div>
+    <div class="main-block" id="swap">Заменить пару</div>
+    <div class="main-block" id="shedule-change">
+        <p>Изменить расписание</p>
+        <div id="shedule-change-group"></div><!--
+        --><div class="delimeter-div" style="height: 100px;"></div><!--
+        --><div id="shedule-change-teacher"></div>
+    </div>
+    <div class="main-block" id="print">Печать</div>
+    <div class="main-block" id="classroom">
+        <p>Установить аудитории</p>
+        <div id="classroom-auto"></div><!--
+        --><div class="delimeter-div" style="height: 150px;"></div><!--
+        --><div id="classroom-manual"></div>        
+    </div>
+    <div class="main-block" id="bugreports">Ппросмотр баг отчетов</div>
+    <div class="main-block" id="settings">Настройки</div>
+    
+<script type="text/javascript" src="./js/handler-main.js"></script>
+</body>
+</html>

@@ -1,0 +1,917 @@
+@color-body: #F5F5F5;
+@color-main: #03a9f4;
+@color-block: #FFF;
+@color-main-shadow: rgba(0,0,0,0.4);
+@color-delimeter: rgba(160, 160, 160, 0.4);
+@color-good: #c0ca33;
+@color-bad: #f4511e;
+@color-table-hover: #EEEEEE;
+
+body
+{
+    position: absolute;
+    background-color: @color-body;
+    left: ~"calc( 50% - 500px )";
+    top: ~"calc( 50% - 250px )";
+    width: 1000px;
+    height: 500px;
+}
+.main-block
+{
+    box-shadow: 0px 0px 3px @color-main-shadow;
+    background-color: @color-block;
+    position: absolute;
+    width: 300px;
+    height: 250px;
+    transition: 0.5s;
+}
+.main-block:hover
+{
+    box-shadow: 0px 0px 20px @color-main-shadow;
+    transition: 0.5s;
+}
+#import-export
+{
+    width: 160px;
+    height: 100px;
+    left: 0;
+    top: 0;
+}
+#import-export p
+{
+	height: 49px;
+	line-height: 50px;
+	width: 140px;
+	text-align: center;
+	margin: 0;
+	padding: 0;
+	margin-left: 10px;
+}
+#group-add
+{
+    width: 160px;
+    height: 100px;
+    left: 0;
+    top: 120px;
+}
+#message-sent
+{
+    width: 820px;
+    height: 50px;
+    left: 180px;
+    top: 0;
+}
+#swap
+{
+    width: 195px;
+    height: 150px;
+    left: 180px;
+    top: 70px;
+}
+#shedule-change
+{
+    width: 390px;
+    height: 150px;
+    left: 395px;
+    top: 70px;
+}
+#print
+{
+    width: 195px;
+    height: 150px;
+    left: 805px;
+    top: 70px;
+}
+#classroom
+{
+    width: 440px;
+    height: 260px;
+    left: 0;
+    top: 240px;
+}
+#bugreports
+{
+    width: 260px;
+    height: 260px;
+    left: 460px;
+    top: 240px;
+}
+#settings
+{
+    width: 260px;
+    height: 260px;
+    left: 740px;
+    top: 240px;
+}
+#message-more, #message-type, #message-to, #message-text, #message-push
+{
+    display: inline-block;
+    height: 50px;
+	vertical-align: top;
+}
+#message-more
+{
+    width: 50px;
+    background-color: orange;
+}
+#message-type p
+{
+	width: 70px;
+	margin-left: 15px;
+	border-bottom: 2px solid @color-delimeter;
+	text-align: center;
+	padding-bottom: 5px;
+}
+#message-type
+{
+    width: 100px;
+}
+#message-to-input
+{
+	margin-left: 10px;
+	width: 70px;
+	height: 18px;
+	margin-top: 11px;
+	outline: 0;
+	border: 0;
+	padding: 5px;
+	border-bottom: 2px solid @color-delimeter;
+	background-color: transparent;
+	text-align: center;
+}
+#message-to
+{
+    width: 100px;
+}
+#message-text
+{
+    width: 520px;
+}
+#message-push
+{
+    width: 50px;
+    background-color: chocolate;
+}
+#message-type-input
+{
+    box-shadow: 0px 4px 10px @color-main-shadow;
+	margin-top: -57px;
+	display: none;
+	width: 100px;
+	height: 150px;
+	position: absolute;
+	z-index: 50000;
+}
+.message-type-list
+{
+	width: 100px;
+	background-color: @color-block;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+}
+#message-type:hover #message-type-input
+{
+	display: block;
+}
+#message-text-input
+{
+	margin-left: 10px;
+	width: 490px;
+	height: 18px;
+	margin-top: 11px;
+	outline: 0;
+	border: 0;
+	padding: 5px;
+	border-bottom: 2px solid @color-delimeter;
+	background-color: transparent;
+}
+#shedule-change p {
+    width: 390px;
+    height: 40px;
+    line-height: 40px;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+#shedule-change-teacher
+{
+    display: inline-block;
+    width: 194px;
+    height: 100px;
+    background-image: url("icons/electronic.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 80px;    
+}
+#shedule-change-group
+{
+    display: inline-block;
+    width: 194px;
+    height: 100px;
+    background-image: url("icons/electronic.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 80px;    
+}
+.delimeter-div
+{
+    display: inline-block;
+    width: 2px;
+    background-color: @color-delimeter;
+}
+#classroom p {
+    width: 440px;
+    height: 80px;
+    line-height: 80px;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+#classroom-auto
+{
+    width: 219px;
+    height: 150px;
+    display: inline-block;
+    vertical-align: top;
+    background-image: url("icons/electronic.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 120px;
+}
+#classroom-manual
+{
+    width: 219px;
+    height: 150px;
+    display: inline-block;
+    vertical-align: top;
+    background-image: url("icons/electronic.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 120px;
+}
+#fileupload
+{
+    box-shadow: 0px 4px 10px @color-main-shadow;
+    position: fixed;
+    background-color: @color-block;
+    width: 400px;
+    left: ~"calc( 50% - 200px )";
+    top: ~"calc( 50% - 100px )";
+    height: 180px;
+    overflow: hidden;
+    transition: 0.5s;
+}
+#fileupload-text
+{
+    width: 360px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+#file-choose
+{
+    height: 100px;
+    width: 400px;
+}
+#file-choose-name
+{
+    display: inline-block;
+    vertical-align: top;
+    width: 0px;
+    height: 40px;
+    margin: 30px 0px;
+    line-height: 40px;
+    text-align: center;
+    overflow: hidden;
+}
+#file-choose-button
+{
+    display: inline-block;
+    width: 300px;
+    margin-left: 50px;
+    height: 80px;
+    background-color: @color-good;
+    overflow: hidden;
+}
+#filename
+{
+    padding: 0;
+    opacity: 0;
+    margin: 0;
+    width: 100px;
+    height: 100px;
+    font-size: 100px;
+    width: 100%;
+    height: 100%;
+}
+#upload-status
+{
+    height: 20px;
+    background-color: @color-main;
+    width: 0px;
+    margin: 10px 0 0;
+}
+#message-more-type label p
+{
+	height: 47px;
+	line-height: 50px;
+	padding: 0;
+	margin: 0;
+	border-bottom: 3px solid transparent;
+	transition: 0.5s;
+}
+#message-more-type label input[type="radio"]:checked + p
+{
+	border-bottom: 3px solid @color-main;
+}
+#message-more-type label input[type="radio"]
+{
+	display: none;
+}
+#message-more-type label
+{
+	display: inline-block;
+	vertical-align: top;
+	width: 100px;
+	height: 50px;
+	margin-left: 80px;
+	text-align: center;
+	line-height: 50px;
+}
+#message-more-type
+{
+	width: 700px;
+	height: 50px;
+	top: 0;
+	left: 0;
+	line-height: 50px;
+	font-size: 20px;
+}
+#message-more-whom
+{
+	width: 280px;
+	height: 430px;
+	top: 0;
+	left: 720px;
+}
+#message-more-filter
+{
+	width: 700px;
+	height: 360px;
+	top: 70px;
+	left: 0;
+}
+#message-more-text
+{
+	width: 930px;
+	height: 50px;
+	top: 450px;
+	left: 0;
+}
+#message-more-send
+{
+	width: 50px;
+	height: 50px;
+	top: 450px;
+	left: 950px;
+}
+#message-more-whom p
+{
+	width: 280px;
+	padding: 0;
+	margin: 0;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	font-size: 20px;
+}
+#message-more-whom ul
+{
+	padding: 0;
+	margin: 0;
+	width: 280px;
+	height: 380px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+#message-more-whom ul li
+{
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	height: 20px;
+	margin-top: 5px;
+	text-align: center;
+	line-height: 20px;
+}
+#message-more-text-input
+{
+	padding: 0 0 0 15px;
+	margin: 10px 0 0 15px;
+	height: 30px;
+	width: 885px;
+	border: 0;
+	border-bottom: 2px solid @color-delimeter;
+	line-height: 30px;
+	font-size: 18px;
+	transition: 1s;
+}
+#message-more-text-input:focus, #message-more-text-input:hover
+{
+	border-bottom: 2px solid @color-main;
+	outline: none;
+}
+#message-more-send
+{
+	background-color: @color-main;
+}
+#filter-text:focus
+{
+	outline: none;
+	border-bottom: 2px solid @color-main;
+}
+#filter-text
+{
+	padding: 0 0 0 10px;
+	margin: 30px 0 0 30px;
+	height: 48px;
+	width: 190px;
+	border: 0;
+	border-bottom: 2px solid @color-delimeter;
+	line-height: 50px;
+	font-size: 18px;
+	transition: 0.5s;	
+	display: inline-block;
+	vertical-align: top;	
+}
+#filter-first:focus, #filter-second:focus
+{
+	outline: none;
+	border-bottom: 2px solid @color-main;
+}
+#filter-first, #filter-second
+{
+	width: 150px;
+	border: 0;
+	border-bottom: 2px solid @color-delimeter;
+	height: 50px;
+	margin: 30px 0 0 30px;
+	padding: 0;
+	line-height: 50px;
+	background-color: transparent;
+	display: inline-block;
+	vertical-align: top;
+	transition: 0.5s;
+}
+#filter-add
+{
+	width: 50px;
+	height: 50px;
+	margin: 30px 0 0 30px;
+	background-color: @color-main;
+	display: inline-block;
+	vertical-align: top;
+}
+#message-more-filter ul
+{
+	padding: 0;
+	margin: 20px 0 0;
+	width: 700px;
+	height: 260px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+#message-more-filter ul li #delete-button
+{
+	height: 20px;
+	width: 20px;
+	display: inline-block;
+	vertical-align: top;
+	margin: 5px 10px 0 0;
+	background-image: url("icons/close.png");
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 12px;
+	padding: 0;
+}
+#message-more-filter ul li
+{
+	position: relative;
+	display: block;
+	list-style: none;
+	padding: 0 0 0 30px;
+	width: ~"calc(100% - 60px)";
+	margin: 0;
+	height: 30px;
+	margin-top: 5px;
+	line-height: 30px;
+}
+#header {
+    line-height: 30px;
+    width: 100%;
+    height: 30px;
+    cursor: pointer;
+    text-align: center;
+    background-color: #03a9f4;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .4);
+}
+#button-close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    /*background-color: #0275a8;*/
+    /*background-color: rgba(0,0,0,0.25);*/
+    
+    background-image: url('./icons/close.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 20px;
+}
+.admin-table
+{
+	background-color: @color-block;
+	margin-top: ~"calc( 25% - 180px)";
+	width: 100%;
+	border-spacing: 0;
+}
+.admin-table thead {
+    text-align: center;
+}
+.admin-table tr {
+    width: 100%;
+    min-height: 50px;
+}
+.admin-table tr:hover {
+    background-color: #ebebeb;
+}
+.admin-table tr td input[type="text"]:focus {
+	outline: none;
+}
+.admin-table tr td input[type="text"]{
+	height: 40px;
+	line-height: 40px;
+	width: ~"calc( 100% - 10px )";
+	border: 0;
+	padding: 0 0 0 10px;
+	background-color: transparent;
+	margin: 0;
+}
+.admin-table tr td {
+	min-height: 50px;
+    position: relative;
+    padding: 5px 5px 5px 8px;
+    padding-left: 8px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(160, 160, 160, .2);
+}
+.admin-table tr td:first-child {
+    min-width: 120px;
+    text-align: left;
+	vertical-align: middle;
+}
+#group-shedule-edit
+{
+	margin-top: 10px;
+	height: ~"calc( 100% - 245px)";
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+#group-shedule-choice
+{
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	background-color: @color-block;
+	box-shadow: 0 0 10px @color-main-shadow;
+	width: 100%;
+	height: 200px;
+}
+#even-choice p:hover
+{
+	border-bottom: 3px solid @color-main;
+}
+#even-choice p
+{
+	height: 97px;
+	text-align: center;
+	line-height: 100px;
+	padding: 0;
+	width: 200px;
+	margin: 0 0 0 50px;
+	border-bottom: 3px solid transparent;
+	transition: 0.5s;
+}
+#even-choice
+{
+	display: inline-block;
+	height: 200px;
+	width: 300px;
+}
+.day-choice:hover
+{
+	border-bottom: 3px solid @color-main;
+}
+.day-choice
+{
+	vertical-align: top;
+	margin: 0;
+	padding: 0;
+	line-height: 200px;
+	display: inline-block;
+	height: 197px;
+	transition: 0.5s;
+	text-align: center;
+	border-bottom: 3px solid transparent;
+	width: ~"calc( ( 100% - 300px ) / 7)";
+}
+#swap-group-choice ul li:hover, #swap-day-choice ul li:hover
+{
+	border-bottom: 1px solid @color-main;
+}
+#swap-group-choice ul li, #swap-day-choice ul li
+{
+	transition: 0.2s;
+	text-align: center;
+	width: 320px;
+	margin: 10px 0 0 40px;
+	height: 19px;
+	line-height: 20px;
+	border-bottom: 1px solid transparent;
+}
+#swap-group-choice ul, #swap-day-choice ul
+{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	overflow-y: auto;
+	width: 400px;
+	height: 240px;
+}
+#swap-group-choice p, #swap-day-choice p
+{
+	padding: 0;
+	margin: 0;
+	height: 60px;
+	line-height: 60px;
+	text-align: center;
+}
+#swap-group-choice
+{
+	top: 0;
+	left: 50px;
+	width: 400px;
+	height: 300px;
+}
+#swap-day-choice
+{
+	height: 300px;
+	left: 500px;
+	width: 400px;
+	top: 0;
+}
+#swap-group-edit
+{
+	width: 850px;
+	height: 100px;
+	top: 350px;
+	left: 50px;
+}
+#lesson-to-swap:hover, #lesson-to-swap:focus
+{
+	outline: none;
+	border-bottom: 2px solid @color-main;
+}
+#lesson-to-swap
+{
+	height: 40px;
+	width: 200px;
+	border: 0;
+	border-bottom: 2px solid @color-delimeter;
+	transition: 1s;
+	background-color: transparent;
+	margin: 28px 0 0 20px;
+	display: inline-block;
+	vertical-align: top;
+}
+#lesson-new:hover, #lesson-new:focus
+{
+	border-bottom: 2px solid @color-main;
+	outline: none;
+}
+#lesson-new
+{
+	padding: 0 0 0 20px;
+	width: 510px;
+	height: 40px;
+	border: 0;
+	border-bottom: 2px solid @color-delimeter;
+	margin: 26px 0 0 20px;
+	display: inline-block;
+	vertical-align: top;
+	transition: 0.2s;
+}
+#swap-button-ok
+{
+	height: 42px;
+	width: 42px;
+	background-color: @color-main;
+	margin: 26px 0 0 20px;
+	display: inline-block;
+	vertical-align: top;	
+}
+#print-chooser-today p, #print-chooser-term p
+{
+	margin: 0;
+	padding: 0;
+	height: 30px;
+	line-height: 30px;
+	margin-top: 150px;
+}
+#print-chooser-today, #print-chooser-term
+{
+	display: inline-block;
+	vertical-align: top;
+	height: 200px;
+	width: 198px;
+	text-align: center;
+	background-image: url("icons/calendar.png");
+	background-size: 100px;
+	background-repeat: no-repeat;
+	background-position: 50% 30%;
+}
+#print-chooser
+{
+	width: 400px;
+	height: 200px;
+	top: 150px;
+	left: 300px;
+}
+#group-creator
+{
+	width: 1000px;
+	height: 500px;
+}
+#group-creator-text
+{
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	height: 100px;
+	line-height: 100px;
+	font-size: 20px;
+}
+.input-p
+{
+	margin: 0;
+	padding: 0 0 0 20px;
+	width: 280px;
+	height: 40px;
+	line-height: 60px;
+	display: inline-block;
+	vertical-align: top;
+}
+.input-class:focus, .input-class:hover
+{
+	border-bottom: 2px solid @color-main;
+	outline: none;
+}
+.input-class
+{
+	transition: 1s;
+	display: inline-block;
+	vertical-align: top;	
+	height: 38px;
+	line-height: 40px;
+	width: 670px;
+	border: 0;
+	padding: 0 0 0 10px;
+	background-color: transparent;
+	border-bottom: 2px solid @color-delimeter;
+	margin: 0;
+}
+#group-creator-button:hover
+{
+	background-color: lighten(@color-main, 20%);
+}
+#group-creator-button
+{
+	position: absolute;
+	bottom: 20px;
+	width: 960px;
+	left: 20px;
+	background-color: @color-main;
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+	transition: 0.5s;
+}
+#table-hide-div .admin-table tr td:focus
+{
+	outline: none;
+}
+#table-hide-div .admin-table
+{
+	margin: 0;
+}
+#table-hide-div
+{
+	margin-top: 20px;
+	width: 100%;
+	height: ~"calc(100% - 50px)";
+	padding: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+#button-classroom-send:hover
+{
+	background-color: lighten(@color-main, 20%);
+}
+#button-classroom-send
+{
+	background-color: @color-main;
+	position: absolute;
+	right: 50px;
+	text-align: center;
+	height: 60px;
+	width: 60px;
+	bottom: 50px;
+	z-index: 4;
+	border-radius: 50%;
+	line-height: 60px;
+	color: #FFF;
+	transition: 0.5s;
+	box-shadow: 2px 2px 10px @color-main-shadow;
+}
+#bugs-container
+{
+	margin: 20px 0 0 5%;
+	height: ~"calc( 100% - 50px )";
+	width: 90%;
+	overflow-y: auto;
+}
+#bugs-refresh-button:hover
+{
+	background-color: lighten(@color-main, 20%);
+}
+#bugs-refresh-button
+{
+	background-color: @color-main;
+	position: absolute;
+	right: 50px;
+	text-align: center;
+	height: 60px;
+	width: 60px;
+	bottom: 50px;
+	z-index: 4;
+	border-radius: 50%;
+	background-image: url("icons/electronic.png");
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: 45px;
+	color: #FFF;
+	transition: 0.5s;
+	box-shadow: 2px 2px 10px @color-main-shadow;
+}
+.bug-line:hover
+{
+	background-color: #ebebeb;
+}
+.bug-line p
+{
+	display: inline-block;
+	margin: 0;
+	padding: 0 0 0 10px;
+	height: 40px;
+	width: ~"calc( 100% - 210px )";
+	vertical-align: top;
+}
+.bug-button:hover
+{
+	background-color: @color-delimeter;
+}
+.bug-button
+{
+	display: inline-block;
+	vertical-align: top;
+	height: 40xp;
+	width: 100px;
+	background-color: transparent;
+	transition: 0.5s;
+	text-align: center;
+}
+.bug-line
+{
+	width: 100%;
+	background-color: @color-block;
+	transition: 0.5s;
+	height: 40px;
+	line-height: 40px;
+	margin-top: 5px;
+}

@@ -1,0 +1,31 @@
+<div class="main-block" id="message-more-type">
+	<p style="height: 50px; vertical-align: top; display: inline-block; padding: 0 0 0 10px; width: 90px; margin: 0;">Тип:</p><!--
+	--><label><input type="radio" name="message-more-text-type" value="alert"><p>Важно</p></label><!--
+	--><label><input type="radio" name="message-more-text-type" value="note"><p>Внимание</p></label><!--
+	--><label><input type="radio" name="message-more-text-type" value="info"><p>Инфо</p></label>
+</div>
+<div class="main-block" id="message-more-whom">
+	<p>Получатели</p>
+	<ul id="whom-sent"></ul>
+</div>
+<div class="main-block" id="message-more-filter">
+	<select id="filter-first">
+		<option value="group">Группа</option>
+		<option value="grade">Курс</option>
+	</select><!--
+	--><select id="filter-second">
+		<option value="==">Равно</option>
+		<option value="!=">Не равно</option>
+		<option value=">">Больше</option>
+		<option value=">=">Больше либо равно</option>
+		<option value="<">Меньше</option>
+		<option value="<=">Меньше либо равно</option>
+	</select>
+	<input type="text" id="filter-text">
+	<div id="filter-add"></div>
+	<ul id="whom-sent"></ul>
+</div>
+<div class="main-block" id="message-more-text">
+	<input type="text" placeholder="Введите текст..." id="message-more-text-input">
+</div>
+<div class="main-block" id="message-more-send"></div>

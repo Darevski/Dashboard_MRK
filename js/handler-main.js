@@ -149,29 +149,31 @@ Input:
 Output:
 	LOADER - возвращает LOADER типа ELEMENT
 ***/
-function CreateLoader(block, Clear_Option)
+function CreateLoader(block, allBlock, fullscreen)
 {
     var loader = document.createElement("div");
-    loader.style.width = block.offsetWidth + "px";
-    loader.style.height = block.offsetHeight + "px";
-    if ((Clear_Option == undefined) || (Clear_Option == null))
-        {
-            loader.style.left = "calc(50% - 500px + " + block.offsetLeft + "px )";
-            loader.style.top = "calc(50% - 250px + " + block.offsetTop + "px )";
-        }
-    else
-        {
-            loader.style.left = block.offsetLeft + "px";
-            loader.style.top = block.offsetTop + "px";
-        }
-    /*
-    console.log("--- Вызов CreateLoader ---");
-    console.log("Width: " + loader.style.width);
-    console.log("Height: " + loader.style.height);
-    console.log("Top: " + loader.style.top);
-    console.log("Left: " + loader.style.left);
-    console.log("--- Вызов CreateLoader ---");
-    */
+	if ((fullscreen != undefined) || (fullscreen != null))
+		{
+            loader.style.left = "0";
+            loader.style.top = "0";			
+			loader.style.width = "100%";
+			loader.style.height = "100%";
+		}
+	else
+		{
+			loader.style.width = block.offsetWidth + "px";
+			loader.style.height = block.offsetHeight + "px";
+			if ((allBlock == undefined) || (allBlock == null))
+				{
+					loader.style.left = "calc(50% - 500px + " + block.offsetLeft + "px )";
+					loader.style.top = "calc(50% - 250px + " + block.offsetTop + "px )";
+				}
+			else
+				{
+					loader.style.left = block.offsetLeft + "px";
+					loader.style.top = block.offsetTop + "px";
+				}
+		}
     loader.className='loader';
     var span_loader = document.createElement("span");
     span_loader.className = "loader-container";
@@ -184,7 +186,6 @@ function CreateLoader(block, Clear_Option)
     loader.zIndex = 10;
     return loader;
 }
-
 /*** --- Гененирует основное меню
 Input:
 	none
@@ -222,7 +223,6 @@ function Dashboard_Load()
     });
 	}, 600);
 }
-
 /*** --- Генерирует меню выбора группы
 Input:
 	none

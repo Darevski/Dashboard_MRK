@@ -1,3 +1,4 @@
+var TIME_difference;
 function LOAD_import_shedule()
 {
     NewXHR("/Application/Views/Skeletons/Admin_Upload.html", null, function (answer){
@@ -57,4 +58,36 @@ function UPDATE_shedule_from_load()
     }
     var csvfile = document.getElementById("filename").files[0];
     upload(csvfile);
+}
+function DoOnLoad()
+{
+	LOAD_AdminDash();
+}
+function LOAD_AdminDash()
+{
+    var body = document.body;
+    var loader = CreateLoader(body, 1, 1);
+	body.style.opacity = "0";
+	setTimeout(function (){
+		ClearBody();
+		body.style.opacity = "";
+        document.body.appendChild(loader);
+		loader.style.opacity = "1";
+		setTimeout(function () {
+			NewXHR("/Application/Views/Skeletons/Admin_Dashboard.html", null, function (data){
+				if (data.check != false)
+					{
+						loader.style.opacity = "";
+						setTimeout(function () {
+							body.innerHTML = data;							
+							loader.remove();
+						}, 600);
+					}
+				else
+					{
+						//exception handler
+						CreateEx("Обнаружена ошибка: " + data.status);
+					}});
+		}, 600);
+	}, 600);	
 }

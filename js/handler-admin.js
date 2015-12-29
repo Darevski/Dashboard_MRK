@@ -1,9 +1,37 @@
 var TIME_difference;
+function LOAD_SkeletonsFullscreen(route)
+{
+    var body = document.body;
+    var loader = CreateLoader(body, 1, 1);
+	body.style.opacity = "0";
+	setTimeout(function (){
+		ClearBody();
+		body.style.opacity = "";
+        document.body.appendChild(loader);
+		loader.style.opacity = "1";
+		setTimeout(function () {
+			NewXHR(route, null, function (data){
+				if (data.check != false)
+					{
+						loader.style.opacity = "";
+                        body.style.opacity = "0";
+						setTimeout(function () {
+                            body.style.opacity = "";
+							body.innerHTML = data;							
+							loader.remove();
+						}, 600);
+					}
+				else
+					{
+						//exception handler
+						CreateEx("Обнаружена ошибка: " + data.status);
+					}});
+		}, 600);
+	}, 600);	
+}
 function LOAD_import_shedule()
 {
-    NewXHR("/Application/Views/Skeletons/Admin_Upload.html", null, function (answer){
-        document.body.innerHTML = answer;
-    });
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Upload.html");
 }
 function UPDATE_shedule_from_load()
 {
@@ -65,29 +93,37 @@ function DoOnLoad()
 }
 function LOAD_AdminDash()
 {
-    var body = document.body;
-    var loader = CreateLoader(body, 1, 1);
-	body.style.opacity = "0";
-	setTimeout(function (){
-		ClearBody();
-		body.style.opacity = "";
-        document.body.appendChild(loader);
-		loader.style.opacity = "1";
-		setTimeout(function () {
-			NewXHR("/Application/Views/Skeletons/Admin_Dashboard.html", null, function (data){
-				if (data.check != false)
-					{
-						loader.style.opacity = "";
-						setTimeout(function () {
-							body.innerHTML = data;							
-							loader.remove();
-						}, 600);
-					}
-				else
-					{
-						//exception handler
-						CreateEx("Обнаружена ошибка: " + data.status);
-					}});
-		}, 600);
-	}, 600);	
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Dashboard.html");
+}
+function LOAD_GroupAdd()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Group_Create.html");
+}
+function LOAD_Message()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Message.html");
+}
+function LOAD_Swap()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Swap.html");
+}
+function LOAD_GroupChange()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Group_Create.html");
+}
+function LOAD_ProfessorEdit()
+{
+    alert();
+}
+function LOAD_PrintDialog()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Print.html");
+}
+function LOAD_RoomsEdit()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Classroom_Edit.html");
+}
+function LOAD_Reports()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Bugs.html");
 }

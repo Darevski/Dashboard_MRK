@@ -23,10 +23,11 @@
 		<option value="<=">Меньше либо равно</option>
 	</select>
 	<input type="text" id="filter-text">
-	<div id="filter-add"></div>
-	<ul id="whom-sent"></ul>
+	<div id="filter-add" onclick="ADD_message_filter()"></div>
+	<ul id="whom-filter">
+    </ul>
 </div>
 <div class="main-block" id="message-more-text">
 	<input type="text" placeholder="Введите текст..." id="message-more-text-input">
 </div>
-<div class="main-block" id="message-more-send"></div>
+<div class="main-block" id="message-more-send" onclick="SEND_premessage_full()"></div>

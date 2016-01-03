@@ -5,17 +5,17 @@
 <div class="main-block" id="group-add" onclick="LOAD_GroupAdd()">Добавить группу</div>
 <div class="main-block" id="message-sent"><!--
     --><div id="message-more" onclick="LOAD_Message()"></div><!--
-    --><div id="message-type">
-    <p>Важно</p>
+    --><div id="message-type" data-messagetype="alert" onclick="SHOW_message_types()">
+    <p id="message-type-p-type">Важно</p>
     <div id="message-type-input">
-        <div class="message-type-list">Важно</div>
-        <div class="message-type-list">Внимание</div>
-        <div class="message-type-list">Инфо</div>
+        <div class="message-type-list" onclick="SET_message_type('alert')">Важно</div>
+        <div class="message-type-list" onclick="SET_message_type('note')">Внимание</div>
+        <div class="message-type-list" onclick="SET_message_type('info')">Инфо</div>
     </div>
     </div><!--
     --><div id="message-to"><input type="text" id="message-to-input"></div><!--
     --><div id="message-text"><input id="message-text-input" type="text"></div><!--
-    --><div id="message-push"></div><!--
+    --><div id="message-push" onclick="SEND_message_small()"></div><!--
 --></div>
 <div class="main-block" id="swap" onclick="LOAD_Swap()">Заменить пару</div>
 <div class="main-block" id="shedule-change">

@@ -24,6 +24,7 @@ class Controller_Dashboard extends Core\Controller
         $this->view = new Core\View();
         $this->professor_model = new Models\Model_Professors();
         $this->timetable_model = new Models\Model_TimeTable();
+        $this->list_group_model = new Models\Model_List_Groups();
     }
 
     /**
@@ -115,7 +116,7 @@ class Controller_Dashboard extends Core\Controller
      * @api
      */
     function action_get_list_group(){
-        $list_group=$this->timetable_model->get_list_group();
+        $list_group=$this->list_group_model->get_list_group();
         $this->view->output_json($list_group);
     }
 

@@ -110,22 +110,6 @@ class Model_TimeTable extends Model_Dashboard
     }
 
     /**
-     * Получает список всех групп (курс группы).
-     * Сортирует его согласно номеру групп по возрастанию
-     * @return array номер группы + курс
-     */
-    function get_list_group(){
-        $result_query=$this->database->getALL("SELECT group_number,grade FROM groups_list");
-        //сортировка полученного списка в соответсвии с их номером по возрастанию
-        usort($result_query,array($this,'Groups_Sort_CallBack'));
-        foreach ($result_query as $value){
-            $grade = $value['grade'];
-            $result[$grade][] = $value['group_number'];
-        }
-        return $result;
-    }
-
-    /**
      * возвращает рассписание на сегодня и на след учебный день
      * @param int $group_number номер группы
      * @return mixed -
@@ -255,18 +239,6 @@ class Model_TimeTable extends Model_Dashboard
         return ($a['lesson_number'] < $b['lesson_number']) ? -1 : 1;
     }
 
-    /**
-     * Callback функция для сортировки списка групп по их номеру
-     * @param array $a ячейка группы
-     * @param array $b ячейка группы
-     * @return int результат сравнения номера группы
-     */
-    private function Groups_Sort_CallBack($a, $b) {
-        if ($a['group_number'] == $b['group_number']) {
-            return 0;
-        }
-        return ($a['group_number'] < $b['group_number']) ? -1 : 1;
-    }
 
     /**
      * Callback функция для сортировки уведомлений по дате их старта

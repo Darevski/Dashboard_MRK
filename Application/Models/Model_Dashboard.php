@@ -9,6 +9,7 @@
 
 namespace Application\Models;
 use Application\Core;
+use DateTime;
 
 /**
  * Класс связанный с базовым функционалом рассписанием
@@ -153,4 +154,17 @@ class Model_Dashboard extends Core\Model
         $result =  $this->database->getRow($query,$number_lesson);
         return $result;
     }
+
+    /**
+     * Проверяет Дату на валидность
+     * @param string $date
+     * @param string $format по умолчанию Y-m-d
+     * @return bool
+     */
+    protected function validateDate($date,$format = 'Y-m-d')
+    {
+        $date_format = DateTime::createFromFormat($format, $date);
+        return $date_format && $date_format->format($format) == $date;
+    }
+
 }

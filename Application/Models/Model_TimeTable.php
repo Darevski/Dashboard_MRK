@@ -67,28 +67,6 @@ class Model_TimeTable extends Model_Dashboard
     }
 
     /**
-     * Возвращает массив с уведомлениями для выбранной группы
-     * состояние уведомления
-     * Сортировка по дате, в начале новейшие
-     * @param integer $number_group
-     * @return array {string 'state' critical|warning|info , string text}
-     */
-    function get_notification_for_group($number_group){
-        $today = date("Ymd");
-        $query = "SELECT state,text,starting_date FROM notification WHERE (group_number=?s or group_number=0) and ending_date>=$today";
-        $result_of_query = $this->database->getAll($query,$number_group);
-        // сортируем по дате добавления в начале новейшие
-        usort($result_of_query,array($this,'Notifications_Sort_by_date_CallBack'));
-        foreach ($result_of_query as $value)
-        {
-            $array_temp['state']=$value['state'];
-            $array_temp['text']=$value['text'];
-            $result[]=$array_temp;
-        }
-        return $result;
-    }
-
-    /**
      * Возвращает рассписание на 2 недели (числитель + знаменатель + all)
      * Возвращаемая структура {string 'even'/'uneven' {
      *
@@ -237,19 +215,5 @@ class Model_TimeTable extends Model_Dashboard
      */
     private function lessons_number_sort_CallBack($a, $b) {
         return ($a['lesson_number'] < $b['lesson_number']) ? -1 : 1;
-    }
-
-
-    /**
-     * Callback функция для сортировки уведомлений по дате их старта
-     * @param array $a ячейка уведомления
-     * @param array $b ячейка уведомления
-     * @return int результат дат уведомлений
-     */
-    private function Notifications_Sort_by_date_CallBack($a,$b){
-        if ($a['starting_date'] == $b['starting_date']) {
-            return 0;
-        }
-        return ($a['starting_date'] > $b['starting_date']) ? -1 : 1;
     }
 }

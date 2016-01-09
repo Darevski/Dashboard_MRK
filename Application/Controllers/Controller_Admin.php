@@ -28,6 +28,7 @@ class Controller_Admin extends Core\Controller{
         $this->validate();
         $this->model = new Models\Model_Admin();
         $this->list_group_model = new Models\Model_List_Groups();
+        $this->notifications =new Models\Model_Notifications();
     }
 
     /**
@@ -64,10 +65,12 @@ class Controller_Admin extends Core\Controller{
      * Входные данные через integer Post 'grade' и 'group_number'
      *
      * Вывод результата выполнения array string state:success||fail , string message
+     *
+     * @api
      */
     function action_add_group(){
-        $_POST['grade'] = 1;
-        $_POST['group_number'] = 12494;
+       //$_POST['grade'] = 1;
+       //$_POST['group_number'] = 12494;
         if (isset($_POST['grade']) && isset($_POST['group_number'])){
             $grade = $this->security_variable($_POST['grade']);
             $group_number = $this->security_variable($_POST['group_number']);
@@ -77,5 +80,31 @@ class Controller_Admin extends Core\Controller{
             //Вывод результата выполнения
             $this->view->output_json($result);
         }
+    }
+
+    /**
+     * Добавление В базу данных нового уведомления
+     * Входные данные через Post
+     * type = 'critical|warning|info'
+     * targer = кому предназначены, 0 - для всех
+     * message
+     * ending_date - дата окончания уведомления
+     *
+     * @api
+     */
+    function action_add_notification(){
+        //$_POST['type']='info';
+        //$_POST['target']='32494';
+        //$_POST['message']='Уведомление1';
+        //$_POST['ending_date']='2016-09-20';
+        if(isset($_POST['type']) && isset($_POST['target']) && isset($_POST['message']) && isset($_POST['ending_date'])){
+            $type = $this->security_variable($_POST['type']);
+            $target = $this->security_variable($_POST['target']);
+            $message = $this->security_variable($_POST['message']);
+            $ending_date = $this->security_variable($_POST['ending_date']);
+            $result =  $this->notifications->add_notification($type,$target,$message,$ending_date);
+            $this->view->output_json($result);
+        }
+
     }
 }

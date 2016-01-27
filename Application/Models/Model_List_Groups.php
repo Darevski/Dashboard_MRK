@@ -68,7 +68,7 @@ class Model_List_Groups extends Model_Dashboard
         usort($result_query,array($this,'Groups_Sort_CallBack'));
 
         foreach ($result_query as $value)
-            $result[]=$value['group_number'];
+            $result['groups'][]=$value['group_number'];
         return $result;
     }
 

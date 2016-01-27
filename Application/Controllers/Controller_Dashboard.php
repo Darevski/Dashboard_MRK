@@ -192,4 +192,16 @@ class Controller_Dashboard extends Core\Controller
             $this->view->output_json($result);
         }
     }
+
+
+    /**
+     * Вывод Json строки, содержащей отсортированный по возрастанию список групп
+     * integer group_number
+     *
+     * @api
+     */
+    function action_get_list_group_without_grade(){
+        $list_group=$this->list_group_model->get_list_group_without_grade();
+        $this->view->output_json($list_group);
+    }
 }

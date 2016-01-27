@@ -50,17 +50,6 @@ class Controller_Admin extends Core\Controller{
     }
 
     /**
-     * Вывод Json строки, содержащей отсортированный по возраст список групп
-     * integer group_number
-     *
-     * @api
-     */
-    function action_get_list_group_without_grade(){
-        $list_group=$this->list_group_model->get_list_group_without_grade();
-        $this->view->output_json($list_group);
-    }
-
-    /**
      * Добавление новой группу в список групп
      * Входные данные через integer Post 'grade' и 'group_number'
      *

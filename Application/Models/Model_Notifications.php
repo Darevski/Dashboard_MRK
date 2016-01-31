@@ -8,7 +8,7 @@
 
 namespace Application\Models;
 
-
+use Application\Models\Base\Model_Dashboard;
 class Model_Notifications extends Model_Dashboard
 {
     /**

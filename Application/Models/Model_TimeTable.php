@@ -9,6 +9,7 @@
 
 namespace Application\Models;
 
+use Application\Models\Base\Model_Dashboard;
 /**
  * Класс логики связанный с отображением рассписания, уведомлений и т.д. занятий выбранных групп
  * Class Model_TimeTable
@@ -30,8 +31,8 @@ class Model_TimeTable extends Model_Dashboard
      * - bool multiple при наличии нескольких преподавателей ведущих пары одновременно у одной группы - true
      */
     function get_lesson_info_by($number_group,$lesson_number){
-        $today = $this->get_day()['today'];
-        $numerator = $this->get_week_numerator();
+        $today = $this->date_time_model->get_day()['today'];
+        $numerator = $this->date_time_model->get_week_numerator();
         $query = "SELECT * FROM groups,professors,departments_list WHERE groups.professor_id=professors.id AND
         professors.department_id = departments_list.id AND group_number=?s AND day_number=?s AND lesson_number=?s
         AND (numerator='all' or numerator=?s)";
@@ -102,25 +103,25 @@ class Model_TimeTable extends Model_Dashboard
      * }
      */
     function get_actual_dashboard($group_number){
-        $numerator = $this->get_week_numerator(); // получение значения нумератора для текущей недели
+        $numerator = $this->date_time_model->get_week_numerator(); // получение значения нумератора для текущей недели
 
         $query = "SELECT * FROM groups,professors WHERE groups.professor_id=professors.id AND group_number=?s AND day_number=?s AND (numerator=?s or numerator='all')";
 
         //Получение дней на сегодня и завтра
-        $day=$this->get_day();
+        $day=$this->date_time_model->get_day();
         $today = $day['today'];
         $tomorrow = $day['tomorrow'];
 
         $result_today=$this->database->getAll($query,$group_number,$today,$numerator);
         $result['today']=$this->parse_timetable($result_today);
 
-        $result['today']['day_name'] = $this->get_name_day($today); // Получение названия дня
+        $result['today']['day_name'] = $this->date_time_model->get_name_day($today); // Получение названия дня
 
         $result_tomorrow = $this->database->getAll($query,$group_number,$tomorrow,$numerator);
 
         $result['tomorrow']=$this->parse_timetable($result_tomorrow);
 
-        $result['tomorrow']['day_name'] = $this->get_name_day($tomorrow); // Получение названия дня
+        $result['tomorrow']['day_name'] = $this->date_time_model->get_name_day($tomorrow); // Получение названия дня
 
         return $result;
     }

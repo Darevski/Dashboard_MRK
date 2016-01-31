@@ -7,8 +7,7 @@
  * @author Darevski
  */
 
-namespace Application\Models;
-
+namespace Application\Models\Base;
 
 use Application\Core\Model;
 

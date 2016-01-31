@@ -42,7 +42,7 @@ class Controller {
     function __construct()
     {
         $this->model = new Model();
-        $this->auth_model= new Models\Model_Auth();
+        $this->auth_model= new Models\Base\Model_Auth();
         $this->view = new View();
     }
 

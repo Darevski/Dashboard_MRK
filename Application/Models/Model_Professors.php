@@ -9,6 +9,7 @@
 
 namespace Application\Models;
 
+use Application\Models\Base\Model_Dashboard;
 /**
  * Класс логики связанный с отображением информации о преподавателях, их рассписание, и т.д.
  * Class Model_Professors
@@ -28,13 +29,14 @@ class Model_Professors extends Model_Dashboard
      * group_number, lesson_name, classroom,start_time,end_time
      */
     function get_professor_state($professor_id){
-        $day = $this->get_day()['today'];
+        $day = $this->date_time_model->get_day()['today'];
         // Если сегодня воскресенье
         if ($day == false){
             $result['weekend']='true';
         }
         else{
-            $lesson_number = $this->get_lesson_number_by_time(date("H:i:s")); // определяет какая по счету идет пара/ пар нету
+            // определяет какая по счету идет пара/ пар нету
+            $lesson_number = $this->get_lesson_number_by_time(date("H:i:s"));
             if ($lesson_number === false)
                 $result["state"] = "false";
             else{
@@ -58,7 +60,8 @@ class Model_Professors extends Model_Dashboard
      * @return array уникальный id,professor(ФИО),depart_name(кафедра)
      */
     function get_professors_list(){
-        $query = "SELECT prof.id,prof.professor,list.depart_name FROM professors as prof,departments_list as list WHERE prof.department_id = list.id";
+        $query = "SELECT prof.id,prof.professor,dep_list.depart_name FROM professors as prof,departments_list as dep_list
+                  WHERE prof.department_id = dep_list.ID";
         $result=$this->database->getALL($query);
         return $result;
     }
@@ -84,8 +87,8 @@ class Model_Professors extends Model_Dashboard
      * @return array
      */
     private function find_professor_day_conformity_with_lesson_number($professor_id,$lesson_number,$day){
-        $week_numerator = $this->get_week_numerator();
-
+        $week_numerator = $this->date_time_model->get_week_numerator();
+        $result = false;
         $min_dif = 7; // минимальная разница между следующей и текущей парой
 
         // Получение пар преподавателя на сегодня
@@ -132,7 +135,8 @@ class Model_Professors extends Model_Dashboard
      * @return array [professor] [depart_name] [photo_url]
      */
     private function get_professor_info($professor_id){
-        $query = "SELECT prof.professor,list.depart_name,photo_url FROM professors as prof,departments_list as list WHERE prof.department_id = list.id and prof.id=?s";
+        $query = "SELECT prof.professor,dep_list.depart_name,photo_url FROM professors as prof,departments_list as dep_list
+                  WHERE prof.department_id = dep_list.ID and prof.id=?s";
         $result=$this->database->getRow($query,$professor_id);
         return $result;
     }
@@ -141,12 +145,12 @@ class Model_Professors extends Model_Dashboard
      * Создание рассписания преподавателя на неделю с учетом нумератора недели
      * @param integer $professor_id
      * @param string $numerator
-     * @return array
+     * @return array Номер дня, номер пары, название предмета, номер группы у которой ведет преподаватель
      */
     private function week_professor_parse($professor_id,$numerator){
         $query = "SELECT * FROM groups WHERE professor_id=?s and (numerator = 'all' or numerator= ?s)";
         $result_of_query=$this->database->getAll($query,$professor_id,$numerator);
-
+        $result = null;
         for ($i=1;$i<=6;$i++)
             $result[$i]=array();
 

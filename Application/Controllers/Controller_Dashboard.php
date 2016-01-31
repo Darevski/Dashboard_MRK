@@ -25,6 +25,7 @@ class Controller_Dashboard extends Core\Controller
         $this->professor_model = new Models\Model_Professors();
         $this->timetable_model = new Models\Model_TimeTable();
         $this->list_group_model = new Models\Model_List_Groups();
+        $this->notification_model = new Models\Model_Notifications();
     }
 
     /**
@@ -49,7 +50,7 @@ class Controller_Dashboard extends Core\Controller
         //$_POST['group_number']=32494;
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
-            $notification = $this->timetable_model->get_notification_for_group($group_number);
+            $notification = $this->notification_model->get_notification_for_group($group_number);
             $this->view->output_json($notification);
         }
     }
@@ -135,7 +136,7 @@ class Controller_Dashboard extends Core\Controller
      * @api
      */
     function action_get_actual_dashboard(){
-        //$_POST['group_number']='32494';
+        $_POST['group_number']='32494';
         if (isset($_POST['group_number'])){
             $group_number = $this->security_variable($_POST['group_number']);
             $dashboard = $this->timetable_model->get_actual_dashboard($group_number);

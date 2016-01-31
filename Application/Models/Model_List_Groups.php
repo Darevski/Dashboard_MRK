@@ -8,6 +8,7 @@
 
 namespace Application\Models;
 
+use Application\Models\Base\Model_Dashboard;
 /**
  * Класс логики связанный со списком групп, его изменение и вывод.
  * Class Model_ListGroups

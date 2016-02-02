@@ -194,7 +194,18 @@ class Controller_Dashboard extends Core\Controller
         }
     }
 
-
+    /**
+     * Вывод Json строки, содержащей даты учебных занятий для определенной группы
+     * integer group_number
+     */
+    function action_get_working_days_group_for_month(){
+        //$_POST['group_number']=32494;
+        if (isset($_POST['group_number'])) {
+            $number_group=$this->security_variable($_POST['group_number']);
+            $result=$this->timetable_model->get_working_days_group_for_month($number_group);
+            $this->view->output_json($result);
+        }
+    }
     /**
      * Вывод Json строки, содержащей отсортированный по возрастанию список групп
      * integer group_number

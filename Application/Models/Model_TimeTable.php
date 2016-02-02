@@ -127,6 +127,21 @@ class Model_TimeTable extends Model_Dashboard
     }
 
     /**
+     * Возвращает массив дат по которым проходят занятия на ближайший месяц
+     * @param $group_number
+     * @return mixed
+     */
+    function get_working_days_group_for_month($group_number){
+        $result['days'] = [];
+        for ($i=0;$i<31;$i++){
+            $date = date("Y-m-d",strtotime(date("Y-m-d").'+'.$i.'day'));
+            if ($this->date_time_model->is_lessons_today($group_number,$date))
+                $result['days'][]=$date;
+        }
+        return $result;
+    }
+
+    /**
      * Получение рассписания на неделю (6 дней пн-сб) с учетом нумератора недели
      * @param string $group_number
      * @param string $numerator

@@ -74,4 +74,18 @@ class Model_Date_Time extends Model
         return $date_format && $date_format->format($format) == $date;
     }
 
+    /**
+     * Проверяет есть ли занятия у выбранной группы на выбранную дату
+     * @param $date - дата в формате GIS
+     * @return bool false - если занятий нету, true - если занятия есть
+     */
+    public function is_lessons_today($group_number,$date){
+        $query = "SELECT * FROM holidays WHERE (group_number=?s or group_number ='all') and date = ?s";
+        $result=$this->database->getAll($query,$group_number,$date);
+        $count_rows = count($result);
+        if ($count_rows >0)
+            return false;
+        else
+            return true;
+    }
 }

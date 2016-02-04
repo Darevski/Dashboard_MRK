@@ -16,14 +16,14 @@ class Model_Notifications extends Model_Dashboard
      * @param string $type
      * @param integer $target 0 - for all groups
      * @param string $text
-     * @param string $ending_date
+     * @param string $ending_date в формате Y-m-d
      * @return mixed
      */
     public function add_notification($type,$target,$text,$ending_date)
     {
         //Проверка на валидности даты
-        if ($this->validateDate($ending_date, 'Y-m-d')){
-            if ($ending_date<date("Ymd")){
+        if ($this->date_time_model->validateDate($ending_date, 'Y-m-d')){
+            if ($ending_date<date("Y-m-d")){
                 $result['state'] = 'fail';
                 $result['message'] = 'Дата окончания не может быть меньше текущей даты';
             }

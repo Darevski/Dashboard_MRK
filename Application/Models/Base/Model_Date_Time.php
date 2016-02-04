@@ -63,7 +63,7 @@ class Model_Date_Time extends Model
     }
 
     /**
-     * Проверяет Дату на валидность
+     * Проверяет Дату на валидность указанному формату
      * @param string $date
      * @param string $format по умолчанию Y-m-d
      * @return bool

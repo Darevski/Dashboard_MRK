@@ -77,7 +77,7 @@ class Controller_Admin extends Core\Controller{
      * type = 'critical|warning|info'
      * targer = кому предназначены, 0 - для всех
      * message
-     * ending_date - дата окончания уведомления
+     * ending_date - дата окончания уведомления в формате Y-m-d
      *
      * @api
      */

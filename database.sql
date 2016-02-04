@@ -2,10 +2,10 @@
 -- version 4.0.10deb1
 -- http://www.phpmyadmin.net
 --
--- Хост: localhost
--- Время создания: Дек 04 2015 г., 01:50
--- Версия сервера: 5.5.46-0ubuntu0.14.04.2
--- Версия PHP: 5.5.9-1ubuntu4.14
+-- Host: localhost
+-- Generation Time: Feb 04, 2016 at 04:01 PM
+-- Server version: 5.5.47-0ubuntu0.14.04.1
+-- PHP Version: 5.6.17-3+deb.sury.org~trusty+1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,37 +17,33 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- База данных: `MGVRK`
+-- Database: `MGVRK`
 --
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `Config`
+-- Table structure for table `Config`
 --
 
 CREATE TABLE IF NOT EXISTS `Config` (
-  `even` text COLLATE utf8_unicode_ci NOT NULL,
-  `uneven` text COLLATE utf8_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `id` int(11) NOT NULL,
+  `even` text NOT NULL,
+  `uneven` text NOT NULL,
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Дамп данных таблицы `Config`
+-- Dumping data for table `Config`
 --
 
-INSERT INTO `Config` (`even`, `uneven`) VALUES
-('ch', 'zn'),
-('ch', 'zn'),
-('ch', 'zn'),
-('ch', 'zn'),
-('ch', 'zn'),
-('ch', 'zn'),
-('ch', 'zn');
+INSERT INTO `Config` (`id`, `even`, `uneven`) VALUES
+(0, 'ch', 'zn');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `departments_list`
+-- Table structure for table `departments_list`
 --
 
 CREATE TABLE IF NOT EXISTS `departments_list` (
@@ -55,19 +51,25 @@ CREATE TABLE IF NOT EXISTS `departments_list` (
   `depart_name` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `ID` (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8 ;
 
 --
--- Дамп данных таблицы `departments_list`
+-- Dumping data for table `departments_list`
 --
 
 INSERT INTO `departments_list` (`ID`, `depart_name`) VALUES
-(1, 'Informatiki');
+(1, 'Программное обеспечение информационных технологий'),
+(2, 'Проектирование и производство радиоэлектронных средств'),
+(3, 'Техническая эксплуатациия радиоэлектронных средств'),
+(4, 'Электронные вычислительные средства'),
+(5, 'Микро- и наноэлектроника'),
+(6, 'Социально-гуманитарные дисциплины'),
+(7, 'Физическое воспитание');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `groups`
+-- Table structure for table `groups`
 --
 
 CREATE TABLE IF NOT EXISTS `groups` (
@@ -77,47 +79,48 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `lesson_number` int(11) NOT NULL,
   `professor_id` int(11) DEFAULT NULL,
   `lesson_name` text COLLATE utf8_unicode_ci NOT NULL,
-  `classroom` int(11) NOT NULL,
+  `classroom` text COLLATE utf8_unicode_ci NOT NULL,
   `numerator` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `professor_id` (`professor_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=43 ;
+  KEY `professor_id` (`professor_id`),
+  KEY `professor_id_2` (`professor_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=26 ;
 
 --
--- Дамп данных таблицы `groups`
+-- Dumping data for table `groups`
 --
 
 INSERT INTO `groups` (`id`, `group_number`, `day_number`, `lesson_number`, `professor_id`, `lesson_name`, `classroom`, `numerator`) VALUES
-(18, 32494, 1, 4, 7, 'Экономика и организация', 201, 'all'),
-(19, 32494, 1, 5, 7, 'Охрана труда', 201, 'all'),
-(20, 32494, 1, 6, 7, 'Основы менеджмента', 201, 'all'),
-(21, 32494, 2, 4, 7, 'Математическое моделирование', 201, 'ch'),
-(22, 32494, 2, 5, 7, 'Техническое разработка программного обеспечения', 201, 'ch'),
-(23, 32494, 2, 6, 7, 'Прикладное программное обеспечение', 201, 'all'),
-(24, 32494, 2, 7, 7, 'Конструирование программ и языки программирования', 201, 'all'),
-(25, 32494, 3, 4, 7, 'Физическая культура и здоровье (девушки)', 201, 'ch'),
-(26, 32494, 3, 5, 7, 'Прикладное программное обеспечение', 201, 'ch'),
-(27, 32494, 3, 6, 7, 'Техническое разработка программного обеспечения', 201, 'all'),
-(28, 32494, 3, 7, 7, 'Защита компьютерной информации', 201, 'all'),
-(29, 32494, 4, 4, 7, 'Кураторский час', 201, 'all'),
-(30, 32494, 4, 5, 7, 'Охрана труда', 201, 'all'),
-(31, 32494, 4, 6, 7, 'Конструирование программ и языки программирования', 201, 'all'),
-(32, 32494, 4, 7, 7, 'Тестирование и отладка программного обеспечения', 201, 'all'),
-(33, 32494, 5, 3, 7, 'Физическая культура и здоровье (девушки)', 201, 'all'),
-(34, 32494, 5, 4, 7, 'Экономика и организация', 201, 'all'),
-(35, 32494, 5, 5, 7, 'Математическое моделирование', 201, 'ch'),
-(36, 32494, 5, 6, 7, 'Защита компьютерной информации', 201, 'all'),
-(37, 32494, 6, 3, 7, 'Конструирование программ и языки программирования', 201, 'all'),
-(38, 32494, 6, 4, 7, 'Физическая культура и здоровье (юноши)', 201, 'all'),
-(39, 32494, 2, 4, 7, 'Математическое моделирование', 201, 'zn'),
-(40, 32494, 2, 5, 7, 'Физическая культура и здоровье (юноши)', 201, 'zn'),
-(41, 32494, 5, 5, 7, 'Техническое разработка программного обеспечения', 201, 'zn'),
-(42, 32494, 1, 7, 7, 'Техническое разработка программного обеспечения', 201, 'all');
+(1, 32494, 1, 4, 1, 'Экономика и организация', '201', 'all'),
+(2, 32494, 1, 5, 2, 'Охрана труда', '201', 'all'),
+(3, 32494, 1, 6, 1, 'Основы менеджмента', '201', 'all'),
+(4, 32494, 2, 4, 1, 'Математическое моделирование', '201', 'zn'),
+(5, 32494, 2, 4, 1, 'Математическое моделирование', '201', 'ch'),
+(6, 32494, 1, 7, 1, 'Техническое разработка программного обеспечения', '201', 'all'),
+(7, 32494, 2, 5, 1, 'Физическая культура и здоровье (юноши)', '201', 'zn'),
+(8, 32494, 2, 5, 1, 'Техническое разработка программного обеспечения', '201', 'ch'),
+(9, 32494, 2, 6, 1, 'Прикладное программное обеспечение', '201', 'all'),
+(10, 32494, 2, 7, 1, 'Конструирование программ и языки программирования', '201', 'all'),
+(11, 32494, 3, 4, 1, 'Физическая культура и здоровье (девушки)', '201', 'ch'),
+(12, 32494, 3, 5, 1, 'Прикладное программное обеспечение', '201', 'ch'),
+(13, 32494, 3, 6, 1, 'Техническое разработка программного обеспечения', '201', 'all'),
+(14, 32494, 3, 7, 1, 'Защита компьютерной информации', '201', 'all'),
+(15, 32494, 4, 4, 1, 'Кураторский час', '201', 'all'),
+(16, 32494, 4, 5, 1, 'Охрана труда', '201', 'all'),
+(17, 32494, 4, 7, 3, 'Конструирование программ и языки программирования', '201', 'all'),
+(18, 32494, 4, 7, 1, 'Тестирование и отладка программного обеспечения', '201', 'all'),
+(19, 32494, 5, 3, 1, 'Физическая культура и здоровье (девушки)', 'Спорт. Зал', 'all'),
+(20, 32494, 5, 4, 2, 'Экономика организаций', '407', 'all'),
+(21, 32494, 5, 5, 3, 'Математическое моделирование', '108', 'ch'),
+(22, 32494, 5, 5, 4, 'Техническое разработка программного обеспечения', '201', 'zn'),
+(23, 32494, 5, 6, 4, 'Защита компьютерной информации', '117', 'all'),
+(24, 32494, 6, 4, 1, 'Конструирование программ и языки программирования', '201', 'all'),
+(25, 32494, 6, 4, 2, 'Физическая культура и здоровье (юноши)', '201', 'all');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `groups_list`
+-- Table structure for table `groups_list`
 --
 
 CREATE TABLE IF NOT EXISTS `groups_list` (
@@ -125,22 +128,45 @@ CREATE TABLE IF NOT EXISTS `groups_list` (
   `group_number` int(11) NOT NULL,
   `grade` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8 ;
 
 --
--- Дамп данных таблицы `groups_list`
+-- Dumping data for table `groups_list`
 --
 
 INSERT INTO `groups_list` (`id`, `group_number`, `grade`) VALUES
 (1, 32494, 3),
 (2, 22494, 4),
 (3, 32491, 3),
-(4, 52492, 1);
+(4, 52492, 1),
+(6, 12494, 1),
+(7, 552494, 1);
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `notification`
+-- Table structure for table `holidays`
+--
+
+CREATE TABLE IF NOT EXISTS `holidays` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `group_number` text NOT NULL,
+  `date` date NOT NULL,
+  `type` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `holidays`
+--
+
+INSERT INTO `holidays` (`id`, `group_number`, `date`, `type`) VALUES
+(1, '32494', '2016-02-07', 'weekend');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notification`
 --
 
 CREATE TABLE IF NOT EXISTS `notification` (
@@ -153,21 +179,22 @@ CREATE TABLE IF NOT EXISTS `notification` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`),
   UNIQUE KEY `id_2` (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=12 ;
 
 --
--- Дамп данных таблицы `notification`
+-- Dumping data for table `notification`
 --
 
 INSERT INTO `notification` (`id`, `state`, `group_number`, `text`, `starting_date`, `ending_date`) VALUES
-(1, 'critical', 32494, 'мэйдэй-мэйдэй', '2015-12-03', '2015-12-24'),
-(2, 'warning', 0, 'все хорошо', '2015-12-02', '2015-12-24'),
-(3, 'warning', 32494, 'все не очень хорошо', '2015-12-01', '2015-12-31');
+(1, 'alert', 32494, 'мэйдэй-мэйдэй', '2015-12-03', '2015-12-24'),
+(2, 'alert', 0, 'все хорошо', '2015-12-02', '2015-12-24'),
+(3, 'info', 32494, 'все не очень хорошо', '2015-12-01', '2015-12-31'),
+(11, 'info', 32494, 'Уведомление1', '2016-01-09', '2017-09-20');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `professors`
+-- Table structure for table `professors`
 --
 
 CREATE TABLE IF NOT EXISTS `professors` (
@@ -179,19 +206,22 @@ CREATE TABLE IF NOT EXISTS `professors` (
   UNIQUE KEY `id` (`id`),
   UNIQUE KEY `id_2` (`id`),
   KEY `departmenet_id` (`department_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=5 ;
 
 --
--- Дамп данных таблицы `professors`
+-- Dumping data for table `professors`
 --
 
 INSERT INTO `professors` (`id`, `professor`, `department_id`, `photo_url`) VALUES
-(7, 'Апанасевич С.А.', 1, '');
+(1, 'Дерман У.В.', 7, ''),
+(2, 'Чикун Е.О.', 6, ''),
+(3, 'Смолер И. Г.', 1, ''),
+(4, 'Черкас А. М.', 1, '');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `shift`
+-- Table structure for table `shift`
 --
 
 CREATE TABLE IF NOT EXISTS `shift` (
@@ -202,7 +232,7 @@ CREATE TABLE IF NOT EXISTS `shift` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
 --
--- Дамп данных таблицы `shift`
+-- Dumping data for table `shift`
 --
 
 INSERT INTO `shift` (`id`, `number_gr`, `shift`) VALUES
@@ -211,7 +241,7 @@ INSERT INTO `shift` (`id`, `number_gr`, `shift`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `swap`
+-- Table structure for table `swap`
 --
 
 CREATE TABLE IF NOT EXISTS `swap` (
@@ -229,7 +259,7 @@ CREATE TABLE IF NOT EXISTS `swap` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `timetable`
+-- Table structure for table `timetable`
 --
 
 CREATE TABLE IF NOT EXISTS `timetable` (
@@ -241,7 +271,7 @@ CREATE TABLE IF NOT EXISTS `timetable` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8 ;
 
 --
--- Дамп данных таблицы `timetable`
+-- Dumping data for table `timetable`
 --
 
 INSERT INTO `timetable` (`id`, `num_lesson`, `start_time`, `end_time`) VALUES
@@ -256,7 +286,7 @@ INSERT INTO `timetable` (`id`, `num_lesson`, `start_time`, `end_time`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE IF NOT EXISTS `users` (
@@ -271,24 +301,24 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
 --
--- Дамп данных таблицы `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `login`, `password`, `hash`, `privilege`, `name`, `number_gr`) VALUES
-(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 'Hhe972e64KBdHZT', 'Admin', 'Администратор', '');
+(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 'bA3Y9Yt5f2239eZ', 'Admin', 'Администратор', '');
 
 --
--- Ограничения внешнего ключа сохраненных таблиц
+-- Constraints for dumped tables
 --
 
 --
--- Ограничения внешнего ключа таблицы `groups`
+-- Constraints for table `groups`
 --
 ALTER TABLE `groups`
   ADD CONSTRAINT `groups_ibfk_1` FOREIGN KEY (`professor_id`) REFERENCES `professors` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Ограничения внешнего ключа таблицы `professors`
+-- Constraints for table `professors`
 --
 ALTER TABLE `professors`
   ADD CONSTRAINT `professors_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `departments_list` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE;

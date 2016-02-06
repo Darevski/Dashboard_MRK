@@ -51,23 +51,26 @@ class Controller_Admin extends Core\Controller{
 
     /**
      * Добавление новой группу в список групп
-     * Входные данные через integer Post 'grade' и 'group_number'
+     * Входные данные через JSON строку(POST) с полями integer 'grade' и 'group_number'
      *
      * Вывод результата выполнения array string state:success||fail , string message
      *
      * @api
      */
     function action_add_group(){
-       //$_POST['grade'] = 1;
-       //$_POST['group_number'] = 12494;
-        if (isset($_POST['grade']) && isset($_POST['group_number'])){
-            $grade = $this->security_variable($_POST['grade']);
-            $group_number = $this->security_variable($_POST['group_number']);
+        //$_POST['json_input'] = '{"group_number":"32494","grade":"3"}';
+        if (isset($_POST['json_input'])) {
+            $data= json_decode($_POST['json_input'],JSON_UNESCAPED_UNICODE);
+            if (isset($data['grade']) && isset($data['group_number'])) {
 
-            $result = $this->list_group_model->group_add($grade,$group_number);
+                $grade = $this->security_variable($data['grade']);
+                $group_number = $this->security_variable($data['group_number']);
 
-            //Вывод результата выполнения
-            $this->view->output_json($result);
+                $result = $this->list_group_model->group_add($grade, $group_number);
+
+                //Вывод результата выполнения
+                $this->view->output_json($result);
+            }
         }
     }
 
@@ -82,17 +85,23 @@ class Controller_Admin extends Core\Controller{
      * @api
      */
     function action_add_notification(){
-        //$_POST['type']='info';
-        //$_POST['target']='32494';
-        //$_POST['message']='Уведомление1';
-        //$_POST['ending_date']='2016-09-20';
-        if(isset($_POST['type']) && isset($_POST['target']) && isset($_POST['message']) && isset($_POST['ending_date'])){
-            $type = $this->security_variable($_POST['type']);
-            $target = $this->security_variable($_POST['target']);
-            $message = $this->security_variable($_POST['message']);
-            $ending_date = $this->security_variable($_POST['ending_date']);
-            $result =  $this->notifications->add_notification($type,$target,$message,$ending_date);
-            $this->view->output_json($result);
+        //$_POST['json_input'] = '{"type":"info","target":"32494","message":"32494","ending_date":"2016-09-20"}';
+        if (isset($_POST['json_input'])) {
+            $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
+
+
+            if (isset($data['type']) && isset($data['target']) && isset($data['message']) &&
+                isset($data['ending_date'])){
+
+                $type = $this->security_variable($data['type']);
+                $target = $this->security_variable($data['target']);
+                $message = $this->security_variable($data['message']);
+                $ending_date = $this->security_variable($data['ending_date']);
+
+                $result = $this->notifications->add_notification($type, $target, $message, $ending_date);
+
+                $this->view->output_json($result);
+            }
         }
 
     }

@@ -9,6 +9,7 @@
 
 namespace Application\Models;
 
+use Application\Models\Base\Model_Dashboard;
 /**
  * Класс логики связанный с отображением рассписания, уведомлений и т.д. занятий выбранных групп
  * Class Model_TimeTable
@@ -30,8 +31,8 @@ class Model_TimeTable extends Model_Dashboard
      * - bool multiple при наличии нескольких преподавателей ведущих пары одновременно у одной группы - true
      */
     function get_lesson_info_by($number_group,$lesson_number){
-        $today = $this->get_day()['today'];
-        $numerator = $this->get_week_numerator();
+        $today = $this->date_time_model->get_day()['today'];
+        $numerator = $this->date_time_model->get_week_numerator();
         $query = "SELECT * FROM groups,professors,departments_list WHERE groups.professor_id=professors.id AND
         professors.department_id = departments_list.id AND group_number=?s AND day_number=?s AND lesson_number=?s
         AND (numerator='all' or numerator=?s)";
@@ -67,28 +68,6 @@ class Model_TimeTable extends Model_Dashboard
     }
 
     /**
-     * Возвращает массив с уведомлениями для выбранной группы
-     * состояние уведомления
-     * Сортировка по дате, в начале новейшие
-     * @param integer $number_group
-     * @return array {string 'state' critical|warning|info , string text}
-     */
-    function get_notification_for_group($number_group){
-        $today = date("Ymd");
-        $query = "SELECT state,text,starting_date FROM notification WHERE (group_number=?s or group_number=0) and ending_date>=$today";
-        $result_of_query = $this->database->getAll($query,$number_group);
-        // сортируем по дате добавления в начале новейшие
-        usort($result_of_query,array($this,'Notifications_Sort_by_date_CallBack'));
-        foreach ($result_of_query as $value)
-        {
-            $array_temp['state']=$value['state'];
-            $array_temp['text']=$value['text'];
-            $result[]=$array_temp;
-        }
-        return $result;
-    }
-
-    /**
      * Возвращает рассписание на 2 недели (числитель + знаменатель + all)
      * Возвращаемая структура {string 'even'/'uneven' {
      *
@@ -110,22 +89,6 @@ class Model_TimeTable extends Model_Dashboard
     }
 
     /**
-     * Получает список всех групп (курс группы).
-     * Сортирует его согласно номеру групп по возрастанию
-     * @return array номер группы + курс
-     */
-    function get_list_group(){
-        $result_query=$this->database->getALL("SELECT group_number,grade FROM groups_list");
-        //сортировка полученного списка в соответсвии с их номером по возрастанию
-        usort($result_query,array($this,'Groups_Sort_CallBack'));
-        foreach ($result_query as $value){
-            $grade = $value['grade'];
-            $result[$grade][] = $value['group_number'];
-        }
-        return $result;
-    }
-
-    /**
      * возвращает рассписание на сегодня и на след учебный день
      * @param int $group_number номер группы
      * @return mixed -
@@ -140,26 +103,41 @@ class Model_TimeTable extends Model_Dashboard
      * }
      */
     function get_actual_dashboard($group_number){
-        $numerator = $this->get_week_numerator(); // получение значения нумератора для текущей недели
+        $numerator = $this->date_time_model->get_week_numerator(); // получение значения нумератора для текущей недели
 
         $query = "SELECT * FROM groups,professors WHERE groups.professor_id=professors.id AND group_number=?s AND day_number=?s AND (numerator=?s or numerator='all')";
 
         //Получение дней на сегодня и завтра
-        $day=$this->get_day();
+        $day=$this->date_time_model->get_day();
         $today = $day['today'];
         $tomorrow = $day['tomorrow'];
 
         $result_today=$this->database->getAll($query,$group_number,$today,$numerator);
         $result['today']=$this->parse_timetable($result_today);
 
-        $result['today']['day_name'] = $this->get_name_day($today); // Получение названия дня
+        $result['today']['day_name'] = $this->date_time_model->get_name_day($today); // Получение названия дня
 
         $result_tomorrow = $this->database->getAll($query,$group_number,$tomorrow,$numerator);
 
         $result['tomorrow']=$this->parse_timetable($result_tomorrow);
 
-        $result['tomorrow']['day_name'] = $this->get_name_day($tomorrow); // Получение названия дня
+        $result['tomorrow']['day_name'] = $this->date_time_model->get_name_day($tomorrow); // Получение названия дня
 
+        return $result;
+    }
+
+    /**
+     * Возвращает массив дат по которым проходят занятия на ближайший месяц
+     * @param $group_number
+     * @return mixed
+     */
+    function get_working_days_group_for_month($group_number){
+        $result['days'] = [];
+        for ($i=0;$i<31;$i++){
+            $date = date("Y-m-d",strtotime(date("Y-m-d").'+'.$i.'day'));
+            if ($this->date_time_model->is_lessons_today($group_number,$date))
+                $result['days'][]=$date;
+        }
         return $result;
     }
 
@@ -253,31 +231,5 @@ class Model_TimeTable extends Model_Dashboard
      */
     private function lessons_number_sort_CallBack($a, $b) {
         return ($a['lesson_number'] < $b['lesson_number']) ? -1 : 1;
-    }
-
-    /**
-     * Callback функция для сортировки списка групп по их номеру
-     * @param array $a ячейка группы
-     * @param array $b ячейка группы
-     * @return int результат сравнения номера группы
-     */
-    private function Groups_Sort_CallBack($a, $b) {
-        if ($a['group_number'] == $b['group_number']) {
-            return 0;
-        }
-        return ($a['group_number'] < $b['group_number']) ? -1 : 1;
-    }
-
-    /**
-     * Callback функция для сортировки уведомлений по дате их старта
-     * @param array $a ячейка уведомления
-     * @param array $b ячейка уведомления
-     * @return int результат дат уведомлений
-     */
-    private function Notifications_Sort_by_date_CallBack($a,$b){
-        if ($a['starting_date'] == $b['starting_date']) {
-            return 0;
-        }
-        return ($a['starting_date'] > $b['starting_date']) ? -1 : 1;
     }
 }

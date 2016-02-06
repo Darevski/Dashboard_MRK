@@ -7,49 +7,31 @@
  * @author Darevski
  */
 
-namespace Application\Models;
+namespace Application\Models\Base;
 use Application\Core;
 
 /**
- * Класс связанный с базовым функционалом рассписанием
+ * Класс связанный с вспомогательным функционалом
  *
  * Class Model_Dashboard
- * @package Application\Models
- * @see Application\Models\Model_Professors 1 наследник Model_Professors
- * @see Application\Models\Model_Timetable 2 наследник Model_Timetable
+ * @package Application\Models\Base
+ * @see Application\Models\Model_Professors
+ * @see Application\Models\Model_Timetable
+ * @see Application\Models\Model_List_Groups
+ * @see Application\Models\Model_Notifications
  *
  */
 class Model_Dashboard extends Core\Model
 {
-    /**
-     * Возвращает название дня по его номеру
-     * @param int $day
-     * @return string
-     */
-    protected function get_name_day($day){
-        $day_name = array("Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота");
-        return $day_name[$day];
-    }
+    // переменная для хранения объекта содержащего методы работы с Датами и временем
+    protected $date_time_model;
 
     /**
-     * Возвращает день недели на сегодня/завтра
-     * Если день 6 (суббота) - возвращается 1(понедельник) для следующего дня и 6 для сегодняшнего
-     * Если воскресенье - возврашается 1(понедельник) для текущего дня и 2 (вторник) для следующего
-     *
-     * @return mixed $date [today,tomorrow]
+     * Создает объект для работы с датой и временем
      */
-    protected  function get_day(){
-        $day = (int)date('w');
-        $date['today']=$day;
-        if ($day == 0){
-            $date['today']=1;
-            $date['tomorrow']=2;
-        }
-        else if ($day == 6)
-            $date['tomorrow']=1;
-        else
-            $date['tomorrow']=$day+1;
-        return $date;
+    public function __construct(){
+        parent::__construct();
+        $this->date_time_model = new Model_Date_Time();
     }
     /**
      * Определяет идет пара или нет
@@ -84,19 +66,6 @@ class Model_Dashboard extends Core\Model
             return true;
         else
             return false;
-    }
-
-    /**
-     * Получение значения нумератора текущей недели
-     * @return string - ch/zn
-     */
-    protected function get_week_numerator(){
-        $week = date('W'); //Дата недели с начала года
-        if ($week % 2 ==0)
-            $result = $this->database->getOne("SELECT even FROM Config");
-        else
-            $result = $this->database->getOne("SELECT uneven FROM Config");
-        return $result;
     }
 
     /**

@@ -58,6 +58,25 @@ class Controller {
     }
 
     /**
+     * Функция для рекурсивной обработки массивов
+     * Удаляет спецсимволы тэги и т.д. из значений
+     * @param $array
+     * @return mixed
+     */
+    protected function secure_array($array){
+        foreach ($array as &$value){
+            if (is_array($value))
+                $value=$this->secure_array($value);
+            else{
+                $value=htmlentities($value);
+                $value=strip_tags($value);
+            }
+        }
+        unset($value);
+        return $array;
+    }
+
+    /**
      * Проверка на сущуствование сессии для пользователя
      * Проверка хэша пользователя, при не совпадении хэша очистка сессии в бд и на стороне клинета
      * @return bool|string сессия не существует / значение привелегии

@@ -96,7 +96,7 @@ class Controller_Admin extends Core\Controller{
                 isset($data['ending_date'])){
 
                 $type = $this->security_variable($data['parameters']['type']);
-                $target = $this->security_variable($data['parameters']['tartget']);
+                $target = $this->security_variable($data['parameters']['target']);
                 $message = $this->security_variable($data['text']);
                 $ending_date = $this->security_variable($data['ending_date']);
 

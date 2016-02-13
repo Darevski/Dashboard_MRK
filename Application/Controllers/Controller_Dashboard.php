@@ -229,7 +229,7 @@ class Controller_Dashboard extends Core\Controller
      *
      */
     function action_get_working_days_group_for_month(){
-        $_POST['json_input'] = '{"group_number":"32494"}';
+        //$_POST['json_input'] = '{"group_number":"32494"}';
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
             if (isset($data['group_number'])) {
@@ -248,5 +248,26 @@ class Controller_Dashboard extends Core\Controller
     function action_get_list_group_without_grade(){
         $list_group=$this->list_group_model->get_list_group_without_grade();
         $this->view->output_json($list_group);
+    }
+
+    /**
+     * Возвращает список групп под указанные фильтры
+     * grade - курс группы ["1".."4"]
+     * class -  после какого класса группа 9/11
+     * spec - специальность группы
+     * faculty - отделение группы
+     * @api
+     */
+    function action_get_filtered_groups()
+    {
+        //$_POST['json_input'] = '{"grade":"null","class":["9"],"spec":["4","5","7"],"faculty":["1","2"]}';
+        if (isset($_POST['json_input'])) {
+            $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
+            if (isset ($data['grade']) || isset($data['class'])||isset($data['specialization'])||isset($data['faculty'])){
+                $data=$this->secure_array($data);
+                $result = $this->list_group_model->get_groups_by_filter($data);
+                $this->view->output_json($result);
+            }
+        }
     }
 }

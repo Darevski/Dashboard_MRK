@@ -26,6 +26,7 @@ class Controller_Dashboard extends Core\Controller
         $this->timetable_model = new Models\Model_TimeTable();
         $this->list_group_model = new Models\Model_List_Groups();
         $this->notification_model = new Models\Model_Notifications();
+        $this->depart_list = new Models\Model_List_Departments();
     }
 
     /**
@@ -239,6 +240,7 @@ class Controller_Dashboard extends Core\Controller
             }
         }
     }
+
     /**
      * Вывод Json строки, содержащей отсортированный по возрастанию список групп
      * integer group_number
@@ -269,5 +271,35 @@ class Controller_Dashboard extends Core\Controller
                 $this->view->output_json($result);
             }
         }
+    }
+
+    /**
+     * Возвращает список отделений с их кодом
+     * {name:" ", code " "}
+     * @api
+     */
+    function action_get_faculty_list(){
+        $list=$this->depart_list->get_faculty_list();
+        $this->view->output_json($list);
+    }
+
+    /**
+     * Возвращает список специальностей с их кодом
+     * {name:" ", code " "}
+     * @api
+     */
+    function action_get_specializations_list(){
+        $list=$this->depart_list->get_specializations_list();
+        $this->view->output_json($list);
+    }
+
+    /**
+     * Возвращает список кафедр с их кодом
+     * {name:" ", code " "}
+     * @api
+     */
+    function action_get_departments_list(){
+        $list=$this->depart_list->get_departments_list();
+        $this->view->output_json($list);
     }
 }

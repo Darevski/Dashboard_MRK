@@ -61,7 +61,7 @@ class Model_Professors extends Model_Dashboard
      */
     function get_professors_list(){
         $query = "SELECT prof.id,prof.professor,dep_list.depart_name FROM professors as prof,departments_list as dep_list
-                  WHERE prof.department_id = dep_list.ID";
+                  WHERE prof.department_code = dep_list.code";
         $result=$this->database->getALL($query);
         return $result;
     }
@@ -136,7 +136,7 @@ class Model_Professors extends Model_Dashboard
      */
     private function get_professor_info($professor_id){
         $query = "SELECT prof.professor,dep_list.depart_name,photo_url FROM professors as prof,departments_list as dep_list
-                  WHERE prof.department_id = dep_list.ID and prof.id=?s";
+                  WHERE prof.department_code = dep_list.code and prof.id=?s";
         $result=$this->database->getRow($query,$professor_id);
         return $result;
     }

@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 13, 2016 at 09:24 PM
+-- Generation Time: Feb 14, 2016 at 05:46 PM
 -- Server version: 5.5.47-0ubuntu0.14.04.1
--- PHP Version: 5.6.17-3+deb.sury.org~trusty+1
+-- PHP Version: 5.6.18-1+deb.sury.org~trusty+1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -49,22 +49,25 @@ INSERT INTO `Config` (`id`, `even`, `uneven`) VALUES
 CREATE TABLE IF NOT EXISTS `departments_list` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `depart_name` text COLLATE utf8_unicode_ci NOT NULL,
+  `code` int(11) NOT NULL,
   PRIMARY KEY (`ID`),
-  UNIQUE KEY `ID` (`ID`)
+  UNIQUE KEY `ID` (`ID`),
+  UNIQUE KEY `code` (`code`),
+  KEY `code_2` (`code`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8 ;
 
 --
 -- Dumping data for table `departments_list`
 --
 
-INSERT INTO `departments_list` (`ID`, `depart_name`) VALUES
-(1, 'Программное обеспечение информационных технологий'),
-(2, 'Проектирование и производство радиоэлектронных средств'),
-(3, 'Техническая эксплуатациия радиоэлектронных средств'),
-(4, 'Электронные вычислительные средства'),
-(5, 'Микро- и наноэлектроника'),
-(6, 'Социально-гуманитарные дисциплины'),
-(7, 'Физическое воспитание');
+INSERT INTO `departments_list` (`ID`, `depart_name`, `code`) VALUES
+(1, 'Программное обеспечение информационных технологий', 1),
+(2, 'Проектирование и производство радиоэлектронных средств', 2),
+(3, 'Техническая эксплуатациия радиоэлектронных средств', 3),
+(4, 'Электронные вычислительные средства', 4),
+(5, 'Микро- и наноэлектроника', 5),
+(6, 'Социально-гуманитарные дисциплины', 6),
+(7, 'Физическое воспитание', 7);
 
 -- --------------------------------------------------------
 
@@ -158,7 +161,7 @@ CREATE TABLE IF NOT EXISTS `groups_list` (
   KEY `specialization_2` (`specialization`),
   KEY `faculty_2` (`faculty`),
   KEY `specialization_3` (`specialization`,`faculty`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=7 ;
 
 --
 -- Dumping data for table `groups_list`
@@ -230,19 +233,20 @@ INSERT INTO `notification` (`id`, `state`, `group_number`, `text`, `starting_dat
 CREATE TABLE IF NOT EXISTS `professors` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `professor` text COLLATE utf8_unicode_ci NOT NULL,
-  `department_id` int(11) DEFAULT NULL,
+  `department_code` int(11) DEFAULT NULL,
   `photo_url` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`),
   UNIQUE KEY `id_2` (`id`),
-  KEY `departmenet_id` (`department_id`)
+  KEY `departmenet_id` (`department_code`),
+  KEY `department_code` (`department_code`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `professors`
 --
 
-INSERT INTO `professors` (`id`, `professor`, `department_id`, `photo_url`) VALUES
+INSERT INTO `professors` (`id`, `professor`, `department_code`, `photo_url`) VALUES
 (1, 'Дерман У.В.', 7, ''),
 (2, 'Чикун Е.О.', 6, ''),
 (3, 'Смолер И. Г.', 1, ''),
@@ -374,14 +378,14 @@ ALTER TABLE `groups`
 -- Constraints for table `groups_list`
 --
 ALTER TABLE `groups_list`
-  ADD CONSTRAINT `groups_list_ibfk_2` FOREIGN KEY (`specialization`) REFERENCES `specialization_list` (`code`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  ADD CONSTRAINT `groups_list_ibfk_1` FOREIGN KEY (`faculty`) REFERENCES `faculty_list` (`code`) ON DELETE NO ACTION ON UPDATE CASCADE;
+  ADD CONSTRAINT `groups_list_ibfk_1` FOREIGN KEY (`faculty`) REFERENCES `faculty_list` (`code`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  ADD CONSTRAINT `groups_list_ibfk_2` FOREIGN KEY (`specialization`) REFERENCES `specialization_list` (`code`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
 -- Constraints for table `professors`
 --
 ALTER TABLE `professors`
-  ADD CONSTRAINT `professors_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `departments_list` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE;
+  ADD CONSTRAINT `professors_ibfk_1` FOREIGN KEY (`department_code`) REFERENCES `departments_list` (`code`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -240,6 +240,7 @@ class Controller_Dashboard extends Core\Controller
             }
         }
     }
+
     /**
      * Вывод Json строки, содержащей отсортированный по возрастанию список групп
      * integer group_number
@@ -289,6 +290,16 @@ class Controller_Dashboard extends Core\Controller
      */
     function action_get_specializations_list(){
         $list=$this->depart_list->get_specializations_list();
+        $this->view->output_json($list);
+    }
+
+    /**
+     * Возвращает список кафедр с их кодом
+     * {name:" ", code " "}
+     * @api
+     */
+    function action_get_departments_list(){
+        $list=$this->depart_list->get_departments_list();
         $this->view->output_json($list);
     }
 }

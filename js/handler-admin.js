@@ -112,16 +112,16 @@ function CreateGroup()
         loader.style.opacity = "1";    
         setTimeout(function () {
             var group = {};
-            group.number = document.getElementsByName("number")[0].value;
+            group.group_number = document.getElementsByName("number")[0].value;
             group.grade = document.getElementsByName("grade")[0].value;
             try {
-            NewXHR("URL_TO_SEND_NEW_GROUP", JSON.stringify(group), function(ResponseText){
+            NewXHR("/Admin/add_group", "json_input=" + JSON.stringify(group), function(ResponseText){
                 loader.style.opacity = "";
                 try {
                     var answer = JSON.parse(ResponseText);            
                     setTimeout(function () {
                         loader.remove();
-                        if (answer.success)
+                        if (answer.state == "success")
                             CreateEx("Группа успешно создана!");
                         else
                             CreateEx("Произошла ошибка:" + answer.message);
@@ -138,10 +138,7 @@ function CreateGroup()
                     loader.style.opacity = "";
                     setTimeout(function () {
                         loader.remove();
-                        if (answer.success)
-                            CreateEx("Группа успешно создана!");
-                        else
-                            CreateEx("Произошла ошибка:" + answer.message);
+                        CreateEx("Произошла ошибка:" + answer.message);
                     }, 500);
                 }
         }, 500);        
@@ -149,7 +146,59 @@ function CreateGroup()
 }
 function LOAD_Message()
 {
-    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Message.html");
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Message.html", function () {
+		NewXHR("/Dashboard/get_faculty_list", null, function (Response){
+			try {
+					var answer = JSON.parse(Response);
+					var block = document.getElementById("message-filter-department").children[1];
+					var i =0;
+					while (answer[i] != undefined)
+						{
+							var el1 = CreateElem("li", null, "checkbox_list_item");
+							var el2 = CreateElem("label", null, "checkbox_label");
+							var el3 = CreateElem("input", null, "checkbox");
+							el3.setAttribute("onchange", "LOAD_whom_sent()");							
+							el3.setAttribute("type", "checkbox");
+							el3.setAttribute("value", answer[i].code);
+							el2.appendChild(el3);
+							el2.innerHTML += answer[i].name;
+							el1.appendChild(el2);
+							block.appendChild(el1);
+							i++;
+						}
+				}
+			catch (ex)
+				{
+					CreateEx("Ошибка" + ex.message);
+				}
+		});
+		NewXHR("/Dashboard/get_specializations_list", null, function (Response){
+			try {
+					var answer = JSON.parse(Response);
+					var block = document.getElementById("message-filter-spec").children[1];
+					var i =0;
+					while (answer[i] != undefined)
+						{
+							var el1 = CreateElem("li", null, "checkbox_list_item");
+							var el2 = CreateElem("label", null, "checkbox_label");
+							var el3 = CreateElem("input", null, "checkbox");
+							el3.setAttribute("type", "checkbox");
+							el3.setAttribute("value", answer[i].code);
+							el3.setAttribute("onchange", "LOAD_whom_sent()");
+							el2.appendChild(el3);
+							el2.innerHTML += answer[i].name;
+							el1.appendChild(el2);
+							block.appendChild(el1);
+							i++;
+						}
+				}
+			catch (ex)
+				{
+					CreateEx("Ошибка" + ex.message);
+				}
+		});
+        LOAD_whom_sent();
+	});
 }
 function LOAD_Swap()
 {
@@ -192,17 +241,17 @@ function SEND_message(options, text)
     setTimeout(function () {
         loader.style.opacity = "1";
         setTimeout(function () {
-            NewXHR("URL_TO_SEND_NOTIFICATION", JSON.stringify(req), function(Response) {
+            NewXHR("/Admin/add_notification", "json_input=" + JSON.stringify(req), function(Response) {
 				try 
 					{
 						var answer = JSON.parse(Response);
 						loader.style.opacity = "";
 						setTimeout(function () {
 							loader.remove();
-							if (Response.success)
+							if (answer.state == "success")
 								CreateEx("Успешно отправлено!");
 							else
-								CreateEx(Response.error);
+								CreateEx(answer.message);
 						}, 500);
 					}
 				catch (ex)
@@ -220,82 +269,64 @@ function SEND_message(options, text)
 }
 function LOAD_whom_sent()
 {
-    var mods = {};
-    var block = document.getElementById("message-more-whom");
-    var options = document.getElementById("whom-filter");
-    for (var i =0; i<options.childElementCount; i++)
-        {
-            var option = options.children[i];
-            mods[i].parameter = option.dataset.param;
-            mods[i].comaremod = option.dataset.compare;
-            mods[i].value = option.dataset.value;
-        }
-    NewXHR("URL_Load_whome_will_be_sent", JSON.stringify(mods), function (Response) {
-        var answer = JSON.parse(Response);
-        var whom_list = document.getElementById("whom-sent");
-        whom_list.innerHTML = "";
-        for (var i=0; i<answer.responder.length; i++)
-            {
-                var elem = CreateElem("li", null, null, null, answer.responder[i]);
-                whom_list.appendChild(elem);
-            }
+	function Result_find(elem)
+	{
+		var option_not_null = false;
+		var el_array = [];
+		for (var i =0; i<elem.length; i++)
+			if (elem[i].checked)
+				{
+					option_not_null = true;
+					el_array[el_array.length] = elem[i].value;
+				}
+		if (!option_not_null)
+			return "null";
+		else
+			return el_array;
+	}
+	var options = {};
+	var option_not_null = false;
+	options.grade = Result_find(document.getElementById("message-filter-grade").getElementsByTagName("input"));
+	options.class = Result_find(document.getElementById("message-filter-after").getElementsByTagName("input"))
+	options.faculty = Result_find(document.getElementById("message-filter-department").children[1].getElementsByTagName("input"));
+	options.spec = Result_find(document.getElementById("message-filter-spec").children[1].getElementsByTagName("input"));
+  	NewXHR("/Dashboard/get_filtered_groups", "json_input=" + JSON.stringify(options), function (Response) {
+		try {
+			var answer = JSON.parse(Response);
+			var whom_list = document.getElementById("whom-sent");
+			whom_list.innerHTML = "";
+			var i =0;
+			if (answer.groups != null)
+				while (answer.groups[i] != undefined)
+					{
+						var elem = CreateElem("li", null, null, null, answer.groups[i]);
+						whom_list.appendChild(elem);
+						i++;
+					}
+		}
+		catch (ex)
+			{
+				CreateEx(ex.message);
+				console.log(ex);
+			}
     });
-}
-function ADD_message_filter()
-{
-    var option = {};
-    option.param = document.getElementById("filter-first").value;
-    option.name_param = document.getElementById("filter-first").selectedOptions[0].innerHTML;
-    option.mod = document.getElementById("filter-second").value;
-    option.name_mod = document.getElementById("filter-second").selectedOptions[0].innerHTML.toLowerCase();
-    option.value = document.getElementById("filter-text").value;
-    var elem = CreateElem("li");
-    var elembutton = CreateElem("div", null, "delete-button", "REM_filter(" + document.getElementById("whom-filter").childElementCount + ")");
-    elem.appendChild(elembutton);
-    elem.innerHTML += option.name_param + " " + option.name_mod + " " + option.value;
-    elem.setAttribute("data-param",option.param);
-    elem.setAttribute("data-compare",option.mod);
-    elem.setAttribute("data-value",option.value);
-    document.getElementById("whom-filter").appendChild(elem);
-    LOAD_whom_sent();
-}
-function REM_filter(index)
-{
-    var blocks = document.getElementById("whom-filter");
-    for (var i=0; i <blocks.childElementCount; i++)
-        {
-            var toRemove;
-            if (i == index)
-                toRemove = blocks.children[i];
-            if (i > index)
-                {
-                    var onclick = "REM_filter(" + (i-1) + ")";
-                    blocks.children[i].children[0].setAttribute("onclick", onclick);
-                }
-        }
-    toRemove.remove();
-    LOAD_whom_sent();
+
 }
 function SEND_premessage_full()
 {
+    '{"parameters":{"type":"info","target":"32494"},"text":"123","ending_date":"2016-09-20"}'
     var preset = {};
-    for (var i = 0; i<document.getElementsByName("message-more-text-type").length; i++)
+    var elem = document.getElementById("message-more-type");
+    for(var i =1; i < 4; i++)
+        if (elem.children[i].getElementsByTagName("input")[0].checked)
+            preset.type = elem.children[i].getElementsByTagName("input")[0].value;
+    var elem = document.getElementById("whom-sent");
+    preset.ending_date = document.getElementById("message-datepicker").value;
+    for (var i = 0; i < elem.childElementCount; i++)
         {
-            if (document.getElementsByName("message-more-text-type")[i].checked)
-                preset.type = document.getElementsByName("message-more-text-type")[i].value;
+            preset.target = elem.children[i].innerHTML;
+            SEND_message(preset, document.getElementById("message-more-text-input").value);
         }
-    var options = [];
-    for (var i =0; i<document.getElementById("whom-filter").childElementCount; i++)
-        {
-            var option = document.getElementById("whom-filter").children[i];
-            var opt = {};
-            opt.parameter = option.dataset.param;
-            opt.comparemod = option.dataset.compare;
-            opt.value = option.dataset.value;
-            options[i] = opt;
-        }
-    preset.options = options;
-    SEND_message(options, document.getElementById("message-more-text-input").value);
 }
 function SHOW_message_types()
 {
@@ -328,7 +359,7 @@ function SEND_message_small()
 {
 	var options = {};
 	options.type = document.getElementById("message-type").dataset.messagetype;
-	options.whom = document.getElementById("message-to-input").value;
+	options.target = document.getElementById("message-to-input").value;
 	SEND_message(options, document.getElementById("message-text-input").value);
 }
 function LOAD_grouplist()
@@ -671,4 +702,30 @@ function SEND_shedule_edit(numerator, day)
 				}
 		}, 500);
 	}, 10);	
+}
+function LOAD_classrooms()
+{
+	var body = document.body;
+	var block = document.getElementById("table-hide-div");
+	var loader = CreateLoader(block, 1, 1);
+	body.appendChild(loader);
+	setTimeout(function () {
+		loader.style.opacity = "1";
+		setTimeout(function () {
+			NewXHR("URL_TO_GET_CLASSROOMS_NEED_TOMORROW", null, function (Response) {
+				loader.style.opacity = "";
+				try {
+					var answer = JSON.parse(Response);
+					for (var i =0; i<answer.roomlist.length; i++)
+						{
+							
+						}
+				}
+				catch (ex)
+					{
+						CreateEx(ex.message);
+					}
+			});
+		}, 500);
+	}, 10);
 }

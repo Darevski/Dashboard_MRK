@@ -74,31 +74,31 @@ class Controller_Admin extends Core\Controller{
         }
     }
 
-     /**
+    /**
      * Добавление В базу данных нового уведомления
-     * Входные данные через Post
+     * Входные данные через Post строку
      * parameters{
-	 *	type = 'critical|warning|info'
-	 * 	target = кому предназначены, 0 - для всех
-     *}
-     * text
-     * ending_date - дата окончания уведомления в формате Y-m-d
+     *  type = 'critical|warning|info'
+     *  target = кому предназначены, 0 - для всех
+     *  ending_date - дата окончания уведомления в формате Y-m-d / string "tomorrow" - подставляется завтрашняя дата
+     * }
+     * text - текст уведомления
      *
      * @api
      */
     function action_add_notification(){
-        //$_POST['json_input'] = '{"parameters":{"type":"info","target":"32494"},"text":"123","ending_date":"2016-09-20"}';
+        //$_POST['json_input'] = '{"parameters":{"type":"info","target":"32494","ending_date":"tomorrow/2016-02-14"},"text":"123"}';
 
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
 
             if (isset($data['parameters']['type']) && isset($data['parameters']['target']) && isset($data['text']) &&
-                isset($data['ending_date'])){
+                isset($data['parameters']['ending_date'])){
 
                 $type = $this->security_variable($data['parameters']['type']);
                 $target = $this->security_variable($data['parameters']['target']);
+                $ending_date = $this->security_variable($data['parameters']['ending_date']);
                 $message = $this->security_variable($data['text']);
-                $ending_date = $this->security_variable($data['ending_date']);
 
                 $result = $this->notifications->add_notification($type, $target, $message, $ending_date);
 

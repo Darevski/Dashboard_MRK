@@ -381,7 +381,9 @@ function LOAD_grouplist()
 }
 function LOAD_daylist()
 {
-	NewXHR("URL_TO_LOAD_DAY_LIST", "group=" + document.getElementById("swap-group-choice").dataset.group, function (Response){
+	var req = {};
+	req.group = document.getElementById("swap-group-choice").dataset.group;
+	NewXHR("URL_TO_LOAD_DAY_LIST", "json_input=" + JSON.stringify(req), function (Response){
 		try{
 			var answer = JSON.parse(Response);
 			for (var i =0; i < answer.days.length; i++)
@@ -432,7 +434,7 @@ function LOAD_lessonlist()
 	var body = {};
 	body.group = document.getElementById("swap-group-choice").dataset.group;
 	body.day = document.getElementById("swap-day-choice").dataset.day;
-	NewXHR("URL_TO_LOAD_LESSON_LIST", JSON.stringify(body), function (Response) {
+	NewXHR("URL_TO_LOAD_LESSON_LIST", "json_input=" + JSON.stringify(body), function (Response) {
 		try{
 			var answer = JSON.parse(Response);
 			for (var i =0; i<answer.lessons.length; i++)
@@ -467,7 +469,7 @@ function SEND_swap()
 					{
 						req.new = document.getElementById("lesson-list").children[i].innerHTML;
 					}
-			NewXHR("URL_TO_SEND_SWAP", JSON.stringify(req), function (Response) {
+			NewXHR("URL_TO_SEND_SWAP", "json_input=" + JSON.stringify(req), function (Response) {
 				loader.style.opacity = "";
 				setTimeout(function () {
 					loader.remove();
@@ -529,7 +531,7 @@ function LOAD_shedule_edit(day, numerator)
 			req.day = {};
 			req.day.number = day;
 			req.day.numerator = numerator;
-			NewXHR("URL_TO_GET_SHEDULE", JSON.stringify(req), function (Response) {
+			NewXHR("URL_TO_GET_SHEDULE", "json_input=" +  JSON.stringify(req), function (Response) {
 				try{
 					var answer = JSON.parse(Response);
 					var tbl = CreateElem("table", null, "admin-table");
@@ -674,7 +676,7 @@ function SEND_shedule_edit(numerator, day)
 							req.shedule[j].professor_id = Response;
 						});			
 					}
-				NewXHR("URL_TO_SEND_SHEDULE_EDIT", JSON.stringify(req), function (ResponseText) {
+				NewXHR("URL_TO_SEND_SHEDULE_EDIT", "json_input=" + JSON.stringify(req), function (ResponseText) {
 					loader.style.opacity = "";
 					setTimeout(function () {
 						loader.remove();

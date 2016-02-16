@@ -7,6 +7,17 @@
 @color-bad: #f4511e;
 @color-table-hover: #EEEEEE;
 
+@keyframes slideUp {
+  0% {
+    -webkit-transform: translateY(6.25rem);
+    transform: translateY(6.25rem);
+  }
+  100% {
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+
 body
 {
     position: absolute;
@@ -16,6 +27,8 @@ body
     width: 1000px;
     height: 500px;
 	transition: 0.5s;
+	margin: 0;
+	padding: 0;
 }
 .main-block
 {
@@ -156,12 +169,13 @@ body
 #message-type-input
 {
     box-shadow: 0px 4px 10px @color-main-shadow;
-	margin-top: -57px;
+	margin-top: -107px;
 	display: none;
 	width: 100px;
 	height: 150px;
 	position: absolute;
 	z-index: 50000;
+	transition: 0.2s;
 }
 .message-type-list
 {
@@ -170,10 +184,6 @@ body
 	height: 50px;
 	line-height: 50px;
 	text-align: center;
-}
-#message-type:hover #message-type-input
-{
-	display: block;
 }
 #message-text-input
 {
@@ -358,16 +368,9 @@ body
 	top: 0;
 	left: 720px;
 }
-#message-more-filter
-{
-	width: 700px;
-	height: 360px;
-	top: 70px;
-	left: 0;
-}
 #message-more-text
 {
-	width: 930px;
+	width: 700px;
 	height: 50px;
 	top: 450px;
 	left: 0;
@@ -413,12 +416,223 @@ body
 	padding: 0 0 0 15px;
 	margin: 10px 0 0 15px;
 	height: 30px;
-	width: 885px;
+	width: 655px;
 	border: 0;
 	border-bottom: 2px solid @color-delimeter;
 	line-height: 30px;
 	font-size: 18px;
 	transition: 1s;
+}
+.message-filter-line-selector
+{
+	display: inline-block;
+	vertical-align: top;
+	height: 50px;
+	margin: 0;
+	padding: 0;
+	line-height: 50px;
+	font-size: 16px;
+	text-align: center;
+}
+.message-filter-line-selector label p
+{
+	height: 47px;
+	line-height: 50px;
+	font-size: 16px;
+	padding: 0;
+	margin: 0;
+	border-bottom: 3px solid transparent;
+	transition: 0.5s;
+}
+.message-filter-line-selector label input[type="checkbox"]:checked + p
+{
+	border-bottom: 3px solid @color-main;
+}
+.message-filter-line-selector label input[type="checkbox"]
+{
+	display: none;
+}
+.message-filter-line-selector label
+{
+	display: inline-block;
+	vertical-align: top;
+	width: 100%;
+	height: 50px;
+	margin: 0;
+	text-align: center;
+	line-height: 50px;
+}
+#message-filter-grade .message-filter-line-selector
+{
+	width: 160px;
+}
+#message-filter-grade
+{
+	width: 700px;
+	height: 50px;
+	top: 60px;
+	left: 0px;
+}
+#message-filter-number input:focus
+{
+	outline: none;
+	border-bottom: 2px solid @color-main;
+	transition: 0.5s;
+}
+#message-filter-number input
+{
+	transition: 0.5s;
+	height: 30px;
+	width: 230px;
+	border: 0;
+	margin: 8px 15px;
+	padding: 0 10px;
+	border-bottom: 2px solid @color-delimeter;
+}
+#message-filter-number
+{
+	width: 280px;
+	height: 50px;
+	top: 120px;
+	left: 0px;
+}
+#message-filter-after .message-filter-line-selector
+{
+	width: 205px;
+}
+#message-filter-after
+{
+	width: 410px;
+	height: 50px;
+	top: 120px;
+	left: 290px;
+}
+
+.checkbox_list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	overflow-y: auto; 
+	width: 345px;
+	height: 215px;
+}
+.checkbox_list_item {
+	margin: 8px 0 2px 0;
+	height: 25px;
+	padding: 0;
+}
+.checkbox_label {
+  	position: relative;
+  	margin-left: 15px;
+	height: 15px;
+}
+.checkbox:focus {
+	outline: none;
+}
+.checkbox {
+  position: relative;
+  top: -0.375rem;
+  margin: 0 1rem 0 0;
+  cursor: pointer;
+}
+.checkbox:before {
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  content: "";
+  position: absolute;
+  left: 0;
+  z-index: 1;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 2px solid @color-delimeter;
+}
+.checkbox:checked:before {
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  height: .5rem;
+  border-color: @color-main;
+  border-top-style: none;
+  border-right-style: none;
+}
+.checkbox:after {
+  content: "";
+  position: absolute;
+  top: -0.125rem;
+  left: 0;
+  width: 1.2rem;
+  height: 1.2rem;
+  background: @color-block;
+  cursor: pointer;
+}
+
+#message-filter-spec p, #message-filter-department p
+{
+	height: 35px;
+	padding: 0;
+	margin: 0;
+	line-height: 35px;
+	font-size: 18px;
+	text-align: center;
+}
+#message-filter-department
+{
+	width: 345px;
+	height: 250px;
+	top: 180px;
+	left: 0px;
+}
+
+#message-filter-spec
+{
+	width: 345px;
+	height: 250px;
+	top: 180px;
+	left: 355px;
+}
+#message-more-date-end
+{
+	width: 210px;
+	height: 50px;
+	top: 450px;
+	left: 720px;
+}
+#message-datepicker:focus
+{
+	outline: 0;
+}
+#message-datepicker:before
+{
+	content: "До: ";
+}
+#message-datepicker
+{
+	width: 135px;
+	line-height: 50px;
+	padding: 0px 25px 0px 50px;
+	border: 0;
+	outline: 0;
+	height: 50px;
+	transition: 0.5s;
+}
+#message-datepicker::-webkit-calendar-picker-indicator:hover
+{
+	color: @color-main;
+	transition: 0.5s;
+	background-color: none;
+}
+#message-datepicker::-webkit-calendar-picker-indicator
+{
+    font-size: 16px;
+	display: block;
+	transition: 0.5s;
+	background-color: none;	
+}
+#message-datepicker::-webkit-clear-button, #message-datepicker::-webkit-inner-spin-button {
+    display: none;
 }
 #message-more-text-input:focus, #message-more-text-input:hover
 {
@@ -428,87 +642,6 @@ body
 #message-more-send
 {
 	background-color: @color-main;
-}
-#filter-text:focus
-{
-	outline: none;
-	border-bottom: 2px solid @color-main;
-}
-#filter-text
-{
-	padding: 0 0 0 10px;
-	margin: 30px 0 0 30px;
-	height: 48px;
-	width: 190px;
-	border: 0;
-	border-bottom: 2px solid @color-delimeter;
-	line-height: 50px;
-	font-size: 18px;
-	transition: 0.5s;	
-	display: inline-block;
-	vertical-align: top;	
-}
-#filter-first:focus, #filter-second:focus
-{
-	outline: none;
-	border-bottom: 2px solid @color-main;
-}
-#filter-first, #filter-second
-{
-	width: 150px;
-	border: 0;
-	border-bottom: 2px solid @color-delimeter;
-	height: 50px;
-	margin: 30px 0 0 30px;
-	padding: 0;
-	line-height: 50px;
-	background-color: transparent;
-	display: inline-block;
-	vertical-align: top;
-	transition: 0.5s;
-}
-#filter-add
-{
-	width: 50px;
-	height: 50px;
-	margin: 30px 0 0 30px;
-	background-color: @color-main;
-	display: inline-block;
-	vertical-align: top;
-}
-#message-more-filter ul
-{
-	padding: 0;
-	margin: 20px 0 0;
-	width: 700px;
-	height: 260px;
-	overflow-y: auto;
-	overflow-x: hidden;
-}
-#message-more-filter ul li #delete-button
-{
-	height: 20px;
-	width: 20px;
-	display: inline-block;
-	vertical-align: top;
-	margin: 5px 10px 0 0;
-	background-image: url("icons/close.png");
-	background-position: center center;
-	background-repeat: no-repeat;
-	background-size: 12px;
-	padding: 0;
-}
-#message-more-filter ul li
-{
-	position: relative;
-	display: block;
-	list-style: none;
-	padding: 0 0 0 30px;
-	width: ~"calc(100% - 60px)";
-	margin: 0;
-	height: 30px;
-	margin-top: 5px;
-	line-height: 30px;
 }
 #header {
     line-height: 30px;

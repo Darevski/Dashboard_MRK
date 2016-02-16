@@ -1,3 +1,4 @@
+<div id="button-close" style="position: fixed; top: 10px; right: 10px;" onclick="LOAD_AdminDash()"></div>
 <div class="main-block" id="message-more-type">
 	<p style="height: 50px; vertical-align: top; display: inline-block; padding: 0 0 0 10px; width: 90px; margin: 0;">Тип:</p><!--
 	--><label><input type="radio" name="message-more-text-type" value="alert"><p>Важно</p></label><!--
@@ -8,24 +9,32 @@
 	<p>Получатели</p>
 	<ul id="whom-sent"></ul>
 </div>
-<div class="main-block" id="message-more-filter">
-	<select id="filter-first">
-		<option value="group">Группа</option>
-		<option value="grade">Курс</option>
-	</select><!--
-	--><select id="filter-second">
-		<option value="==">Равно</option>
-		<option value="!=">Не равно</option>
-		<option value=">">Больше</option>
-		<option value=">=">Больше либо равно</option>
-		<option value="<">Меньше</option>
-		<option value="<=">Меньше либо равно</option>
-	</select>
-	<input type="text" id="filter-text">
-	<div id="filter-add"></div>
-	<ul id="whom-sent"></ul>
+<div id="message-filter">
+	<div class="main-block" id="message-filter-grade">
+		<p style="display: inline-block; vertical-align: top; height: 50px; width: 50px; line-height: 50px; font-size: 18px; padding: 0 0 0 10px; margin: 0;">Курс:</p><!--
+		--><div class="message-filter-line-selector"><label><input onchange="LOAD_whom_sent()" type="checkbox" value="1"><p>I курс</p></label></div><!--
+		--><div class="message-filter-line-selector"><label><input onchange="LOAD_whom_sent()" type="checkbox" value="2"><p>II курс</p></label></div><!--
+		--><div class="message-filter-line-selector"><label><input onchange="LOAD_whom_sent()" type="checkbox" value="3"><p>III курс</p></label></div><!--
+		--><div class="message-filter-line-selector"><label><input onchange="LOAD_whom_sent()" type="checkbox" value="4"><p>IV курс</p></label></div>
+	</div>
+	<div class="main-block" id="message-filter-number"><input onchange="LOAD_whom_sent()" placeholder="Номер группы..." type="text"></div>
+	<div class="main-block" id="message-filter-after">
+		<div class="message-filter-line-selector"><label><input onchange="LOAD_whom_sent()" type="checkbox" value="9"><p>9 класс</p></label></div><!--
+		--><div class="message-filter-line-selector"><label><input onchange="LOAD_whom_sent()" type="checkbox" value="1"><p>11 класс</p></label></div>
+	</div>
+	<div class="main-block" id="message-filter-department">
+		<p>Отделение</p>
+		<ul class="checkbox_list">
+	  </ul>
+	</div>
+	<div class="main-block" id="message-filter-spec">
+		<p>Специальность</p>
+		<ul class="checkbox_list">
+	  </ul>
+	</div>
 </div>
 <div class="main-block" id="message-more-text">
 	<input type="text" placeholder="Введите текст..." id="message-more-text-input">
 </div>
-<div class="main-block" id="message-more-send"></div>
+<div class="main-block" id="message-more-date-end"><input type="date" id="message-datepicker"></div>
+<div class="main-block" id="message-more-send" onclick="SEND_premessage_full()"></div>

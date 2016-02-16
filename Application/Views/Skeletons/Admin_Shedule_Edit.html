@@ -1,53 +1,16 @@
 <style>	body{	top: 0px;	left: 0px;	width: 100%;	height: 100%;	margin: 0;	}</style>
-<div id="header"></div><div id="button-close" onclick="alert()"></div>
-<div id="group-shedule-edit">
-	<table class="admin-table">
-		<thead>
-			<tr>
-				<td></td>
-				<td>1 пара</td>
-				<td>2 пара</td>
-				<td>3 пара</td>
-				<td>4 пара</td>
-				<td>5 пара</td>
-				<td>6 пара</td>
-				<td>7 пара</td>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>Дисциплина</td>
-				<td><input type="text" list="dl1" placeholder="Введите дисциплину..."></td>
-				<td><input type="text" list="dl2" placeholder="Введите дисциплину..."></td>
-				<td><input type="text" list="dl3" placeholder="Введите дисциплину..."></td>
-				<td><input type="text" list="dl4" placeholder="Введите дисциплину..."></td>
-				<td><input type="text" list="dl5" placeholder="Введите дисциплину..."></td>
-				<td><input type="text" list="dl6" placeholder="Введите дисциплину..."></td>
-				<td><input type="text" list="dl7" placeholder="Введите дисциплину..."></td>
-			</tr>
-			<tr>
-				<td>Преподаватель</td>
-				<td><input type="text" list="pl1" placeholder="Введите преподавателя..."></td>
-				<td><input type="text" list="pl2" placeholder="Введите преподавателя..."></td>
-				<td><input type="text" list="pl3" placeholder="Введите преподавателя..."></td>
-				<td><input type="text" list="pl4" placeholder="Введите преподавателя..."></td>
-				<td><input type="text" list="pl5" placeholder="Введите преподавателя..."></td>
-				<td><input type="text" list="pl6" placeholder="Введите преподавателя..."></td>
-				<td><input type="text" list="pl7" placeholder="Введите преподавателя..."></td>
-			</tr>			
-		</tbody>
-	</table>
-</div>
+<div id="header"></div><div id="button-close" onclick="LOAD_AdminDash()"></div>
+<div id="group-shedule-edit"></div>
 <div id="group-shedule-choice">
 	<div id="even-choice">
-		<p>Числитель</p>
-		<p>Знаменатель</p>
+		<p onclick="PRELOAD_shedule_edit(0, null)">Числитель</p>
+		<p onclick="PRELOAD_shedule_edit(1, null)">Знаменатель</p>
 	</div><!--
---><p class="day-choice">Понедельник</p><!--
---><p class="day-choice">Вторник</p><!--
---><p class="day-choice">Среда</p><!--
---><p class="day-choice">Четверг</p><!--
---><p class="day-choice">Пятница</p><!--
---><p class="day-choice">Суббота</p><!--
---><p class="day-choice">Сохранить</p>
+--><p class="day-choice" onclick="PRELOAD_shedule_edit(null, 1)">Понедельник</p><!--
+--><p class="day-choice" onclick="PRELOAD_shedule_edit(null, 2)">Вторник</p><!--
+--><p class="day-choice" onclick="PRELOAD_shedule_edit(null, 3)">Среда</p><!--
+--><p class="day-choice" onclick="PRELOAD_shedule_edit(null, 4)">Четверг</p><!--
+--><p class="day-choice" onclick="PRELOAD_shedule_edit(null, 5)">Пятница</p><!--
+--><p class="day-choice" onclick="PRELOAD_shedule_edit(null, 6)">Суббота</p><!--
+--><p class="day-choice" onclick="SEND_shedule_edit(0,1)">Сохранить</p>
 </div>

@@ -285,11 +285,18 @@ function LOAD_whom_sent()
 			return el_array;
 	}
 	var options = {};
-	var option_not_null = false;
+	var option_null = true;
 	options.grade = Result_find(document.getElementById("message-filter-grade").getElementsByTagName("input"));
 	options.class = Result_find(document.getElementById("message-filter-after").getElementsByTagName("input"))
 	options.faculty = Result_find(document.getElementById("message-filter-department").children[1].getElementsByTagName("input"));
 	options.spec = Result_find(document.getElementById("message-filter-spec").children[1].getElementsByTagName("input"));
+    for (var obj in options)
+        if (obj != "null")
+            option_null = false;
+    if (option_null)
+        document.getElementById("whom-sent").setAttribute("selected-all", "true");
+    else
+        document.getElementById("whom-sent").removeAttribute("selected-all");
   	NewXHR("/Dashboard/get_filtered_groups", "json_input=" + JSON.stringify(options), function (Response) {
 		try {
 			var answer = JSON.parse(Response);
@@ -324,10 +331,17 @@ function SEND_premessage_full()
         preset.ending_date = "tomorrow";
     else
         preset.ending_date = document.getElementById("message-datepicker").value;
-    for (var i = 0; i < elem.childElementCount; i++)
+    if (document.getElementById("whom-sent").getAttribute("selected-all") == "true")
         {
-            preset.target = elem.children[i].innerHTML;
-            SEND_message(preset, document.getElementById("message-more-text-input").value);
+            preset.target = "0";
+        }
+    else
+        {
+            for (var i = 0; i < elem.childElementCount; i++)
+                {
+                    preset.target = elem.children[i].innerHTML;
+                    SEND_message(preset, document.getElementById("message-more-text-input").value);
+                }
         }
 }
 function SHOW_message_types()

@@ -314,14 +314,16 @@ function LOAD_whom_sent()
 }
 function SEND_premessage_full()
 {
-    '{"parameters":{"type":"info","target":"32494"},"text":"123","ending_date":"2016-09-20"}'
     var preset = {};
     var elem = document.getElementById("message-more-type");
     for(var i =1; i < 4; i++)
         if (elem.children[i].getElementsByTagName("input")[0].checked)
             preset.type = elem.children[i].getElementsByTagName("input")[0].value;
     var elem = document.getElementById("whom-sent");
-    preset.ending_date = document.getElementById("message-datepicker").value;
+    if ( document.getElementById("message-datepicker").value == "" )
+        preset.ending_date = "tomorrow";
+    else
+        preset.ending_date = document.getElementById("message-datepicker").value;
     for (var i = 0; i < elem.childElementCount; i++)
         {
             preset.target = elem.children[i].innerHTML;
@@ -360,6 +362,7 @@ function SEND_message_small()
 	var options = {};
 	options.type = document.getElementById("message-type").dataset.messagetype;
 	options.target = document.getElementById("message-to-input").value;
+    options.ending_date = "tomorrow";
 	SEND_message(options, document.getElementById("message-text-input").value);
 }
 function LOAD_grouplist()

@@ -11,7 +11,10 @@ function CHECK_Shedule()
 {
     if (!getCookie("inprogress_shedule"))
         if (getCookie("group"))
-            NewXHR("/Dashboard/get_actual_dashboard","group_number=" + getCookie("group"), function(ResponseText) {
+			{
+				var req = {};
+				req.group_number = getCookie("group");
+            	NewXHR("/Dashboard/get_actual_dashboard","json_input=" + JSON.stringify(req), function(ResponseText) {
                 if (ResponseText.check != false) {
                     var answer = JSON.parse(ResponseText);
                         if (answer.md5 != getCookie("shedule"))
@@ -23,6 +26,7 @@ function CHECK_Shedule()
                         CreateEx("Обнаружена ошибка: " + ResponseText.status);
                     }
             });
+			}
 	if (!getCookie("group"))
 		GroupChoice();
 }
@@ -164,7 +168,10 @@ function LOAD_Professor_BASIC(lesson_num)
                         setTimeout( function() {
                             block.innerHTML = "";
                             setTimeout(function() {
-                            NewXHR("/Dashboard/get_lesson_info","group_number=" + getCookie("group") + "&lesson_number=" + lesson_num, function(ResponseText) {
+								var req = {};
+								req.group_number = getCookie("group");
+								req.lesson_number = lesson_num;
+                            NewXHR("/Dashboard/get_lesson_info","json_input=" + JSON.stringify(req), function(ResponseText) {
                                 if (ResponseText.check != false) {
                                     var answer = JSON.parse(ResponseText);
                                     var div_info = document.createElement("div");
@@ -250,7 +257,10 @@ function CHECK_alerts()
 {
     if (!getCookie("inprogress_alerts"))
         if (getCookie("group"))
-            NewXHR("/Dashboard/get_notifications_by_group","group_number=" + getCookie("group"), function(ResponseText) {
+			{
+				var req = {};
+				req.group_number = getCookie("group");
+            	NewXHR("/Dashboard/get_notifications_by_group","json_input=" + JSON.stringify(req), function(ResponseText) {
                 if (ResponseText.check != false)
                     {
                         var answer = JSON.parse(ResponseText);
@@ -263,6 +273,7 @@ function CHECK_alerts()
                         CreateEx("Обнаружена ошибка: " + ResponseText.status);
                     }
             });
+			}
 	if (!getCookie("group"))
 		GroupChoice();
 }
@@ -422,8 +433,9 @@ function LOAD_fullShedule()
 		body.appendChild(loader);
 		body.style.opacity = "";
 		setTimeout(function() {
-			
-			NewXHR("/Dashboard/get_week_dashboard", "group_number=" + getCookie("group"), function (ResponseText) {
+			var req = {};
+			req.group_number = getCookie("group");
+			NewXHR("/Dashboard/get_week_dashboard", "json_input=" + JSON.stringify(req), function (ResponseText) {
                 if (ResponseText.check != false)
                     {
                         var answer = JSON.parse(ResponseText);
@@ -621,7 +633,9 @@ function LOAD_Professor(id)
                 loader.style.backgroundColor = "transparent";
 				document.getElementById("screen").appendChild(loader);
 				loader.style.opacity = "1";
-				NewXHR("Dashboard/get_professor_state", "professor_id=" + id, function (ResponseText) {
+				var req = {};
+				req.professor_id = id;
+				NewXHR("Dashboard/get_professor_state", "json_input=" + JSON.stringify(req), function (ResponseText) {
                     if (ResponseText.check != false)
 					{
                         setTimeout(function () {

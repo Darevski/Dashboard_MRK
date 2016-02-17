@@ -46,7 +46,7 @@ class Controller_Admin extends Core\Controller{
      * Базовое действие контроллера
      */
     public function action_start(){
-        $this->view->generate("Admin_view.php");
+        $this->view->generate("Admin_View.php");
     }
 
     /**
@@ -87,7 +87,7 @@ class Controller_Admin extends Core\Controller{
      * @api
      */
     function action_add_notification(){
-        //$_POST['json_input'] = '{"parameters":{"type":"info","target":"32494","ending_date":"tomorrow/2016-02-14"},"text":"123"}';
+        //$_POST['json_input'] = '{"parameters":{"type":"info","target":"32494","ending_date":"tomorrow"},"text":"123"}';
 
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);

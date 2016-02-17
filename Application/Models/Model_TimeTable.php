@@ -34,7 +34,7 @@ class Model_TimeTable extends Model_Dashboard
         $today = $this->date_time_model->get_day()['today'];
         $numerator = $this->date_time_model->get_week_numerator();
         $query = "SELECT * FROM groups,professors,departments_list WHERE groups.professor_id=professors.id AND
-        professors.department_id = departments_list.id AND group_number=?s AND day_number=?s AND lesson_number=?s
+        professors.department_code = departments_list.code AND group_number=?s AND day_number=?s AND lesson_number=?s
         AND (numerator='all' or numerator=?s)";
         $result_of_query = $this->database->getALL($query,$number_group,$today,$lesson_number,$numerator);
 

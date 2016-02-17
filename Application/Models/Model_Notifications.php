@@ -30,11 +30,11 @@ class Model_Notifications extends Model_Dashboard
             else{
                 // При флаге равном tomorrow устанавливается дата следующего дня
                 if ($ending_date === "tomorrow")
-                    $date = date("Y-m-d",strtotime(date("Y-m-d").'+1 day'));
-                else
-                    $date = date("Ymd");
-                $query = "INSERT INTO notification SET state=?s,group_number=?i,text=?s,starting_date=".$date.",ending_date=?s";
-                $this->database->query($query,$type,$target,$text,$ending_date);
+                    $ending_date = date("Y-m-d",strtotime(date("Y-m-d").'+1 day'));
+
+                $today_date = date("Y-m-d");
+                $query = "INSERT INTO notification SET state=?s,group_number=?i,text=?s,starting_date=?s,ending_date=?s";
+                $this->database->query($query,$type,$target,$text,$today_date,$ending_date);
                 $result['state'] = 'success';
             }
         }

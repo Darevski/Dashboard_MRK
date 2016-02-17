@@ -16,19 +16,24 @@ class Model_Notifications extends Model_Dashboard
      * @param string $type
      * @param integer $target 0 - for all groups
      * @param string $text
-     * @param string $ending_date в формате Y-m-d
+     * @param string $ending_date в формате Y-m-d // string "tomorrow" - подставляется дата следующего дня
      * @return mixed
      */
     public function add_notification($type,$target,$text,$ending_date)
     {
         //Проверка на валидности даты
-        if ($this->date_time_model->validateDate($ending_date, 'Y-m-d')){
+        if ($this->date_time_model->validateDate($ending_date, 'Y-m-d') || $ending_date === "tomorrow"){
             if ($ending_date<date("Y-m-d")){
                 $result['state'] = 'fail';
                 $result['message'] = 'Дата окончания не может быть меньше текущей даты';
             }
             else{
-                $query = "INSERT INTO notification SET state=?s,group_number=?i,text=?s,starting_date=".date("Ymd").",ending_date=?s";
+                // При флаге равном tomorrow устанавливается дата следующего дня
+                if ($ending_date === "tomorrow")
+                    $date = date("Y-m-d",strtotime(date("Y-m-d").'+1 day'));
+                else
+                    $date = date("Ymd");
+                $query = "INSERT INTO notification SET state=?s,group_number=?i,text=?s,starting_date=".$date.",ending_date=?s";
                 $this->database->query($query,$type,$target,$text,$ending_date);
                 $result['state'] = 'success';
             }

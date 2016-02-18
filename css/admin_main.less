@@ -1087,12 +1087,13 @@ body
 	margin: 0;
 	padding: 0;
 	width: 200px;
-	height: 300px;
+	height: 100%;
 	overflow-x: hidden;
 	overflow-y: auto;
 }
 #message-whom-status
 {
+    opacity: 0;
 	background-color: @color-block;
 	box-shadow: 0px 0px 10px rgba(0,0,0,0.8);
 	position: fixed;
@@ -1102,4 +1103,5 @@ body
 	left: ~"calc( 100% - 200px )";
 	z-index: 11;
 	overflow: hidden;
+    transition: 0.5s;
 }

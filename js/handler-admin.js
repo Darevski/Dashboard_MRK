@@ -230,7 +230,7 @@ function LOAD_Reports()
 {
     LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Bugs.html");
 }
-function SEND_message(options, text, callback)
+function SEND_message(options, text, number, callback)
 {
     var req = {};
     req.parameters = options;
@@ -238,14 +238,14 @@ function SEND_message(options, text, callback)
 	NewXHR("/Admin/add_notification", "json_input=" + JSON.stringify(req), function(Response) {
 		try 
 			{
-				callback(JSON.parse(Response));
+				callback(JSON.parse(Response), number);
 			}
 		catch (ex)
 			{
 				var answer = {};
 				answer.state = "fail";
 				answer.message = ex.message;
-				callback(answer);
+				callback(answer, number);
 			}
 	});  
 }
@@ -310,6 +310,31 @@ function SEND_premessage_full()
     setTimeout(function () {
         loader.style.opacity = "1";
         setTimeout(function () {
+            var states = CreateElem("div", "message-whom-status");
+            var states_ul = CreateElem("ul");
+            var elem = document.getElementById("whom-sent");
+            for (var i = 0; i < elem.childElementCount; i++)
+                {
+                    var states_li = CreateElem("li");
+                    var states_p = CreateElem("p", null, null, null, elem.children[i].innerHTML);
+                    var states_status = CreateElem("state", null, null, null, "Обработка");
+                    states_li.appendChild(states_p);
+                    states_li.appendChild(states_status);
+                    states_ul.appendChild(states_li);
+                }
+            states.appendChild(states_ul);
+            var close_button = CreateElem("div", "button-close");
+            close_button.onclick = function () {
+                document.getElementById('message-whom-status').style.opacity = "";
+                setTimeout( function() {
+                    document.getElementById('message-whom-status').remove();
+                }, 600);
+            };
+            close_button.style.top = "calc( 100% - 25px )";
+            states.appendChild(close_button);
+            body.appendChild(states);
+            states.style.top = "calc( 50% - " + (15 * (states_ul.childElementCount + 2)) + "px)";
+            states.style.height = 30 * (states_ul.childElementCount + 1) + "px";
 			var preset = {};
 			var elem = document.getElementById("message-more-type");
 			preset.type = "null";
@@ -321,7 +346,8 @@ function SEND_premessage_full()
 				preset.ending_date = "tomorrow";
 			else
 				preset.ending_date = document.getElementById("message-datepicker").value;
-			if (document.getElementById("whom-sent").getAttribute("selected-all") == "true")
+            states.style.opacity = "1";
+			if (elem.getAttribute("selected-all") == "true")
 				{
 					preset.target = "0";
 					SEND_message(preset, document.getElementById("message-more-text-input").value, function (Response) {
@@ -330,7 +356,7 @@ function SEND_premessage_full()
 							loader.remove();
 							setTimeout(function () {
 								if (Response.state == "success")
-									CreateEx("Успешно отправлено!");
+									CreateEx("Успешно отправлено");
 								else
 									CreateEx(Response.message);
 							}, 100);
@@ -340,21 +366,38 @@ function SEND_premessage_full()
 			else
 				{
 					var counter = 0;
+                    var counter_ok = 0;
 					for (var i = 0; i < elem.childElementCount; i++)
 						{
 							preset.target = elem.children[i].innerHTML;
-							SEND_message(preset, document.getElementById("message-more-text-input").value, function (Response){
+                            states.children[0].children[i].children[1].innerHTML = "Отправка";
+                            states.children[0].children[i].style.borderLeft = "4px solid #03a9f4";
+							SEND_message(preset, document.getElementById("message-more-text-input").value, i, function (Response, number){
+                                if (Response.state == "success")
+                                    {
+                                        counter_ok++;
+                                        states.children[0].children[number].children[1].innerHTML = "Успешно";
+                                        states.children[0].children[number].style.borderLeft = "4px solid #c0ca33";
+                                    }
+                                else
+                                    {
+                                        states.children[0].children[number].children[1].innerHTML = "Ошибка " + Response.code;
+                                        states.children[0].children[number].style.borderLeft = "4px solid #f4511e";
+                                    }
 								counter++;
-								if (counter == elem.childElementCount)
-									{
-										loader.style.opacity = "";
-										setTimeout(function () {
-											loader.remove();
-											setTimeout(function () {
-												CreateEx("Отправлено.");
-											}, 100);
-										}, 550);
-									}
+                                if (counter == elem.childElementCount)
+                                    {
+                                        loader.style.opacity = "";
+                                        setTimeout(function () {
+                                            loader.remove();
+                                            setTimeout(function () {
+                                                if (counter == counter_ok)
+                                                    CreateEx("Успешно отправлено");
+                                                else
+                                                    CreateEx("При отправке возникли ошибки");
+                                            }, 100);
+                                        }, 550);
+                                    }
 							});
 						}
 				}

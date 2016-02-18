@@ -230,42 +230,24 @@ function LOAD_Reports()
 {
     LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Bugs.html");
 }
-function SEND_message(options, text)
+function SEND_message(options, text, callback)
 {
-    var body = document.body;
     var req = {};
     req.parameters = options;
     req.text = text;
-    var loader = CreateLoader(body, 1, 1);
-    body.appendChild(loader);
-    setTimeout(function () {
-        loader.style.opacity = "1";
-        setTimeout(function () {
-            NewXHR("/Admin/add_notification", "json_input=" + JSON.stringify(req), function(Response) {
-				try 
-					{
-						var answer = JSON.parse(Response);
-						loader.style.opacity = "";
-						setTimeout(function () {
-							loader.remove();
-							if (answer.state == "success")
-								CreateEx("Успешно отправлено!");
-							else
-								CreateEx(answer.message);
-						}, 500);
-					}
-				catch (ex)
-					{
-						loader.style.opacity = "";
-						setTimeout(function () {
-							loader.remove();
-							CreateEx(ex.message);
-						}, 500);						
-					}
-            });
-        }, 500);
-    }, 10);
-    
+	NewXHR("/Admin/add_notification", "json_input=" + JSON.stringify(req), function(Response) {
+		try 
+			{
+				callback(JSON.parse(Response));
+			}
+		catch (ex)
+			{
+				var answer = {};
+				answer.state = "fail";
+				answer.message = ex.message;
+				callback(answer);
+			}
+	});  
 }
 function LOAD_whom_sent()
 {
@@ -321,29 +303,63 @@ function LOAD_whom_sent()
 }
 function SEND_premessage_full()
 {
-    var preset = {};
-    var elem = document.getElementById("message-more-type");
-    for(var i =1; i < 4; i++)
-        if (elem.children[i].getElementsByTagName("input")[0].checked)
-            preset.type = elem.children[i].getElementsByTagName("input")[0].value;
-    var elem = document.getElementById("whom-sent");
-    if ( document.getElementById("message-datepicker").value == "" )
-        preset.ending_date = "tomorrow";
-    else
-        preset.ending_date = document.getElementById("message-datepicker").value;
-    if (document.getElementById("whom-sent").getAttribute("selected-all") == "true")
-        {
-            preset.target = "0";
-			SEND_message(preset, document.getElementById("message-more-text-input").value);
-        }
-    else
-        {
-            for (var i = 0; i < elem.childElementCount; i++)
-                {
-                    preset.target = elem.children[i].innerHTML;
-                    SEND_message(preset, document.getElementById("message-more-text-input").value);
-                }
-        }
+
+    var body = document.body;
+    var loader = CreateLoader(body, 1, 1);
+    body.appendChild(loader);
+    setTimeout(function () {
+        loader.style.opacity = "1";
+        setTimeout(function () {
+			var preset = {};
+			var elem = document.getElementById("message-more-type");
+			preset.type = "null";
+			for(var i =1; i < 4; i++)
+				if (elem.children[i].getElementsByTagName("input")[0].checked)
+					preset.type = elem.children[i].getElementsByTagName("input")[0].value;
+			var elem = document.getElementById("whom-sent");
+			if ( document.getElementById("message-datepicker").value == "" )
+				preset.ending_date = "tomorrow";
+			else
+				preset.ending_date = document.getElementById("message-datepicker").value;
+			if (document.getElementById("whom-sent").getAttribute("selected-all") == "true")
+				{
+					preset.target = "0";
+					SEND_message(preset, document.getElementById("message-more-text-input").value, function (Response) {
+						loader.style.opacity = "";
+						setTimeout(function () {
+							loader.remove();
+							setTimeout(function () {
+								if (Response.state == "success")
+									CreateEx("Успешно отправлено!");
+								else
+									CreateEx(Response.message);
+							}, 100);
+						}, 550);
+					});
+				}
+			else
+				{
+					var counter = 0;
+					for (var i = 0; i < elem.childElementCount; i++)
+						{
+							preset.target = elem.children[i].innerHTML;
+							SEND_message(preset, document.getElementById("message-more-text-input").value, function (Response){
+								counter++;
+								if (counter == elem.childElementCount)
+									{
+										loader.style.opacity = "";
+										setTimeout(function () {
+											loader.remove();
+											setTimeout(function () {
+												CreateEx("Отправлено.");
+											}, 100);
+										}, 550);
+									}
+							});
+						}
+				}
+        }, 500);
+    }, 10);
 }
 function SHOW_message_types()
 {
@@ -374,11 +390,33 @@ function SET_message_type(value)
 }
 function SEND_message_small()
 {
-	var options = {};
-	options.type = document.getElementById("message-type").dataset.messagetype;
-	options.target = document.getElementById("message-to-input").value;
-    options.ending_date = "tomorrow";
-	SEND_message(options, document.getElementById("message-text-input").value);
+    var body = document.body;
+    var loader = CreateLoader(body, 1, 1);
+    body.appendChild(loader);
+    setTimeout(function () {
+        loader.style.opacity = "1";
+        setTimeout(function () {
+			var options = {};
+			options.type = document.getElementById("message-type").dataset.messagetype;
+			if (document.getElementById("message-to-input").value == "")
+				options.target = "0";
+			else
+				options.target = document.getElementById("message-to-input").value;
+			options.ending_date = "tomorrow";
+			SEND_message(options, document.getElementById("message-text-input").value, function (Response){
+				loader.style.opacity = "";
+				setTimeout(function () {
+					loader.remove();
+					setTimeout(function () {
+						if (Response.state == "success")
+							CreateEx("Успешно отправлено!");
+						else
+							CreateEx(Response.message);
+					}, 100);
+				}, 500);
+			});
+        }, 500);
+    }, 10);
 }
 function LOAD_grouplist()
 {

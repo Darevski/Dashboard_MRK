@@ -291,7 +291,7 @@ function LOAD_whom_sent()
 	options.faculty = Result_find(document.getElementById("message-filter-department").children[1].getElementsByTagName("input"));
 	options.spec = Result_find(document.getElementById("message-filter-spec").children[1].getElementsByTagName("input"));
     for (var obj in options)
-        if (obj != "null")
+        if (options[obj] != "null")
             option_null = false;
     if (option_null)
         document.getElementById("whom-sent").setAttribute("selected-all", "true");
@@ -334,6 +334,7 @@ function SEND_premessage_full()
     if (document.getElementById("whom-sent").getAttribute("selected-all") == "true")
         {
             preset.target = "0";
+			SEND_message(preset, document.getElementById("message-more-text-input").value);
         }
     else
         {

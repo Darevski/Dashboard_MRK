@@ -1049,3 +1049,57 @@ body
 	line-height: 40px;
 	margin-top: 5px;
 }
+#message-whom-status ul li:hover p
+{
+	margin-left: -188px;
+	transition: 0.8s;
+}
+#message-whom-status ul li p
+{
+	text-align: center;
+	width: 188px;
+	display: inline-block;
+	vertical-align: top;
+	height: 30px;
+	padding: 0;
+	margin: 0;
+	transition: 0.8s;
+	overflow: hidden;
+}
+#message-whom-status ul li
+{
+	list-style: none;
+	width: 188px;
+	border-left: 4px solid @color-delimeter;
+	transition: 0.5s;
+	height: 30px;
+	line-height: 30px;
+	font-size: 18px;
+	padding: 0 0 0 8px;
+	margin: 0;
+	overflow: hidden;
+}
+#message-whom-status ul
+{
+	list-style: none;
+	outline: none;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	width: 200px;
+	height: 300px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+#message-whom-status
+{
+	background-color: @color-block;
+	box-shadow: 0px 0px 10px rgba(0,0,0,0.8);
+	position: fixed;
+	top: ~"calc( 50% - 150px)";
+	width: 200px;
+	height: 300px;
+	left: ~"calc( 100% - 200px )";
+	z-index: 11;
+	overflow: hidden;
+}

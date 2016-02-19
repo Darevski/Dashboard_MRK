@@ -321,7 +321,6 @@ function SEND_premessage_full()
 				preset.ending_date = "tomorrow";
 			else
 				preset.ending_date = document.getElementById("message-datepicker").value;
-            states.style.opacity = "1";
 			if (elem.getAttribute("selected-all") == "true")
 				{
 					preset.target = "0";
@@ -338,7 +337,7 @@ function SEND_premessage_full()
 						}, 550);
 					});
 				}
-			else
+			else if (document.getElementById("whom-sent").childElementCount > 0)
 				{
 					var states = CreateElem("div", "message-whom-status");
 					var states_ul = CreateElem("ul");
@@ -363,6 +362,7 @@ function SEND_premessage_full()
 					close_button.style.top = "calc( 100% - 25px )";
 					states.appendChild(close_button);
 					body.appendChild(states);
+					setTimeout(function () { states.style.opacity = "1"; }, 100);
 					states.style.top = "calc( 50% - " + (15 * (states_ul.childElementCount + 2)) + "px)";
 					states.style.height = 30 * (states_ul.childElementCount + 1) + "px";
 					var counter = 0;
@@ -381,7 +381,7 @@ function SEND_premessage_full()
                                     }
                                 else
                                     {
-                                        states.children[0].children[number].children[1].innerHTML = "Ошибка " + Response.code;
+                                        states.children[0].children[number].children[1].innerHTML = "Ошибка " + Response.message;
                                         states.children[0].children[number].style.borderLeft = "4px solid #f4511e";
                                     }
 								counter++;
@@ -406,6 +406,16 @@ function SEND_premessage_full()
                                     }
 							});
 						}
+				}
+			else
+				{
+					loader.style.opacity = "";
+					setTimeout(function () {
+						loader.remove();
+						setTimeout(function () {
+							CreateEx("Отсутствуют получатели");
+						}, 100);
+					}, 550);
 				}
         }, 500);
     }, 10);

@@ -29,6 +29,7 @@ class Model
     function __construct(){
         $data = parse_ini_file($_SERVER['DOCUMENT_ROOT'].'/Application/Config.ini',true);
         $data_base_opt = $data['Data_Base_config'];
-        $this->database = new Safe_SQL($data_base_opt);
+        /** @var Safe_SQL database singleton */
+        $this->database = Safe_SQL::get_instance($data_base_opt);
     }
 }

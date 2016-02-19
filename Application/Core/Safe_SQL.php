@@ -80,7 +80,21 @@ class Safe_SQL
     const RESULT_ASSOC = MYSQLI_ASSOC;
     const RESULT_NUM = MYSQLI_NUM;
 
-    function __construct($opt = array())
+    /**
+     * @var - singleton
+     */
+    private static $instance = null;
+    /**
+     * Использование singleton шаблона
+     */
+    public static function get_instance($opts){
+        if (is_null(self::$instance))
+            self::$instance = new self($opts);
+        return self::$instance;
+    }
+
+    private function __clone(){}
+    private function __construct($opt = array())
     {
         $opt = array_merge($this->defaults, $opt);
         $this->emode = $opt['errmode'];

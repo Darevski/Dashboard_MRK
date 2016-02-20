@@ -309,7 +309,12 @@ function SEND_premessage_full()
     body.appendChild(loader);
     setTimeout(function () {
         loader.style.opacity = "1";
+		var elem = document.getElementById("message-whom-status");
+		if ((elem != undefined) & (elem != null))
+			elem.style.opacity = "";
         setTimeout(function () {
+			if ((elem != undefined) & (elem != null))
+				elem.remove();
 			var preset = {};
 			var elem = document.getElementById("message-more-type");
 			preset.type = "null";
@@ -381,7 +386,7 @@ function SEND_premessage_full()
                                     }
                                 else
                                     {
-                                        states.children[0].children[number].children[1].innerHTML = "Ошибка " + Response.message;
+                                        states.children[0].children[number].children[1].innerHTML = Response.message;
                                         states.children[0].children[number].style.borderLeft = "4px solid #f4511e";
                                     }
 								counter++;

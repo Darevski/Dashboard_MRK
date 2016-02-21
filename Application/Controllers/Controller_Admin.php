@@ -18,7 +18,10 @@ use Application\Models;
  * @package Application\Controllers
  */
 class Controller_Admin extends Core\Controller{
-
+    /**
+     * @var Models\Model_Admin набор логики связанной с администратором
+     */
+    private $admin_model;
     /**
      * Проверка разрешения на доступ к данной информации по индефикатору пользователя
      * @throws UFO_Except при не совпадении индификатора пользователя вброс исключения с ошибкой доступа
@@ -26,9 +29,7 @@ class Controller_Admin extends Core\Controller{
     function __construct(){
         parent::__construct();
         $this->validate();
-        $this->model = new Models\Model_Admin();
-        $this->list_group_model = new Models\Model_List_Groups();
-        $this->notifications =new Models\Model_Notifications();
+        $this->admin_model = new Models\Model_Admin();
     }
 
     /**
@@ -58,7 +59,7 @@ class Controller_Admin extends Core\Controller{
      * @api
      */
     function action_add_group(){
-        //$_POST['json_input'] = '{"group_number":"32494","grade":"3"}';
+        //$_POST['json_input'] = '{"group_number":"12494","grade":"3"}';
         if (isset($_POST['json_input'])) {
             $data= json_decode($_POST['json_input'],JSON_UNESCAPED_UNICODE);
             if (isset($data['grade']) && isset($data['group_number'])) {

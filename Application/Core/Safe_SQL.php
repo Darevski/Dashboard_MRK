@@ -75,13 +75,13 @@ class Safe_SQL
         'pconnect' => FALSE,
         'charset' => 'utf8',
         'errmode' => 'exception', //or 'error'
-        'exception' => 'Exception', //Exception class name
+        'exception' => 'SQL_Exception', //Exception class name
     );
     const RESULT_ASSOC = MYSQLI_ASSOC;
     const RESULT_NUM = MYSQLI_NUM;
 
     /**
-     * @var - singleton
+     * @var Safe_SQL singleton
      */
     private static $instance = null;
     /**

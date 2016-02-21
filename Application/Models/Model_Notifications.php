@@ -85,9 +85,11 @@ class Model_Notifications extends Model_Dashboard
      * @return array {string 'state' critical|warning|info , string text}
      */
     public function get_notification_for_group($number_group){
-        $result=[];
+        $result = [];
         $today = date("Ymd");
-        $query = "SELECT state,text,starting_date FROM notification WHERE (group_number=?s or group_number=0) and ending_date>=$today";
+        // Получение уведомлений для указанной группы, дата которых больше сегодняшней (уведомления актуальны)
+        $query = "SELECT state,text,starting_date FROM notification WHERE (group_number=?s or
+                                                                            group_number=0) and ending_date>=$today";
         $result_of_query = $this->database->getAll($query,$number_group);
         // сортируем по дате добавления в начале новейшие
         foreach ($result_of_query as $value)

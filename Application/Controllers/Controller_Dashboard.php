@@ -18,22 +18,9 @@ use Application\Models;
 class Controller_Dashboard extends Core\Controller
 {
     /**
-     * Подключение моделей рассписания + преподавателей
-     */
-    function __construct(){
-        $this->view = new Core\View();
-        $this->professor_model = new Models\Model_Professors();
-        $this->timetable_model = new Models\Model_TimeTable();
-        $this->list_group_model = new Models\Model_List_Groups();
-        $this->notification_model = new Models\Model_Notifications();
-        $this->depart_list = new Models\Model_List_Departments();
-    }
-
-    /**
      * Стартовое действие (по-умолчанию)
      */
-    function action_start()
-    {
+    function action_start(){
         $this->view->generate("Dashboard_View.php");
     }
 
@@ -43,12 +30,12 @@ class Controller_Dashboard extends Core\Controller
      * Входной параметр через JSON строку(POST) integer 'group_number'
      *
      * Структура результата:
-     * {string 'state' critical|warning|info , string text}
+     * {string 'type' critical|warning|info , string text}
      *
      * @api
      */
     function action_get_notifications_by_group(){
-        //$_POST['json_input'] = '{"group_number":"32494"}';
+        $_POST['json_input'] = '{"group_number":"32791"}';
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
 
@@ -301,5 +288,14 @@ class Controller_Dashboard extends Core\Controller
     function action_get_departments_list(){
         $list=$this->depart_list->get_departments_list();
         $this->view->output_json($list);
+    }
+    /**
+     * Выводит json строку со временем на сервере
+     * string now_time - unix timestamp
+     * @api
+     */
+    public function action_get_time(){
+        $date['now_time'] = date("U");
+        $this->view->output_json($date);
     }
 }

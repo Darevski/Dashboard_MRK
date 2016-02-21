@@ -20,7 +20,7 @@ class View
      * Генерация вида страницы
      * @param string $template_view
      */
-    function generate($template_view){
+    static function generate($template_view){
         include 'Application/Views/'.$template_view;
     }
 
@@ -29,7 +29,7 @@ class View
      * @param $content_view
      * @param null $data
      */
-    function display($content_view,$data = null){
+    static function display($content_view,$data = null){
         include 'Application/Views/'.$content_view;
     }
 
@@ -37,7 +37,7 @@ class View
      * Вывод Json данных на страницу + добавление md5 json строки
      * @param array $value
      */
-    function output_json($value){
+    static function output_json($value){
         $json=json_encode($value,JSON_UNESCAPED_UNICODE );
         $md5 = md5($json);
         $value['md5']=$md5;

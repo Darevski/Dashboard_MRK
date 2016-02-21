@@ -25,6 +25,9 @@ catch (Exceptions\UFO_Except $error){
     $error->classification_error($error);
 }
 catch (Exceptions\SQL_Except $error){
-        echo "Произошла ошибка при работе с базой данных";
-        // обработка ошибок при работе с базой данных
+    $error->output_error();
+    $error->log_errors();
+}
+catch (\Exception $error){
+    echo $error->getMessage();
 }

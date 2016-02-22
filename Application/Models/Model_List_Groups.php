@@ -77,11 +77,11 @@ class Model_List_Groups extends Model_Dashboard
      * Возвращает список групп отсортированный по возрастанию на основании переданных фильтров
      * @param $filter - массив фильтров курс{1,..,4}, класс поступления после 9/11, специальность зашифрованнная в коде
      * отделение защифрованное в коде
-     * @return array
+     * @return array список групп подходящий под заданные параметры / список всех групп && bool select_all = true
      */
     public function get_groups_by_filter($filter){
         $string_filter = [];
-        $result =[];
+        $result=[];
         $surname = array ('grade_filter','class_filter','specialization_filter','faculty_filter');
 
         /**
@@ -132,11 +132,16 @@ class Model_List_Groups extends Model_Dashboard
             usort($group_list, array($this, 'Groups_Sort_CallBack'));
             foreach ($group_list as $value)
                 $result['groups'][] = $value['group_number'];
+
+            // Если выбранны все группы добавление параметра
+            if ($result === $this->get_list_group_without_grade())
+                $result['selected_all'] = true;
         }
         // при отсутсвии фильтров возвращаются все группы
-        else
+        else{
             $result = $this->get_list_group_without_grade();
-
+            $result['selected_all'] = true;
+        }
         return $result;
     }
 

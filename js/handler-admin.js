@@ -311,10 +311,11 @@ function SEND_premessage_full()
         loader.style.opacity = "1";
 		var elem = document.getElementById("message-whom-status");
 		if ((elem != undefined) & (elem != null))
-			elem.style.opacity = "";
+			{
+				elem.style.opacity = "";
+				setTimeout(function () { elem.remove(); }, 500);
+			}
         setTimeout(function () {
-			if ((elem != undefined) & (elem != null))
-				elem.remove();
 			var preset = {};
 			var elem = document.getElementById("message-more-type");
 			preset.type = "null";
@@ -386,7 +387,15 @@ function SEND_premessage_full()
                                     }
                                 else
                                     {
-                                        states.children[0].children[number].children[1].innerHTML = Response.message;
+										var error_more = CreateElem("span", null, "tooltip-left", null, Response.message);
+										states.children[0].children[number].insertBefore(error_more, states.children[0].children[number].children[0]);
+										error_more.style.display = "inline-block";
+										for (var k =0; k<4; k++)
+											error_more.style.marginLeft = "-" + (error_more.offsetWidth + 20) + "px";
+										error_more.style.display = "";
+										states.children[0].children[number].children[2].innerHTML = "Ошибка";
+                                        if (Response.code !== void(0))
+											states.children[0].children[number].children[2].innerHTML = "Ошибка #" + Response.code;
                                         states.children[0].children[number].style.borderLeft = "4px solid #f4511e";
                                     }
 								counter++;

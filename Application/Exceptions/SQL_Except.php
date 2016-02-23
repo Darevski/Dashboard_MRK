@@ -17,25 +17,25 @@ use Application\Core\View;
  */
 class SQL_Except extends Main_Except
 {
+
     const Error_code = 'db_error';
-
-    /**
-     * SQL_Except constructor. создание объекта контроллера для вывода ошибок
-     */
-    public function __construct($message){
-        parent::__construct($message);;
-    }
-
+    // Значения для отображения в Web форме
+    const Response_code = 500;
+    const Error_title = 'Fail DataBase';
     /**
      * Выводит информацию об ошибке клиентским устройствам
      * @param $error array Содержит в себе информацию об ошибке
      */
     private function print_error($error){
-        View::output_json($error);
+        // Формирование массива для вывода в форму
+        $error['json']=View::get_json($error);
+        $error['response_code'] = self::Response_code;
+        $error['title'] = self::Error_title;
+        View::display('Error_View.php',$error);
     }
 
     /**
-     * @param $error array Содержит в себе информацию об ошибке
+     * Ведет журнал ошибок
      */
     public function log_errors(){ }
 

@@ -6,16 +6,16 @@
  * Time: 11:58
  * @author Darevski
  */
-http_response_code($data['Code']);
+http_response_code($data['code']);
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?php echo $data['Error_status']; ?></title>
+    <title><?php echo $data['error_status']; ?></title>
     <meta charset="UTF-8">
 </head>
 <body>
 
-    <?php echo $data['Message']; ?>
+    <?php echo $data['message']; ?>
 </body>
 </html>

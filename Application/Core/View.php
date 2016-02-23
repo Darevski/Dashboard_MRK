@@ -34,14 +34,40 @@ class View
     }
 
     /**
-     * Вывод Json данных на страницу + добавление md5 json строки
-     * @param array $value
+     * Вывод Json данных на страницу c подписью md5
+     * @param array $data
      */
-    static function output_json($value){
-        $json=json_encode($value,JSON_UNESCAPED_UNICODE );
+    static function output_json($data){
+        // При дебаге версии "видимый" вывод ответа
+        if (Config::get_instance()->get_build()['debug'] === true)
+            echo "<json>";
+        else
+            echo "<json style=\"display: none\">";
+        // непосредственный вывод строки
+        echo self::generate_json($data);
+
+        echo "</json>";
+    }
+
+    /**
+     * Возвращает Json строку подписанную md5
+     * @param $data
+     * @return string
+     */
+    static function get_json($data){
+        return self::generate_json($data);
+    }
+
+    /**
+     * генерирует json строку из объектов и подписывает md5
+     * @param $data
+     * @return string
+     */
+    private static function generate_json($data){
+        $json=json_encode($data,JSON_UNESCAPED_UNICODE );
         $md5 = md5($json);
         $value['md5']=$md5;
-        $json=json_encode($value,JSON_UNESCAPED_UNICODE );
-        echo $json;
+        $json=json_encode($data,JSON_UNESCAPED_UNICODE );
+        return $json;
     }
 }

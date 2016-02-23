@@ -10,7 +10,7 @@
 
 namespace Application\Exceptions;
 use Application\Controllers;
-
+use Application\Core\View;
 /**
  * Обработка исключений связанных с несуществующими страницами,ошибками доступа и т.д., вывод страниц ошибок
  * Class UFO_Except
@@ -26,28 +26,31 @@ class UFO_Except extends Main_Except
         $code = $error->code;
         switch ($code) {
             case 404:   //Отсутсвие страницы
-                $data['Error_status'] = '404 Bad Gateway';
-                $data['Message'] = 'Увы такой страницы не существует';
-                $data['Code'] = 404;
+                $data['error_status'] = '404 Bad Gateway';
+                $data['message'] = 'Увы такой страницы не существует';
+                $data['code'] = 404;
                 break;
             case 601:   //Не совпадение хэша с логином при проверке
                 $_SESSION = array();
-                $data['Error_status'] = 'Warning Security problem';
-                $data['Message'] = $error->message;
-                $data['Code'] = 401;
+                $data['error_status'] = 'Warning Security problem';
+                $data['message'] = $error->message;
+                $data['code'] = 401;
                 break;
             case 401:
-                $data['Error_status'] = '401 Unauthorized';
-                $data['Message'] = $error->message;
-                $data['Code'] = 401;
+                $data['error_status'] = '401 Unauthorized';
+                $data['message'] = $error->message;
+                $data['code'] = 401;
                 break;
             case 403:
-                $data['Error_status'] = '403 Forbidden';
-                $data['Message'] = $error->message;
-                $data['Code'] = 403;
+                $data['error_status'] = '403 Forbidden';
+                $data['message'] = $error->message;
+                $data['code'] = 403;
                 break;
+            default:
+                $data['error_status'] = '400 Bad Request';
+                $data['message'] = 'не обрабаботанное исключение';
+                $data['code'] = 400;
         }
-        $controller = new Controllers\Controller_UFO();
-        $controller->display($data);
+        View::display('UFO_View.php',$data);
     }
 }

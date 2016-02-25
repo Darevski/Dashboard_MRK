@@ -207,6 +207,114 @@ function LOAD_Swap()
 		LOAD_grouplist();
 	});
 }
+function DELETE_message(ident, el)
+{
+    var req = {};
+    req.id = ident;
+    NewXHR("Admin/delete_notification", "json_input=" + JSON.stringify(req), function (Response) {
+        try
+            {
+                var answer = JSON.parse(Response);
+                if (answer.state = "success")
+                    {
+                        el.parentElement.parentElement.style.height = "0px";
+						el.parentElement.parentElement.style.borderBottom = "0px solid transparent";
+						setTimeout(function () {
+							el.remove();
+						}, 800);
+                    }
+                else
+                    CreateEx(answer.message);
+            }
+        catch (ex)
+            {
+                CreateEx(ex.message);
+            }
+    });
+}
+function LOAD_Message_manager()
+{
+	try {
+    	NewXHR("/Admin/get_active_notifications", null, function (Response) {
+			try {
+				var answer = JSON.parse(Response);
+				LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_notification_manager.html", function () {
+					try {
+						var container = document.getElementById("notification-list-container").children[0];
+						var i =0;
+						while((answer[i] != undefined) & (answer[i] != null))
+							{
+								var li = CreateElem("li");
+
+								li.style.borderLeftStyle = "solid";
+								li.style.borderLeftWidth = "5px";
+								if (answer[i].state == "note")
+									li.style.borderLeftColor = "#FFC107";
+								else if (answer[i].state == "alert")
+									li.style.borderLeftColor = "#F44336";
+								else if (answer[i].state == "info")
+									li.style.borderLeftColor = "#03A9F4";
+
+								var p = CreateElem("p");
+								p.innerHTML = answer[i].text;
+								li.appendChild(p);
+
+								var p = CreateElem("p");
+								p.innerHTML = answer[i].group_number;
+								li.appendChild(p);
+
+								var p = CreateElem("p");
+								var d = new Date();
+								var temp = {};
+								d.setTime(Date.parse(answer[i].starting_date));
+								temp.day = d.getDate();
+								temp.month = d.getMonth();
+								temp.year = d.getFullYear();
+								if (temp.day < 10)
+									temp.day = "0" + temp.day;
+								if (temp.month < 10)
+									temp.month = "0" + temp.month;
+								p.innerHTML = temp.day + "." + temp.month + "." + temp.year;
+								li.appendChild(p);
+
+								var p = CreateElem("p");
+								d.setTime(Date.parse(answer[i].starting_date));
+								temp.day = d.getDate();
+								temp.month = d.getMonth();
+								temp.year = d.getFullYear();
+								if (temp.day < 10)
+									temp.day = "0" + temp.day;
+								if (temp.month < 10)
+									temp.month = "0" + temp.month;
+								p.innerHTML = temp.day + "." + temp.month + "." + temp.year;
+								li.appendChild(p);
+
+								var elem = CreateElem("div", null, "delete-message-button", "DELETE_message(" + answer[i].id + ", this);", null);
+								var p = CreateElem("p");
+								p.appendChild(elem);
+								li.appendChild(p);
+								container.appendChild(li);
+
+								i++;
+							}
+				}
+					catch (ex)
+						{
+							CreateEx(ex.message);
+						}
+				});
+			}
+			catch (ex)
+				{
+					CreateEx(ex.message);
+				}
+    	});
+	}
+	catch (ex)
+		{
+			CreateEx(ex.message);
+		}
+}
 function LOAD_GroupChange()
 {
     LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Shedule_Edit.html", function (){

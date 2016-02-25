@@ -105,6 +105,34 @@ class Controller_Admin extends Core\Controller{
                 $this->view->output_json($result);
             }
         }
+    }
 
+    /**
+     * Удаление уведомления по его индексу
+     * Входной индефикатор через POST строку json_input
+     * integer id
+     */
+    function action_delete_notification(){
+        //$_POST['json_input'] = '{"id":"22"}';
+        if (isset($_POST['json_input'])){
+            $data = json_decode($_POST['json_input'],JSON_UNESCAPED_UNICODE);
+            if (isset($data['id'])){
+                $id = $this->security_variable($data['id']);
+                $result = $this->notifications->delete_notification($id);
+                $this->view->output_json($result);
+            }
+        }
+    }
+
+    /**
+     * Вывод списка активных уведомлений отсортированнного по дате создания (возрастание)
+     * integer id
+     * string state
+     * integer group_number
+     * date Y-m-d starting_date/ending_date
+     */
+    function action_get_active_notifications(){
+        $result = $this->notifications->get_active_notifications();
+        $this->view->output_json($result);
     }
 }

@@ -46,6 +46,38 @@ class Model_Notifications extends Model_Dashboard
     }
 
     /**
+     * Удаляет уведомления из БД по идентификатору
+     * @param integer $id
+     * @return array состояние выполнения удаления string state = 'fail' /'success' && string message on fail
+     */
+    public function delete_notification($id){
+        $test_query = "SELECT * FROM notification WHERE id = ?i";
+        if (count($this->database->getAll($test_query,$id))>0){
+            $delete_query = "DELETE FROM notification WHERE id = ?i";
+            $this->database->query($delete_query,$id);
+            $result['state'] = 'success';
+        }
+        else{
+            $result['state'] = 'fail';
+            $result['message'] = 'Уведомления с данным индефикатором не существует';
+        }
+        return $result;
+    }
+
+    /**
+     * Возвращает список всех не просроченных уведомлений в БД
+     * @return array 'notifications'
+     */
+    public function get_active_notifications(){
+        $result=[];
+        $query = "SELECT * FROM notification WHERE ending_date>=?s";
+        $today = date('Ymd');
+        $result = $this->database->getAll($query,$today);
+        usort($result,array($this,'Notifications_Sort_by_date_CallBack'));
+        return $result;
+    }
+
+    /**
      * Возвращает массив с уведомлениями для выбранной группы
      * состояние уведомления
      * Сортировка по дате, в начале новейшие
@@ -53,11 +85,11 @@ class Model_Notifications extends Model_Dashboard
      * @return array {string 'state' critical|warning|info , string text}
      */
     public function get_notification_for_group($number_group){
+        $result=[];
         $today = date("Ymd");
         $query = "SELECT state,text,starting_date FROM notification WHERE (group_number=?s or group_number=0) and ending_date>=$today";
         $result_of_query = $this->database->getAll($query,$number_group);
         // сортируем по дате добавления в начале новейшие
-        usort($result_of_query,array($this,'Notifications_Sort_by_date_CallBack'));
         foreach ($result_of_query as $value)
         {
             $array_temp['state']=$value['state'];

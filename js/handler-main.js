@@ -81,7 +81,15 @@ function NewXHR(route, body, callback)
 	xhr.onreadystatechange = function() // listening
 	{
 		if ((xhr.readyState == 4)  && (xhr.status == 200)) // if all OK
-				callback(xhr.responseText);
+			{
+				var json_response = document.createElement("html");
+				json_response.innerHTML = xhr.responseText;
+				var answer = json_response.getElementsByTagName("json")[0];
+				if (answer != void(0))
+					callback(answer.innerHTML);
+				else
+					callback(xhr.responseText);
+			}
 			else
 			{
                 if (!ERROR_STATE)

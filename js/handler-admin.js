@@ -272,13 +272,6 @@ function LOAD_whom_sent()
 	options.class = Result_find(document.getElementById("message-filter-after").getElementsByTagName("input"))
 	options.faculty = Result_find(document.getElementById("message-filter-department").children[1].getElementsByTagName("input"));
 	options.spec = Result_find(document.getElementById("message-filter-spec").children[1].getElementsByTagName("input"));
-    for (var obj in options)
-        if (options[obj] != "null")
-            option_null = false;
-    if (option_null)
-        document.getElementById("whom-sent").setAttribute("selected-all", "true");
-    else
-        document.getElementById("whom-sent").removeAttribute("selected-all");
   	NewXHR("/Dashboard/get_filtered_groups", "json_input=" + JSON.stringify(options), function (Response) {
 		try {
 			var answer = JSON.parse(Response);
@@ -292,6 +285,10 @@ function LOAD_whom_sent()
 						whom_list.appendChild(elem);
 						i++;
 					}
+			if (answer.selected_all !== void(0))
+				document.getElementById("whom-sent").setAttribute("selected-all", "true");
+			else
+				document.getElementById("whom-sent").removeAttribute("selected-all");
 		}
 		catch (ex)
 			{

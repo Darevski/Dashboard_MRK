@@ -55,12 +55,14 @@ class Model_List_Groups extends Model_Dashboard
             $grade = $value['grade'];
             $result[$grade][] = $value['group_number'];
         }
+        $result['state']='success';
         return $result;
     }
 
     /**
      * Возврашает список групп по возрастанию
      * @return array номера групп
+     * [state] = 'success'
      */
     public function get_list_group_without_grade(){
         $result = [];
@@ -70,6 +72,7 @@ class Model_List_Groups extends Model_Dashboard
 
         foreach ($result_query as $value)
             $result['groups'][]=$value['group_number'];
+        $result['state'] = 'success';
         return $result;
     }
 
@@ -142,6 +145,7 @@ class Model_List_Groups extends Model_Dashboard
             $result = $this->get_list_group_without_grade();
             $result['selected_all'] = true;
         }
+        $result['state']='success';
         return $result;
     }
 

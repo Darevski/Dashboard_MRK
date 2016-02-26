@@ -65,7 +65,7 @@ class View
     private static function generate_json($data){
         $json=json_encode($data,JSON_UNESCAPED_UNICODE );
         $md5 = md5($json);
-        $value['md5']=$md5;
+        $data['md5']=$md5;
         $json=json_encode($data,JSON_UNESCAPED_UNICODE );
         return $json;
     }

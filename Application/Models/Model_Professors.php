@@ -21,37 +21,51 @@ class Model_Professors extends Model_Dashboard
      * Возвращает массив с набором данных о текущем местоположении/статусе преподавателя
      * @param integer $professor_id уникальный номер преподавателя
      * @return array
-     * name,photo_url, department, lesson_num, state = now/next/false
+     * name,photo_url, department, lesson_num, lesson_state = now/next/false
      * - now на текущий момент времени идет пара
      * - next возвращена следующая пара
      * - false пар на сегодня нету
      *
      * group_number, lesson_name, classroom,start_time,end_time
+     *
+     * [state] = 'success' || [state] = 'fail' && [message] = string
      */
     function get_professor_state($professor_id){
-        $day = $this->date_time_model->get_day()['today'];
-        // Если сегодня воскресенье
-        if ($day == false){
-            $result['weekend']='true';
+        if (!is_int($professor_id)){
+            $result['state'] = 'fail';
+            $result['message'] = 'Идентификатор должен быть числом';
+        }
+        else if (!$this->isset_professor($professor_id)){
+            $result['state'] = 'fail';
+            $result['message'] = 'Преподавателя с указанным id не существует';
         }
         else{
-            // определяет какая по счету идет пара/ пар нету
-            $lesson_number = $this->get_lesson_number_by_time(date("H:i:s"));
-            if ($lesson_number === false)
-                $result["state"] = "false";
-            else{
-                $result = $this->find_professor_day_conformity_with_lesson_number($professor_id,$lesson_number,$day);
-                $start_end_time= $this->lesson_begin_end_time($lesson_number);
-                $result['start_time']=$start_end_time['start_time'];
-                $result['end_time']=$start_end_time['end_time'];
+            $day = $this->date_time_model->get_day()['today'];
+            // Если сегодня воскресенье
+            if ($day == false){
+                $result['weekend']='true';
             }
+            else{
+                // определяет какая по счету идет пара/ пар нету
+                $lesson_number = $this->get_lesson_number_by_time(date("H:i:s"));
+                if ($lesson_number === false)
+                    $result["lesson_state"] = "false";
+                else{
+                    $result = $this->find_professor_day_conformity_with_lesson_number($professor_id,$lesson_number,$day);
+                    $start_end_time= $this->lesson_begin_end_time($lesson_number);
+                    $result['start_time']=$start_end_time['start_time'];
+                    $result['end_time']=$start_end_time['end_time'];
+                }
+            }
+
+            $prof_info=$this->get_professor_info($professor_id);
+
+            $result['photo_url']=$prof_info['photo_url'];
+            $result['department']=$prof_info['depart_name'];
+            $result['name']=$prof_info['professor'];
+
+            $result['state'] = 'success';
         }
-
-        $prof_info=$this->get_professor_info($professor_id);
-
-        $result['photo_url']=$prof_info['photo_url'];
-        $result['department']=$prof_info['depart_name'];
-        $result['name']=$prof_info['professor'];
 
         return $result;
     }
@@ -63,6 +77,7 @@ class Model_Professors extends Model_Dashboard
         $query = "SELECT prof.id,prof.professor,dep_list.depart_name FROM professors as prof,departments_list as dep_list
                   WHERE prof.department_code = dep_list.code";
         $result=$this->database->getALL($query);
+        $result['state']='success';
         return $result;
     }
 
@@ -72,8 +87,19 @@ class Model_Professors extends Model_Dashboard
      * @return array even/uneven { day { lesson_num { group_number,lesson_name } }
      */
     function get_professor_timetable($professor_id){
-        $result["even"] =$this->week_professor_parse($professor_id,'ch');
-        $result["uneven"] =$this->week_professor_parse($professor_id,'zn');
+        if (!is_int($professor_id)){
+            $result['state'] = 'fail';
+            $result['message'] = 'Идентификатор преподавателя должен быть числом';
+        }
+        else if (!$this->isset_professor($professor_id)) {
+            $result['state'] = 'fail';
+            $result['message'] = 'Преподавателя с указанным id не существует';
+        }
+        else{
+            $result["even"] =$this->week_professor_parse($professor_id,'ch');
+            $result["uneven"] =$this->week_professor_parse($professor_id,'zn');
+            $result['state'] = 'success';
+        }
         return $result;
     }
 
@@ -164,6 +190,19 @@ class Model_Professors extends Model_Dashboard
         $result['max']=$max_min['max'];
         $result['min']=$max_min['min'];
         return $result;
+    }
 
+    /**
+     * Проверяет существование преподавателя по указанному id
+     * @param integer $id
+     * @return bool
+     */
+    public function isset_professor($id){
+        $query = 'SELECT * FROM professors WHERE id = ?s';
+        $result = $this->database->query($query,$id);
+        if ($this->database->numRows($result) > 0)
+            return true;
+        else
+            return false;
     }
 }

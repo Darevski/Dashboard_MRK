@@ -24,5 +24,6 @@ http_response_code($data['response_code']);
 <json style="display: none">
     <?php echo $data['json']; ?>
 </json>
+<?php echo @$data['debug_message']; ?>
 </body>
 </html>

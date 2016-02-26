@@ -170,6 +170,20 @@ class Model_List_Groups extends Model_Dashboard
     }
 
     /**
+     * Проверяет существование группы по указанному id
+     * @param integer $id
+     * @return bool
+     */
+    public function isset_group($id){
+        $query = 'SELECT * FROM groups_list WHERE group_number = ?s';
+        $result = $this->database->query($query,$id);
+        if ($this->database->numRows($result) > 0)
+            return true;
+        else
+            return false;
+    }
+
+    /**
      * Callback функция для сортировки списка групп по их номеру
      * @param array $a ячейка группы
      * @param array $b ячейка группы

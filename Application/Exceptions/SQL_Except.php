@@ -43,13 +43,12 @@ class SQL_Except extends Main_Except
      * Формирует массив с данными о возникшей ошибке
      */
     public function output_error(){
-        $output = [];
         $output['state'] = 'fail';
         $output['error_code'] = self::Error_code;
         $output['message'] = "Ошибка при работе С БД";
         // При отладочной версии приложения вывод отладочного сообщения
         if (Config::get_instance()->get_build()['debug'])
-            $output['Debug_message'] = self::getMessage();
+            $output['debug_message'] = self::getMessage();
         $this->print_error($output);
     }
 }

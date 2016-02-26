@@ -46,10 +46,16 @@ class UFO_Except extends Main_Except
                 $data['message'] = $error->message;
                 $data['code'] = 403;
                 break;
+            case 400:
+                $data['error_status'] = '400 Bad Request';
+                $data['message'] = $error->message;
+                $data['code'] = 400;
+                break;
             default:
                 $data['error_status'] = '400 Bad Request';
-                $data['message'] = 'не обрабаботанное исключение';
+                $data['message'] = $error->message;
                 $data['code'] = 400;
+                break;
         }
         View::display('UFO_View.php',$data);
     }

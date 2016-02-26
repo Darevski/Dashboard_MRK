@@ -38,15 +38,14 @@ class View
      * @param array $data
      */
     static function output_json($data){
+        $data['json'] = self::generate_json($data);
         // При дебаге версии "видимый" вывод ответа
-        if (Config::get_instance()->get_build()['debug'] === true)
-            echo "<json>";
+        if (Config::get_instance()->get_build()['debug'] == true)
+            $data['display_view'] = true;
         else
-            echo "<json style=\"display: none\">";
-        // непосредственный вывод строки
-        echo self::generate_json($data);
+            $data['display_view'] = 'none';
 
-        echo "</json>";
+        self::display('Output_View.php',$data);
     }
 
     /**

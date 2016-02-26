@@ -75,9 +75,13 @@ class Controller {
      * @return string $result результат преобразования
      */
     protected function security_variable($variable){
-        $result=htmlentities($variable);
-        $result=strip_tags($result);
-        return $result;
+        if (is_string($variable)) {
+            $result = htmlentities($variable);
+            $result = strip_tags($result);
+            return $result;
+        }
+        else
+            return $variable;
     }
 
     /**
@@ -90,7 +94,7 @@ class Controller {
         foreach ($array as &$value){
             if (is_array($value))
                 $value=$this->secure_array($value);
-            else{
+            else if (is_string($value)){
                 $value=htmlentities($value);
                 $value=strip_tags($value);
             }

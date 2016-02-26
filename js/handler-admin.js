@@ -1,5 +1,6 @@
 var TIME_difference;
 var professorslist, lessonlist;
+var notificationlist;
 function LOAD_SkeletonsFullscreen(route, callback)
 {
     var body = document.body;
@@ -215,8 +216,15 @@ function DELETE_message(ident, el)
         try
             {
                 var answer = JSON.parse(Response);
-                if (answer.state = "success")
+                if (answer.state == "success")
                     {
+						var i = 0;
+						while ((notificationlist[i] != undefined) & (notificationlist[i] != null))
+							{
+								if (notificationlist[i].id == ident)
+									notificationlist.splice(i, 1);
+								i++;
+							}
                         el.parentElement.parentElement.style.height = "0px";
 						el.parentElement.parentElement.style.borderBottom = "0px solid transparent";
 						setTimeout(function () {
@@ -232,6 +240,114 @@ function DELETE_message(ident, el)
             }
     });
 }
+function create_li_notification(input)
+{
+	var li = CreateElem("li");
+	
+	li.style.borderLeftStyle = "solid";
+	li.style.borderLeftWidth = "5px";
+	if (input.state == "note")
+		li.style.borderLeftColor = "#FFC107";
+	else if (input.state == "alert")
+		li.style.borderLeftColor = "#F44336";
+	else if (input.state == "info")
+		li.style.borderLeftColor = "#03A9F4";
+
+	var p = CreateElem("p");
+	p.innerHTML = input.text;
+	li.appendChild(p);
+
+	var p = CreateElem("p");
+	p.innerHTML = input.group_number;
+	li.appendChild(p);
+
+	var p = CreateElem("p");
+	var d = new Date();
+	var temp = {};
+	d.setTime(Date.parse(input.starting_date));
+	temp.day = d.getDate();
+	temp.month = d.getMonth();
+	temp.year = d.getFullYear();
+	if (temp.day < 10)
+		temp.day = "0" + temp.day;
+	if (temp.month < 10)
+		temp.month = "0" + temp.month;
+	p.innerHTML = temp.day + "." + temp.month + "." + temp.year;
+	li.appendChild(p);
+
+	var p = CreateElem("p");
+	d.setTime(Date.parse(input.ending_date));
+	temp.day = d.getDate();
+	temp.month = d.getMonth();
+	temp.year = d.getFullYear();
+	if (temp.day < 10)
+		temp.day = "0" + temp.day;
+	if (temp.month < 10)
+		temp.month = "0" + temp.month;
+	p.innerHTML = temp.day + "." + temp.month + "." + temp.year;
+	li.appendChild(p);
+
+	var elem = CreateElem("div", null, "delete-message-button", "DELETE_message(" + input.id + ", this);", null);
+	var p = CreateElem("p");
+	p.appendChild(elem);
+	li.appendChild(p);
+	
+	return li;
+}
+function message_sort(str)
+{
+	function compare_number (a, b)
+	{
+		return a.group_number - b.group_number;
+	}
+	function compare_date_start (a, b)
+	{
+		var first = new Date(a.starting_date);
+		var second = new Date(b.starting_date);
+		return first - second;
+	}
+	function compare_date_end (a, b)
+	{
+		var first = new Date(a.ending_date);
+		var second = new Date(b.ending_date);
+		return first - second;
+	}
+	try {
+		var container = document.getElementById("notification-list-container").children[0];
+		var sort_indicator = document.getElementById("notification-list-header");
+		for (var i = 0; i < sort_indicator.childElementCount; i++)
+			sort_indicator.children[i].style.borderTop = "";
+		container.innerHTML = "";
+		var i =0;
+		switch (str)
+		{
+			case 'group':
+				notificationlist.sort(compare_number);
+				sort_indicator.children[1].style.borderTop = "2px solid rgb(3, 169, 244)"
+				break;
+			case 'start':
+				notificationlist.sort(compare_date_start);
+				sort_indicator.children[2].style.borderTop = "2px solid rgb(3, 169, 244)"
+				break;
+			case 'end':
+				notificationlist.sort(compare_date_end);
+				sort_indicator.children[3].style.borderTop = "2px solid rgb(3, 169, 244)"
+				break;
+			default:
+				throw Error("Ошибка сортировки");
+		}
+		while((notificationlist[i] != undefined) & (notificationlist[i] != null))
+			{
+				var li = create_li_notification(notificationlist[i]);
+				container.appendChild(li);
+				i++;
+			}
+	}
+	catch (ex)
+	{
+		CreateEx(ex.message);
+	}
+}
 function LOAD_Message_manager()
 {
 	try {
@@ -242,62 +358,14 @@ function LOAD_Message_manager()
 					try {
 						var container = document.getElementById("notification-list-container").children[0];
 						var i =0;
+						notificationlist = [];
 						while((answer[i] != undefined) & (answer[i] != null))
 							{
-								var li = CreateElem("li");
-
-								li.style.borderLeftStyle = "solid";
-								li.style.borderLeftWidth = "5px";
-								if (answer[i].state == "note")
-									li.style.borderLeftColor = "#FFC107";
-								else if (answer[i].state == "alert")
-									li.style.borderLeftColor = "#F44336";
-								else if (answer[i].state == "info")
-									li.style.borderLeftColor = "#03A9F4";
-
-								var p = CreateElem("p");
-								p.innerHTML = answer[i].text;
-								li.appendChild(p);
-
-								var p = CreateElem("p");
-								p.innerHTML = answer[i].group_number;
-								li.appendChild(p);
-
-								var p = CreateElem("p");
-								var d = new Date();
-								var temp = {};
-								d.setTime(Date.parse(answer[i].starting_date));
-								temp.day = d.getDate();
-								temp.month = d.getMonth();
-								temp.year = d.getFullYear();
-								if (temp.day < 10)
-									temp.day = "0" + temp.day;
-								if (temp.month < 10)
-									temp.month = "0" + temp.month;
-								p.innerHTML = temp.day + "." + temp.month + "." + temp.year;
-								li.appendChild(p);
-
-								var p = CreateElem("p");
-								d.setTime(Date.parse(answer[i].starting_date));
-								temp.day = d.getDate();
-								temp.month = d.getMonth();
-								temp.year = d.getFullYear();
-								if (temp.day < 10)
-									temp.day = "0" + temp.day;
-								if (temp.month < 10)
-									temp.month = "0" + temp.month;
-								p.innerHTML = temp.day + "." + temp.month + "." + temp.year;
-								li.appendChild(p);
-
-								var elem = CreateElem("div", null, "delete-message-button", "DELETE_message(" + answer[i].id + ", this);", null);
-								var p = CreateElem("p");
-								p.appendChild(elem);
-								li.appendChild(p);
-								container.appendChild(li);
-
+								notificationlist[notificationlist.length] = answer[i];
 								i++;
 							}
-				}
+						message_sort("group");
+					}
 					catch (ex)
 						{
 							CreateEx(ex.message);

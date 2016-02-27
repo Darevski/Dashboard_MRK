@@ -10,6 +10,7 @@
 namespace Application\Exceptions;
 use Application\Core\Config;
 use Application\Core\View;
+
 /**
  * Обработчик исключений связанных с базой данных
  * Class SQL_Except
@@ -24,14 +25,25 @@ class SQL_Except extends Main_Except
     const Error_title = 'Fail DataBase';
     /**
      * Выводит информацию об ошибке клиентским устройствам
-     * @param $error array Содержит в себе информацию об ошибке
+     * @param $data array Содержит в себе информацию об ошибке
      */
-    private function print_error($error){
+    private function print_error($data){
         // Формирование массива для вывода в форму
-        $error['json']=View::get_json($error);
-        $error['response_code'] = self::Response_code;
-        $error['title'] = self::Error_title;
-        View::display('Error_View.php',$error);
+        $data['json']=View::get_json($data);
+        $data['response_code'] = self::Response_code;
+        $data['title'] = self::Error_title;
+
+        // "Видимый" ответ сервера при дебаге
+        if (Config::get_instance()->get_build()['debug']){
+            $data['display_view'] = true;
+            // При отладочной версии приложения вывод сообщения об ошибке
+            $data['debug_message'] = self::getMessage();
+        }
+        else
+            $data['display_view'] = 'none';
+
+
+        View::display('Error_View.php',$data);
     }
 
     /**
@@ -46,9 +58,6 @@ class SQL_Except extends Main_Except
         $output['state'] = 'fail';
         $output['error_code'] = self::Error_code;
         $output['message'] = "Ошибка при работе С БД";
-        // При отладочной версии приложения вывод отладочного сообщения
-        if (Config::get_instance()->get_build()['debug'])
-            $output['debug_message'] = self::getMessage();
         $this->print_error($output);
     }
 }

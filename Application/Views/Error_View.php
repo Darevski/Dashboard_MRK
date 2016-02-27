@@ -21,7 +21,7 @@ http_response_code($data['response_code']);
 </div>
 
 
-<json style="display: none">
+<json style="display: <?php echo $data['display_view']; ?>">
     <?php echo $data['json']; ?>
 </json>
 <?php echo @$data['debug_message']; ?>

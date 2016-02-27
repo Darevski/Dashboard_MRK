@@ -10,7 +10,7 @@
 namespace Application\Models;
 
 use Application\Models\Base\Model_Dashboard;
-use phpDocumentor\Compiler\Pass\PackageTreeBuilder;
+use Application\Exceptions\Models_Processing_Except;
 
 /**
  * Класс логики связанный с отображением рассписания, уведомлений и т.д. занятий выбранных групп
@@ -32,56 +32,56 @@ class Model_TimeTable extends Model_Dashboard
      * - время пары
      * - bool multiple при наличии нескольких преподавателей ведущих пары одновременно у одной группы - true
      * [state] = 'success' || [state] = 'fail' && [message] = string ...
+     * @throws Models_Processing_Except
      */
-    function get_lesson_info_by($number_group,$lesson_number){
+    function get_lesson_info_by($number_group,$lesson_number)
+    {
         $groups_model = new Model_List_Groups();
-        if(!is_int($number_group)){
-            $result['state'] = 'fail';
-            $result['message'] = 'Номер группы должен быть числом';
-        }
-        else if (!is_int($lesson_number)){
-            $result['state'] = 'fail';
-            $result['message'] = 'Номер пары должен быть числом';
-        }
-        else if(!$groups_model->isset_group($number_group)){
-            $result['state'] = 'fail';
-            $result['message'] = "Группы $number_group не существует";
-        }
-        else {
-            $today = $this->date_time_model->get_day()['today'];
-            $numerator = $this->date_time_model->get_week_numerator();
-            $query = "SELECT * FROM groups,professors,departments_list WHERE groups.professor_id=professors.id AND
+        if (!is_int($number_group))
+            throw new Models_Processing_Except("Номер группы - $number_group не является числом");
+
+        else if (!$groups_model->isset_group($number_group))
+            throw new Models_Processing_Except("Группы - $number_group не существует");
+
+        else if (!is_int($lesson_number))
+            throw new Models_Processing_Except("Номер пары - $lesson_number не является числом");
+
+        $today = $this->date_time_model->get_day()['today'];
+        $numerator = $this->date_time_model->get_week_numerator();
+
+        $query = "SELECT * FROM groups,professors,departments_list WHERE groups.professor_id=professors.id AND
         professors.department_code = departments_list.code AND group_number=?s AND day_number=?s AND lesson_number=?s
         AND (numerator='all' OR numerator=?s)";
-            $result_of_query = $this->database->getALL($query, $number_group, $today, $lesson_number, $numerator);
+        $result_of_query = $this->database->getALL($query, $number_group, $today, $lesson_number, $numerator);
 
-            //Разбор полученного запроса (преподаватели, которые ведут у группы одновремеенно)
-            foreach ($result_of_query as $value) {
-                // одинаковые поля у всех преподавателей
-                $result['lesson_name'] = $value['lesson_name'];
-                $result['department'] = $value['depart_name'];
+        //Разбор полученного запроса (преподаватели, которые ведут у группы одновремеенно)
+        foreach ($result_of_query as $value) {
+            // одинаковые поля у всех преподавателей
+            $result['lesson_name'] = $value['lesson_name'];
+            $result['department'] = $value['depart_name'];
 
-                // поля, различные у разных преподавателей
-                // если преподавателей больше 2 выводится массивы из соответствующих параметров
-                if (count($result_of_query) > 1) {
-                    $result['professor_id'][] = $value['professor_id'];
-                    $result['classroom'][] = $value['classroom'];
-                    $result['professor'][] = $value['professor'];
-                    $result['multiple'] = true;
-                } else {
-                    // если преподавателей = 1 или 0 то выводится его параметры или null для всех свойств
-                    $result['professor_id'] = $value['professor_id'];
-                    $result['classroom'] = $value['classroom'];
-                    $result['professor'] = $value['professor'];
-                    $result['photo_url'] = $value['photo_url'];
-                    $result['multiple'] = false;
-                }
-
+            // поля, различные у разных преподавателей
+            // если преподавателей больше 2 выводится массивы из соответствующих параметров
+            if (count($result_of_query) > 1) {
+                $result['professor_id'][] = $value['professor_id'];
+                $result['classroom'][] = $value['classroom'];
+                $result['professor'][] = $value['professor'];
+                $result['multiple'] = true;
             }
-            $start_end_time = $this->lesson_begin_end_time($lesson_number);
-            $result['time'] = date('G:i', strtotime($start_end_time['start_time'])) . ' - ' . date('G:i', strtotime($start_end_time['end_time']));
-            $result['state'] = 'success';
+            else {
+                // если преподавателей = 1 или 0 то выводится его параметры или null для всех свойств
+                $result['professor_id'] = $value['professor_id'];
+                $result['classroom'] = $value['classroom'];
+                $result['professor'] = $value['professor'];
+                $result['photo_url'] = $value['photo_url'];
+                $result['multiple'] = false;
+            }
+
         }
+        $start_end_time = $this->lesson_begin_end_time($lesson_number);
+        $result['time'] = date('G:i', strtotime($start_end_time['start_time'])) . ' - ' . date('G:i', strtotime($start_end_time['end_time']));
+        $result['state'] = 'success';
+
         return $result;
     }
 
@@ -98,23 +98,20 @@ class Model_TimeTable extends Model_Dashboard
      * - string professor_name
      * } } }
      * [state] = 'fail' // [state] ='success' && [message] = string ...
+     * @throws Models_Processing_Except
      */
-    function get_week_timetable($number_group)
-    {
+    function get_week_timetable($number_group){
         $groups_model = new Model_List_Groups();
-        if (!is_int($number_group)){
-            $timetable['state'] = 'fail';
-            $timetable['message'] = 'Номер группы должен быть числом';
-        }
-        else if (!$groups_model->isset_group($number_group)) {
-            $timetable['state'] = 'fail';
-            $timetable['message'] = "Группы $number_group не существует";
-        }
-        else {
-            $timetable['even'] = $this->week_timetable($number_group, 'ch');
-            $timetable['uneven'] = $this->week_timetable($number_group, 'zn');
-            $timetable['state'] = 'success';
-        }
+        if (!is_int($number_group))
+            throw new Models_Processing_Except("Номер группы - $number_group не является числом");
+
+        else if (!$groups_model->isset_group($number_group))
+            throw new Models_Processing_Except("Группы - $number_group не существует");
+
+        $timetable['even'] = $this->week_timetable($number_group, 'ch');
+        $timetable['uneven'] = $this->week_timetable($number_group, 'zn');
+        $timetable['state'] = 'success';
+
         return $timetable;
     }
 
@@ -132,40 +129,42 @@ class Model_TimeTable extends Model_Dashboard
      *  }
      * }
      * [state] = 'fail' // [state] ='success' && [message] = string ...
+     * @throws Models_Processing_Except
      */
-    function get_actual_dashboard($group_number){
+    function get_actual_dashboard($group_number)
+    {
         $groups_model = new Model_List_Groups();
-        if(!is_int($group_number)){
-            $result['state'] = 'fail';
-            $result['message'] = 'Номер группы должен быть числом';
-        }
-        else if (!$groups_model->isset_group($group_number)){
-            $result['state'] = 'fail';
-            $result['message'] = "Группы $group_number не существует";
-        }
-        else{
-            $numerator = $this->date_time_model->get_week_numerator(); // получение значения нумератора для текущей недели
+        if (!is_int($group_number))
+            throw new Models_Processing_Except("Номер группы - $group_number не является числом");
 
-            $query = "SELECT * FROM groups,professors WHERE groups.professor_id=professors.id AND group_number=?s AND day_number=?s AND (numerator=?s or numerator='all')";
 
-            //Получение дней на сегодня и завтра
-            $day=$this->date_time_model->get_day();
-            $today = $day['today'];
-            $tomorrow = $day['tomorrow'];
+        else if (!$groups_model->isset_group($group_number))
+            throw new Models_Processing_Except("Группы - $group_number не существует");
 
-            $result_today=$this->database->getAll($query,$group_number,$today,$numerator);
-            $result['today']=$this->parse_timetable($result_today);
 
-            $result['today']['day_name'] = $this->date_time_model->get_name_day($today); // Получение названия дня
+        $numerator = $this->date_time_model->get_week_numerator(); // получение значения нумератора для текущей недели
 
-            $result_tomorrow = $this->database->getAll($query,$group_number,$tomorrow,$numerator);
+        $query = "SELECT * FROM groups,professors WHERE groups.professor_id=professors.id AND group_number=?s
+                                                        AND day_number=?s AND (numerator=?s OR numerator='all')";
 
-            $result['tomorrow']=$this->parse_timetable($result_tomorrow);
+        //Получение дней на сегодня и завтра
+        $day = $this->date_time_model->get_day();
+        $today = $day['today'];
+        $tomorrow = $day['tomorrow'];
 
-            $result['tomorrow']['day_name'] = $this->date_time_model->get_name_day($tomorrow); // Получение названия дня
+        $result_today = $this->database->getAll($query, $group_number, $today, $numerator);
+        $result['today'] = $this->parse_timetable($result_today);
 
-            $result['state'] = 'success';
-        }
+        $result['today']['day_name'] = $this->date_time_model->get_name_day($today); // Получение названия дня
+
+        $result_tomorrow = $this->database->getAll($query, $group_number, $tomorrow, $numerator);
+
+        $result['tomorrow'] = $this->parse_timetable($result_tomorrow);
+
+        $result['tomorrow']['day_name'] = $this->date_time_model->get_name_day($tomorrow); // Получение названия дня
+
+        $result['state'] = 'success';
+
 
         return $result;
     }
@@ -175,26 +174,25 @@ class Model_TimeTable extends Model_Dashboard
      * @param integer $group_number
      * @return mixed
      * [state] = 'success' || [state] = 'fail' && [message] = string ...
+     * @throws Models_Processing_Except
      */
-    function get_working_days_group_for_month($group_number){
+    function get_working_days_group_for_month($group_number)
+    {
         $groups_model = new Model_List_Groups();
-        if(!is_int($group_number)){
-            $result['state'] = 'fail';
-            $result['message'] = 'Номер группы должен быть числом';
+        if (!is_int($group_number))
+            throw new Models_Processing_Except("Номер группы - $group_number не является числом");
+
+        else if (!$groups_model->isset_group($group_number))
+            throw new Models_Processing_Except("Группы - $group_number не существует");
+
+        $result['days'] = [];
+        for ($i = 0; $i < 31; $i++) {
+            $date = date("Y-m-d", strtotime(date("Y-m-d") . '+' . $i . 'day'));
+            if ($this->date_time_model->is_lessons_today($group_number, $date))
+                $result['days'][] = $date;
         }
-        else if(!$groups_model->isset_group($group_number)){
-            $result['state'] = 'fail';
-            $result['message'] = "Группы $group_number не существует";
-        }
-        else {
-            $result['days'] = [];
-            for ($i = 0; $i < 31; $i++) {
-                $date = date("Y-m-d", strtotime(date("Y-m-d") . '+' . $i . 'day'));
-                if ($this->date_time_model->is_lessons_today($group_number, $date))
-                    $result['days'][] = $date;
-            }
-            $result['state']='success';
-        }
+        $result['state'] = 'success';
+
         return $result;
     }
 

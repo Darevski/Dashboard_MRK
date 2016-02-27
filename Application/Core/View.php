@@ -40,7 +40,7 @@ class View
     static function output_json($data){
         $data['json'] = self::generate_json($data);
         // При дебаге версии "видимый" вывод ответа
-        if (Config::get_instance()->get_build()['debug'] == true)
+        if (Config::get_instance()->get_build()['debug'])
             $data['display_view'] = true;
         else
             $data['display_view'] = 'none';

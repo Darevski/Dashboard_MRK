@@ -28,6 +28,9 @@ catch (Exceptions\SQL_Except $error){
     $error->output_error();
     $error->log_errors();
 }
+catch (Exceptions\Models_Processing_Except $error){
+    $error->output_error();
+}
 catch (\Exception $error){
     echo $error->getMessage();
 }

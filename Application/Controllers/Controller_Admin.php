@@ -18,10 +18,7 @@ use Application\Models;
  * @package Application\Controllers
  */
 class Controller_Admin extends Core\Controller{
-    /**
-     * @var Models\Model_Admin набор логики связанной с администратором
-     */
-    private $admin_model;
+
     /**
      * Проверка разрешения на доступ к данной информации по индефикатору пользователя
      * @throws UFO_Except при не совпадении индификатора пользователя вброс исключения с ошибкой доступа
@@ -29,7 +26,6 @@ class Controller_Admin extends Core\Controller{
     function __construct(){
         parent::__construct();
         $this->validate();
-        $this->admin_model = new Models\Model_Admin();
     }
 
     /**
@@ -65,7 +61,7 @@ class Controller_Admin extends Core\Controller{
      * @api
      */
     function action_add_notification(){
-        //$_POST['json_input'] = '{"parameters":{"type":"info","target":32494,"ending_date":"tomorrow"},"text":"123"}';
+        //$_POST['json_input'] = '{"parameters":{"type":"info","target":32494,"ending_date":"2017-02-01"},"text":"123"}';
 
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
@@ -74,7 +70,7 @@ class Controller_Admin extends Core\Controller{
             if (isset($data['parameters']['type']) && isset($data['parameters']['target']) && isset($data['text']) &&
                 isset($data['parameters']['ending_date'])){
                 $type = $data['parameters']['type'];
-                $target = $data['parameters']['target'];
+                $target =(integer)$data['parameters']['target'];
                 $ending_date = $data['parameters']['ending_date'];
                 $message = $data['text'];
 
@@ -103,7 +99,7 @@ class Controller_Admin extends Core\Controller{
             $data = json_decode($_POST['json_input'],JSON_UNESCAPED_UNICODE);
             $data = $this->secure_array($data);
             if (isset($data['id'])){
-                $id = $data['id'];
+                $id = (integer) $data['id'];
                 $result = $this->notification_model->delete_notification($id);
                 $this->view->output_json($result);
             }

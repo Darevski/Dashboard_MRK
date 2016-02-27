@@ -70,18 +70,15 @@ class Controller {
     }
 
     /**
-     * Удаление из строки спецсимволов, тэгов и т.д.
+     * Удаление из переменной спецсимволов, тэгов и т.д.
      * @param string $variable входное значение строки
      * @return string $result результат преобразования
      */
-    protected function security_variable($variable){
-        if (is_string($variable)) {
-            $result = htmlentities($variable);
-            $result = strip_tags($result);
-            return $result;
-        }
-        else
-            return $variable;
+    protected function security_variable($variable)
+    {
+        $result = htmlentities($variable);
+        $result = strip_tags($result);
+        return $result;
     }
 
     /**
@@ -94,7 +91,7 @@ class Controller {
         foreach ($array as &$value){
             if (is_array($value))
                 $value=$this->secure_array($value);
-            else if (is_string($value)){
+            else {
                 $value=htmlentities($value);
                 $value=strip_tags($value);
             }

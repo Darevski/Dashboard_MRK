@@ -42,7 +42,7 @@ class Controller_Dashboard extends Core\Controller
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
             $data = $this->secure_array($data);
             if (isset($data['group_number'])) {
-                $group_number = $data['group_number'];
+                $group_number = (integer)$data['group_number'];
                 $notification = $this->notification_model->get_notification_for_group($group_number);
                 $this->view->output_json($notification);
             }
@@ -76,7 +76,7 @@ class Controller_Dashboard extends Core\Controller
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
             $data = $this->secure_array($data);
             if (isset($data['professor_id'])) {
-                $professor_id = $data['professor_id'];
+                $professor_id = (integer)$data['professor_id'];
                 $result_professor = $this->professor_model->get_professor_state($professor_id);
                 $this->view->output_json($result_professor);
             }
@@ -99,13 +99,13 @@ class Controller_Dashboard extends Core\Controller
      * @api
      */
     function action_get_professor_timetable(){
-        $_POST['json_input'] = '{"professor_id":1}';
+        //$_POST['json_input'] = '{"professor_id":1}';
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
             $data = $this->secure_array($data);
 
             if (isset($data['professor_id'])) {
-                $professor_id = $data['professor_id'];
+                $professor_id = (integer)$data['professor_id'];
                 $professor_timetable = $this->professor_model->get_professor_timetable($professor_id);
                 $this->view->output_json($professor_timetable);
             }
@@ -160,7 +160,7 @@ class Controller_Dashboard extends Core\Controller
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
             $data = $this->secure_array($data);
             if (isset($data['group_number'])) {
-                $group_number = $data['group_number'];
+                $group_number = (integer)$data['group_number'];
                 $dashboard = $this->timetable_model->get_actual_dashboard($group_number);
                 $this->view->output_json($dashboard);
             }
@@ -194,7 +194,7 @@ class Controller_Dashboard extends Core\Controller
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
             $data = $this->secure_array($data);
             if (isset($data['group_number'])) {
-                $group_number = $data['group_number'];
+                $group_number = (integer)$data['group_number'];
                 $dashboard = $this->timetable_model->get_week_timetable($group_number);
                 $this->view->output_json($dashboard);
             }
@@ -230,8 +230,8 @@ class Controller_Dashboard extends Core\Controller
             $data = $this->secure_array($data);
             if (isset($data['group_number']) & isset($data['lesson_number'])) {
 
-                $number_group = $data['group_number'];
-                $lesson_number = $data['lesson_number'];
+                $number_group =(integer) $data['group_number'];
+                $lesson_number =(integer) $data['lesson_number'];
 
                 $result = $this->timetable_model->get_lesson_info_by($number_group, $lesson_number);
                 $this->view->output_json($result);
@@ -254,12 +254,12 @@ class Controller_Dashboard extends Core\Controller
      * @api
      */
     function action_get_working_days_group_for_month(){
-        $_POST['json_input'] = '{"group_number":32494}';
+        //$_POST['json_input'] = '{"group_number":32494}';
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
             $data = $this->secure_array($data);
             if (isset($data['group_number'])) {
-                $number_group = $data['group_number'];
+                $number_group = (integer)$data['group_number'];
                 $result = $this->timetable_model->get_working_days_group_for_month($number_group);
                 $this->view->output_json($result);
             } else
@@ -292,7 +292,7 @@ class Controller_Dashboard extends Core\Controller
      */
     function action_get_filtered_groups()
     {
-        $_POST['json_input'] = '{"grade":"null","class":[9],"spec":[4,5,7],"faculty":[1,2]}';
+        //$_POST['json_input'] = '{"grade":"null","class":[9],"spec":[4,5,7],"faculty":[1,2]}';
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
             if (isset ($data['grade']) || isset($data['class']) || isset($data['specialization']) || isset($data['faculty'])) {

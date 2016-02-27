@@ -10,6 +10,7 @@
 namespace Application\Models;
 
 use Application\Models\Base\Model_Dashboard;
+use Application\Exceptions\Models_Processing_Except;
 /**
  * Класс логики связанный с отображением информации о преподавателях, их рассписание, и т.д.
  * Class Model_Professors
@@ -29,43 +30,41 @@ class Model_Professors extends Model_Dashboard
      * group_number, lesson_name, classroom,start_time,end_time
      *
      * [state] = 'success' || [state] = 'fail' && [message] = string
+     * @throws Models_Processing_Except
      */
-    function get_professor_state($professor_id){
-        if (!is_int($professor_id)){
-            $result['state'] = 'fail';
-            $result['message'] = 'Идентификатор должен быть числом';
+    function get_professor_state($professor_id)
+    {
+        if (!is_int($professor_id))
+            throw new Models_Processing_Except("Идентификатор $professor_id не является числом");
+        else if (!$this->isset_professor($professor_id))
+            throw new Models_Processing_Except("Преподавателя с индентификатором - $professor_id не существует");
+
+        $day = $this->date_time_model->get_day()['today'];
+        // Если сегодня воскресенье
+        if ($day == false) {
+            $result['weekend'] = 'true';
         }
-        else if (!$this->isset_professor($professor_id)){
-            $result['state'] = 'fail';
-            $result['message'] = 'Преподавателя с указанным id не существует';
-        }
-        else{
-            $day = $this->date_time_model->get_day()['today'];
-            // Если сегодня воскресенье
-            if ($day == false){
-                $result['weekend']='true';
+        else {
+            // определяет какая по счету идет пара/ пар нету
+            $lesson_number = $this->get_lesson_number_by_time(date("H:i:s"));
+            if ($lesson_number === false)
+                $result["lesson_state"] = "false";
+            else {
+                $result = $this->find_professor_day_conformity_with_lesson_number($professor_id, $lesson_number, $day);
+                $start_end_time = $this->lesson_begin_end_time($lesson_number);
+                $result['start_time'] = $start_end_time['start_time'];
+                $result['end_time'] = $start_end_time['end_time'];
             }
-            else{
-                // определяет какая по счету идет пара/ пар нету
-                $lesson_number = $this->get_lesson_number_by_time(date("H:i:s"));
-                if ($lesson_number === false)
-                    $result["lesson_state"] = "false";
-                else{
-                    $result = $this->find_professor_day_conformity_with_lesson_number($professor_id,$lesson_number,$day);
-                    $start_end_time= $this->lesson_begin_end_time($lesson_number);
-                    $result['start_time']=$start_end_time['start_time'];
-                    $result['end_time']=$start_end_time['end_time'];
-                }
-            }
-
-            $prof_info=$this->get_professor_info($professor_id);
-
-            $result['photo_url']=$prof_info['photo_url'];
-            $result['department']=$prof_info['depart_name'];
-            $result['name']=$prof_info['professor'];
-
-            $result['state'] = 'success';
         }
+
+        $prof_info = $this->get_professor_info($professor_id);
+
+        $result['photo_url'] = $prof_info['photo_url'];
+        $result['department'] = $prof_info['depart_name'];
+        $result['name'] = $prof_info['professor'];
+
+        $result['state'] = 'success';
+
 
         return $result;
     }
@@ -85,21 +84,19 @@ class Model_Professors extends Model_Dashboard
      * Возвращает рассписание преподавателя на неделю
      * @param integer $professor_id уникальный индентификатор преподавателя
      * @return array even/uneven { day { lesson_num { group_number,lesson_name } }
+     * @throws Models_Processing_Except
      */
-    function get_professor_timetable($professor_id){
-        if (!is_int($professor_id)){
-            $result['state'] = 'fail';
-            $result['message'] = 'Идентификатор преподавателя должен быть числом';
-        }
-        else if (!$this->isset_professor($professor_id)) {
-            $result['state'] = 'fail';
-            $result['message'] = 'Преподавателя с указанным id не существует';
-        }
-        else{
-            $result["even"] =$this->week_professor_parse($professor_id,'ch');
-            $result["uneven"] =$this->week_professor_parse($professor_id,'zn');
-            $result['state'] = 'success';
-        }
+    function get_professor_timetable($professor_id)
+    {
+        if (!is_int($professor_id))
+            throw new Models_Processing_Except("Идентификатор $professor_id не является числом");
+        else if (!$this->isset_professor($professor_id))
+            throw new Models_Processing_Except("Преподавателя с индентификатором - $professor_id не существует");
+
+        $result["even"] = $this->week_professor_parse($professor_id, 'ch');
+        $result["uneven"] = $this->week_professor_parse($professor_id, 'zn');
+        $result['state'] = 'success';
+
         return $result;
     }
 
@@ -128,9 +125,9 @@ class Model_Professors extends Model_Dashboard
                 $result["lesson_num"] = $lesson_number;
 
                 if ($this->is_rest($lesson_number) == true) // При перемене перед парой помечаем состояние пары next
-                    $result["state"] = "next";
+                    $result["lesson_state"] = "next";
                 else
-                    $result["state"] = "now";     // Если пара идет в текущей момент времени помечаем состояние now
+                    $result["lesson_state"] = "now";     // Если пара идет в текущей момент времени помечаем состояние now
                 $result["group_number"] = $value["group_number"];
                 $result["lesson_name"] = $value["lesson_name"];
                 $result["classroom"] = $value["classroom"];
@@ -141,14 +138,14 @@ class Model_Professors extends Model_Dashboard
             if ($difference_between_lessons_number > 0 & $min_dif > $difference_between_lessons_number){
                 $min_dif = $difference_between_lessons_number;
                 $result["lesson_num"] = $value["lesson_number"];
-                $result["state"] = "next";
+                $result["lesson_state"] = "next";
                 $result["group_number"] = $value["group_number"];
                 $result["lesson_name"] = $value["lesson_name"];
                 $result["classroom"] = $value["classroom"];
             }
         }
         if ($min_dif == 7){ // если начальное значение не изменилось - пар сегодня уже нет/ не было
-            $result["state"] = "false";
+            $result["lesson_state"] = "false";
             return $result;
         }
         else

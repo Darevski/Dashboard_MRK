@@ -533,7 +533,17 @@ function SEND_premessage_full()
 			if ( document.getElementById("message-datepicker").value == "" )
 				preset.ending_date = "tomorrow";
 			else
-				preset.ending_date = document.getElementById("message-datepicker").value;
+				{
+					var date = new Date(document.getElementById("message-datepicker").value);
+					var temp = date.getUTCMonth() + 1;
+					if (temp < 10)
+						temp = "0" + temp;
+					preset.ending_date = date.getFullYear() + temp;
+					temp = date.getUTCDate();
+					if (temp < 10)
+						temp = "0" + temp;
+					preset.ending_date += temp;
+				}
 			if (elem.getAttribute("selected-all") == "true")
 				{
 					preset.target = "0";

@@ -409,21 +409,35 @@ function LOAD_Reports()
 function SEND_message(options, text, number, callback)
 {
     var req = {};
-    req.parameters = options;
-    req.text = text;
-	NewXHR("/Admin/add_notification", "json_input=" + JSON.stringify(req), function(Response) {
-		try 
-			{
-				callback(JSON.parse(Response), number);
-			}
-		catch (ex)
-			{
-				var answer = {};
-				answer.state = "fail";
-				answer.message = ex.message;
-				callback(answer, number);
-			}
-	});  
+	//Checking for unexpected input
+	var answer = {};
+	answer.state = "fail";
+	if ((text == "") || (text == void(0)))
+		answer.message = "Не введен текст уведомления";
+	else if ((options.type == "") || (options.type == void(0)))
+			answer.message = "Не указан тип уведомления";
+	else if ((options.ending_date == "") || (options.ending_date == void(0)))
+			answer.message = "Не указана дата окончания";
+	else if ((options.target == "") || (options.target == void(0)))
+			answer.message = "Нет получателей";
+	if (answer.message != void(0))
+		callback(answer, number);
+	else
+		{
+			req.parameters = options;
+			req.text = text;
+			NewXHR("/Admin/add_notification", "json_input=" + JSON.stringify(req), function(Response) {
+				try 
+					{
+						callback(JSON.parse(Response), number);
+					}
+				catch (ex)
+					{
+						answer.message = ex.message;
+						callback(answer, number);
+					}
+			});
+		}
 }
 function LOAD_whom_sent()
 {

@@ -61,7 +61,7 @@ class Controller_Admin extends Core\Controller{
      * @api
      */
     function action_add_notification(){
-        //$_POST['json_input'] = '{"parameters":{"type":"info","target":32494,"ending_date":"2017-02-01"},"text":"123"}';
+        //$_POST['json_input'] = '{"parameters":{"type":"info","target":32494,"ending_date":"20170301"},"text":"123"}';
 
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);

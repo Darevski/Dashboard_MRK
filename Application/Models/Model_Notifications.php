@@ -31,7 +31,7 @@ class Model_Notifications extends Model_Dashboard
     {
         $groups_model = new Model_List_Groups();
         //Проверка на валидности даты
-        if (!$this->date_time_model->validateDate($ending_date, 'Y-m-d') && $ending_date !== "tomorrow")
+        if (!$this->date_time_model->validateDate($ending_date, 'Ymd') && $ending_date !== "tomorrow")
             throw new Models_Processing_Except('Задана некорректная дата');
 
         //При дате меньше текущей на сервере инициализация ошибки
@@ -45,10 +45,10 @@ class Model_Notifications extends Model_Dashboard
         else if ($target != 0 && !$groups_model->isset_group($target))
             throw new Models_Processing_Except("Группы - $target не существует");
 
-        $today_date = date("Y-m-d");
+        $today_date = date("Ymd");
         // При флаге равном 'tomorrow' устанавливается дата следующего дня
         if ($ending_date === "tomorrow")
-            $ending_date = date("Y-m-d", strtotime($today_date . '+1 day'));
+            $ending_date = date("Ymd", strtotime($today_date . '+1 day'));
 
         $query = "INSERT INTO notification SET state=?s,group_number=?i,text=?s,starting_date=?s,ending_date=?s";
         $this->database->query($query, $type, $target, $text, $today_date, $ending_date);
@@ -119,7 +119,7 @@ class Model_Notifications extends Model_Dashboard
 
         $today = date("Ymd");
         // Получение уведомлений для указанной группы, дата которых больше сегодняшней (уведомления актуальны)
-        $query = "SELECT state,text,starting_date,ending_date FROM notification WHERE (group_number=?i or
+        $query = "SELECT state,text,starting_date FROM notification WHERE (group_number=?i or
                                                                             group_number= 0) and ending_date>=?s";
         $result_of_query = $this->database->getAll($query, $number_group,$today);
         // сортируем по дате добавления в начале новейшие

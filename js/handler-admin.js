@@ -13,7 +13,7 @@ function LOAD_SkeletonsFullscreen(route, callback)
 		loader.style.opacity = "1";
 		setTimeout(function () {
 			NewXHR(route, null, function (data){
-				if (data.check != false)
+				if (data.status != "fail")
 					{
 						loader.style.opacity = "";
                         body.style.opacity = "0";
@@ -28,7 +28,7 @@ function LOAD_SkeletonsFullscreen(route, callback)
 				else
 					{
 						//exception handler
-						CreateEx("Обнаружена ошибка: " + data.status);
+						CreateEx(data.message);
 					}});
 		}, 600);
 	}, 600);	
@@ -119,7 +119,7 @@ function CreateGroup()
             NewXHR("/Admin/add_group", "json_input=" + JSON.stringify(group), function(ResponseText){
                 loader.style.opacity = "";
                 try {
-                    var answer = JSON.parse(ResponseText);            
+                    var answer = JSON.parse(ResponseText);
                     setTimeout(function () {
                         loader.remove();
                         if (answer.state == "success")
@@ -151,22 +151,27 @@ function LOAD_Message()
 		NewXHR("/Dashboard/get_faculty_list", null, function (Response){
 			try {
 					var answer = JSON.parse(Response);
-					var block = document.getElementById("message-filter-department").children[1];
-					var i =0;
-					while (answer[i] != undefined)
+					if (answer.state != "fail")
 						{
-							var el1 = CreateElem("li", null, "checkbox_list_item");
-							var el2 = CreateElem("label", null, "checkbox_label");
-							var el3 = CreateElem("input", null, "checkbox");
-							el3.setAttribute("onchange", "LOAD_whom_sent()");							
-							el3.setAttribute("type", "checkbox");
-							el3.setAttribute("value", answer[i].code);
-							el2.appendChild(el3);
-							el2.innerHTML += answer[i].name;
-							el1.appendChild(el2);
-							block.appendChild(el1);
-							i++;
+							var block = document.getElementById("message-filter-department").children[1];
+							var i =0;
+							while (answer[i] != undefined)
+								{
+									var el1 = CreateElem("li", null, "checkbox_list_item");
+									var el2 = CreateElem("label", null, "checkbox_label");
+									var el3 = CreateElem("input", null, "checkbox");
+									el3.setAttribute("onchange", "LOAD_whom_sent()");							
+									el3.setAttribute("type", "checkbox");
+									el3.setAttribute("value", answer[i].code);
+									el2.appendChild(el3);
+									el2.innerHTML += answer[i].name;
+									el1.appendChild(el2);
+									block.appendChild(el1);
+									i++;
+								}
 						}
+					else
+						CreateEx(answer.message);
 				}
 			catch (ex)
 				{
@@ -176,22 +181,27 @@ function LOAD_Message()
 		NewXHR("/Dashboard/get_specializations_list", null, function (Response){
 			try {
 					var answer = JSON.parse(Response);
-					var block = document.getElementById("message-filter-spec").children[1];
-					var i =0;
-					while (answer[i] != undefined)
-						{
-							var el1 = CreateElem("li", null, "checkbox_list_item");
-							var el2 = CreateElem("label", null, "checkbox_label");
-							var el3 = CreateElem("input", null, "checkbox");
-							el3.setAttribute("type", "checkbox");
-							el3.setAttribute("value", answer[i].code);
-							el3.setAttribute("onchange", "LOAD_whom_sent()");
-							el2.appendChild(el3);
-							el2.innerHTML += answer[i].name;
-							el1.appendChild(el2);
-							block.appendChild(el1);
-							i++;
-						}
+				if (answer.state != "fail")
+					{
+						var block = document.getElementById("message-filter-spec").children[1];
+						var i =0;
+						while (answer[i] != undefined)
+							{
+								var el1 = CreateElem("li", null, "checkbox_list_item");
+								var el2 = CreateElem("label", null, "checkbox_label");
+								var el3 = CreateElem("input", null, "checkbox");
+								el3.setAttribute("type", "checkbox");
+								el3.setAttribute("value", answer[i].code);
+								el3.setAttribute("onchange", "LOAD_whom_sent()");
+								el2.appendChild(el3);
+								el2.innerHTML += answer[i].name;
+								el1.appendChild(el2);
+								block.appendChild(el1);
+								i++;
+							}
+					}
+					else
+						CreateEx(answer.message);
 				}
 			catch (ex)
 				{
@@ -354,23 +364,28 @@ function LOAD_Message_manager()
     	NewXHR("/Admin/get_active_notifications", null, function (Response) {
 			try {
 				var answer = JSON.parse(Response);
-				LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_notification_manager.html", function () {
-					try {
-						var container = document.getElementById("notification-list-container").children[0];
-						var i =0;
-						notificationlist = [];
-						while((answer[i] != undefined) & (answer[i] != null))
-							{
-								notificationlist[notificationlist.length] = answer[i];
-								i++;
+				if (answer.state != "fail")
+					{
+						LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_notification_manager.html", function () {
+							try {
+								var container = document.getElementById("notification-list-container").children[0];
+								var i =0;
+								notificationlist = [];
+								while((answer[i] != undefined) & (answer[i] != null))
+									{
+										notificationlist[notificationlist.length] = answer[i];
+										i++;
+									}
+								message_sort("group");
 							}
-						message_sort("group");
+							catch (ex)
+								{
+									CreateEx(ex.message);
+								}
+						});
 					}
-					catch (ex)
-						{
-							CreateEx(ex.message);
-						}
-				});
+				else
+					CreateEx(answer.message);
 			}
 			catch (ex)
 				{
@@ -465,20 +480,25 @@ function LOAD_whom_sent()
   	NewXHR("/Dashboard/get_filtered_groups", "json_input=" + JSON.stringify(options), function (Response) {
 		try {
 			var answer = JSON.parse(Response);
-			var whom_list = document.getElementById("whom-sent");
-			whom_list.innerHTML = "";
-			var i =0;
-			if (answer.groups != null)
-				while (answer.groups[i] != undefined)
-					{
-						var elem = CreateElem("li", null, null, null, answer.groups[i]);
-						whom_list.appendChild(elem);
-						i++;
-					}
-			if (answer.selected_all !== void(0))
-				document.getElementById("whom-sent").setAttribute("selected-all", "true");
+			if (answer.state != "fail")
+				{
+					var whom_list = document.getElementById("whom-sent");
+					whom_list.innerHTML = "";
+					var i =0;
+					if (answer.groups != null)
+						while (answer.groups[i] != undefined)
+							{
+								var elem = CreateElem("li", null, null, null, answer.groups[i]);
+								whom_list.appendChild(elem);
+								i++;
+							}
+					if (answer.selected_all !== void(0))
+						document.getElementById("whom-sent").setAttribute("selected-all", "true");
+					else
+						document.getElementById("whom-sent").removeAttribute("selected-all");
+				}
 			else
-				document.getElementById("whom-sent").removeAttribute("selected-all");
+				CreateEx(answer.message);
 		}
 		catch (ex)
 			{
@@ -683,11 +703,16 @@ function LOAD_grouplist()
 	NewXHR("URL_TO_LOAD_GROUP_LIST", null, function (Response){
 		try{
 			var answer = JSON.parse(Response);
-			for (var i =0; i < answer.groups.length; i++)
+			if (answer.state != "fail")
 				{
-					var el = CreateElem("li", null, null, "SET_group_from_list(this)", answer.groups[i]);
-					document.getElementById("swap-group-choice").appendChild(el);
+					for (var i =0; i < answer.groups.length; i++)
+						{
+							var el = CreateElem("li", null, null, "SET_group_from_list(this)", answer.groups[i]);
+							document.getElementById("swap-group-choice").appendChild(el);
+						}
 				}
+			else
+				CreateEx(answer.message);
 		}
 		catch (ex)
 			{
@@ -702,11 +727,16 @@ function LOAD_daylist()
 	NewXHR("URL_TO_LOAD_DAY_LIST", "json_input=" + JSON.stringify(req), function (Response){
 		try{
 			var answer = JSON.parse(Response);
-			for (var i =0; i < answer.days.length; i++)
+			if (answer.status != "fail")
 				{
-					var el = CreateElem("li", null, null, "SET_day_from_list(this)", answer.days[i]);
-					document.getElementById("swap-day-choice").appendChild(el);
+					for (var i =0; i < answer.days.length; i++)
+						{
+							var el = CreateElem("li", null, null, "SET_day_from_list(this)", answer.days[i]);
+							document.getElementById("swap-day-choice").appendChild(el);
+						}
 				}
+			else
+				CreateEx(answer.message);
 		}
 		catch (ex)
 			{
@@ -730,14 +760,19 @@ function LOAD_all_lessons()
 		var block = document.getElementById("lesson-list");
 		try{
 			var answer = JSON.parse(Response);
-			block.innerHTML = "";
-			for (var i = 0; i < answer.lessons.length; i++)
+			if (answer.state != fail)
 				{
-					var el = document.createElement("option");
-					el.setAttribute("value", answer.lessons[i].name);
-					el.innerHTML = answer.lessons[i].id;
-					block.appendChild(el);
+					block.innerHTML = "";
+					for (var i = 0; i < answer.lessons.length; i++)
+						{
+							var el = document.createElement("option");
+							el.setAttribute("value", answer.lessons[i].name);
+							el.innerHTML = answer.lessons[i].id;
+							block.appendChild(el);
+						}
 				}
+			else
+				CreateEx(answer.message);
 		}
 		catch (ex)
 			{
@@ -753,13 +788,18 @@ function LOAD_lessonlist()
 	NewXHR("URL_TO_LOAD_LESSON_LIST", "json_input=" + JSON.stringify(body), function (Response) {
 		try{
 			var answer = JSON.parse(Response);
-			for (var i =0; i<answer.lessons.length; i++)
+			if (answer.state != "fail")
 				{
-					var el = document.createElement("option");
-					el.setAttribute("value", answer.lessons[i].id);
-					el.innerHTML = answer.lessons[i].name;
-					document.getElementById("lesson-to-swap").appendChild(el);
+					for (var i =0; i<answer.lessons.length; i++)
+						{
+							var el = document.createElement("option");
+							el.setAttribute("value", answer.lessons[i].id);
+							el.innerHTML = answer.lessons[i].name;
+							document.getElementById("lesson-to-swap").appendChild(el);
+						}
 				}
+			else
+				CreateEx(answer.message);
 		}
 		catch (ex)
 			{
@@ -810,21 +850,26 @@ function LOAD_shedule_list()
 	NewXHR("URL_TO_LOAD_LISTS_SHEDULE", null, function (Response) {
 	try {
 		var answer = JSON.parse(Response);
-		professorslist = [];
-		var dl = CreateElem("datalist", "lesson-list");
-		for (var i=0; i < answer.professors.length; i++)
+		if (answer.state != "fail")
 			{
-				professorslist[i] = {};
-				professorslist[i].name = answer.professors[i].name;
-				professorslist[i].id = answer.professors[i].id;
-				professorslist[i].lesson = answer.professors[i].lesson;
-				professorslist[i].lesson_id = answer.professors[i].lesson_id;
-				var el = CreateElem("option");
-				el.innerHTML = professorslist[i].lesson_id;
-				el.setAttribute("value", professorslist[i].lesson);
-				dl.appendChild(el);
+				professorslist = [];
+				var dl = CreateElem("datalist", "lesson-list");
+				for (var i=0; i < answer.professors.length; i++)
+					{
+						professorslist[i] = {};
+						professorslist[i].name = answer.professors[i].name;
+						professorslist[i].id = answer.professors[i].id;
+						professorslist[i].lesson = answer.professors[i].lesson;
+						professorslist[i].lesson_id = answer.professors[i].lesson_id;
+						var el = CreateElem("option");
+						el.innerHTML = professorslist[i].lesson_id;
+						el.setAttribute("value", professorslist[i].lesson);
+						dl.appendChild(el);
+					}
+				document.body.appendChild(dl);
 			}
-		document.body.appendChild(dl);
+		else
+			CreateEx(answer.message);
 	}
 	catch (ex)
 	{
@@ -850,56 +895,67 @@ function LOAD_shedule_edit(day, numerator)
 			NewXHR("URL_TO_GET_SHEDULE", "json_input=" +  JSON.stringify(req), function (Response) {
 				try{
 					var answer = JSON.parse(Response);
-					var tbl = CreateElem("table", null, "admin-table");
-					var thead = tbl.createTHead(-1);
-					var row = thead.insertRow(-1);
-					for (var i = 0; i<8; i++)
+					if (answer.state != "fail")
 						{
-							var cell = row.insertCell(-1);
-							if (i != 0)
-								cell.innerHTML = i + " пара";
-						}
-					var tbody = tbl.createTBody(-1);
-					var row1 = tbody.insertRow(-1);
-					var row2 = tbody.insertRow(-1);
-					var cell = row1.insertCell(-1);
-					cell.innerHTML = "Дисциплина";
-					var cell = row2.insertCell(-1);
-					cell.innerHTML = "Преподаватель";					
-					for (var i =0; i<7; i++)
-						{
+							var tbl = CreateElem("table", null, "admin-table");
+							var thead = tbl.createTHead(-1);
+							var row = thead.insertRow(-1);
+							for (var i = 0; i<8; i++)
+								{
+									var cell = row.insertCell(-1);
+									if (i != 0)
+										cell.innerHTML = i + " пара";
+								}
+							var tbody = tbl.createTBody(-1);
+							var row1 = tbody.insertRow(-1);
+							var row2 = tbody.insertRow(-1);
 							var cell = row1.insertCell(-1);
-							var el = CreateElem("input");
-							el.setAttribute("type", "text");
-							el.setAttribute("list", "dl");
-							el.setAttribute("placeholder", "Название предмета...");
-							if (answer[i] != null)
-									el.value = answer[i].lesson;
-							cell.appendChild(el);
+							cell.innerHTML = "Дисциплина";
 							var cell = row2.insertCell(-1);
-							var el = CreateElem("input");
-							el.setAttribute("type", "text");
-							el.setAttribute("list", "pl" + i + 1);
-							el.setAttribute("placeholder", "Преподаватель...");
-							target.appendChild(CreateElem("datalist", "pl" + i + 1));
-							el.onkeypress = function () {
-								var block = document.getElementById(this.getAttribute("list"));
-								block.innerHTML = "";
-								for (var i =0; i<professorslist.length; i++)
-										if(professorslist[i].name.indexOf(this.value) + 1)
-										{
-											var elem = CreateElem("option");
-											elem.setAttribute("value", professorslist[i].name);
-											block.appendChild(elem);
-										}
-							}
-							if (answer[i] != null)
-									el.value = answer[i].professor;
-							cell.appendChild(el);
+							cell.innerHTML = "Преподаватель";					
+							for (var i =0; i<7; i++)
+								{
+									var cell = row1.insertCell(-1);
+									var el = CreateElem("input");
+									el.setAttribute("type", "text");
+									el.setAttribute("list", "dl");
+									el.setAttribute("placeholder", "Название предмета...");
+									if (answer[i] != null)
+											el.value = answer[i].lesson;
+									cell.appendChild(el);
+									var cell = row2.insertCell(-1);
+									var el = CreateElem("input");
+									el.setAttribute("type", "text");
+									el.setAttribute("list", "pl" + i + 1);
+									el.setAttribute("placeholder", "Преподаватель...");
+									target.appendChild(CreateElem("datalist", "pl" + i + 1));
+									el.onkeypress = function () {
+										var block = document.getElementById(this.getAttribute("list"));
+										block.innerHTML = "";
+										for (var i =0; i<professorslist.length; i++)
+												if(professorslist[i].name.indexOf(this.value) + 1)
+												{
+													var elem = CreateElem("option");
+													elem.setAttribute("value", professorslist[i].name);
+													block.appendChild(elem);
+												}
+									}
+									if (answer[i] != null)
+											el.value = answer[i].professor;
+									cell.appendChild(el);
+								}
+							target.appendChild(tbl);
+							loader.style.opacity = "";
+							setTimeout(function () { loader.remove(); }, 500);
 						}
-					target.appendChild(tbl);
-					loader.style.opacity = "";
-					setTimeout(function () { loader.remove(); }, 500);
+					else
+						{
+							loader.style.opacity = "";
+							setTimeout(function () {
+								loader.remove();
+								CreateEx(answer.message);
+							}, 500);
+						}
 				}
 				catch (ex)
 					{
@@ -1021,6 +1077,7 @@ function SEND_shedule_edit(numerator, day)
 		}, 500);
 	}, 10);	
 }
+/* TODO
 function LOAD_classrooms()
 {
 	var body = document.body;
@@ -1046,4 +1103,4 @@ function LOAD_classrooms()
 			});
 		}, 500);
 	}, 10);
-}
+}*/

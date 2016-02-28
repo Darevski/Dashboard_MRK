@@ -80,7 +80,8 @@ function NewXHR(route, body, callback)
 	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'); //setting xhr headers
 	xhr.onreadystatechange = function() // listening
 	{
-		if ((xhr.readyState == 4)  && (xhr.status == 200)) // if all OK
+		if (xhr.readyState == 4)
+			if (xhr.status == 200) // if all OK
 			{
 				var json_response = document.createElement("html");
 				json_response.innerHTML = xhr.responseText;
@@ -93,19 +94,23 @@ function NewXHR(route, body, callback)
 			else
 			{
                 if (!ERROR_STATE)
-                {
-				    if (xhr.status != 200) // if connection failed
-                            //error connection
-					   {
-                           var ans = {};
-                           ans.check = false;
-                           ans.status = xhr.status;
-                           ans.readyState = xhr.readyState;
-                           ans.ResponseText = xhr.responseText;
-                           callback(ans);
-                           ERROR_STATE = true;
-					   }
-                }
+				   {
+						var json_response = document.createElement("html");
+						json_response.innerHTML = xhr.responseText;
+						var answer = json_response.getElementsByTagName("json")[0];
+						if (answer != void(0))
+							callback(answer.innerHTML);
+						else
+							{
+								var ans = {};
+								ans.check = false;
+								ans.status = xhr.status;
+								ans.readyState = xhr.readyState;
+								ans.ResponseText = xhr.responseText;
+								callback(ans);
+							}
+						ERROR_STATE = true;
+				   }
 			}
 	}
 	xhr.send(body); // send request
@@ -212,7 +217,7 @@ function Dashboard_Load()
         document.body.appendChild(loader);
 		loader.style.opacity = "1";
         NewXHR("/Application/Views/Skeletons/Main_Dashboard.html", null, function (data){
-            if (data.check != false)
+            if (data.status != "fail")
                 setTimeout(function () {
                     loader.style.opacity = "";
                     body.style.opacity = "0";
@@ -226,7 +231,7 @@ function Dashboard_Load()
             else
                 {
                     //exception handler
-                    CreateEx("Обнаружена ошибка: " + data.status);
+                    CreateEx(data.message);
                 }
     });
 	}, 600);
@@ -250,7 +255,7 @@ function GroupChoice()
             if (document.getElementById("main-container") != undefined)
                 document.getElementById("main-container").remove();
             NewXHR("/Dashboard/get_list_group", null, function(ResponseText) {
-                if (ResponseText.check != false) {
+                if (ResponseText.status != "fail") {
                     var answer = JSON.parse(ResponseText);
                     var div_container = document.createElement("div");
                     div_container.id = "container-gr";
@@ -296,7 +301,7 @@ function GroupChoice()
                 else
                     {
                         //exception handler
-                        CreateEx("Обнаружена ошибка: " + data.status);
+                        CreateEx(data.message);
                     }
             });
         }, 600);

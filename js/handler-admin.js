@@ -268,7 +268,9 @@ function create_li_notification(input)
 	li.appendChild(p);
 
 	var p = CreateElem("p");
-	p.innerHTML = input.group_number;
+    p.innerHTML = input.group_number;
+    if (input.group_number == "0")
+	   p.innerHTML = "Всем";
 	li.appendChild(p);
 
 	var p = CreateElem("p");

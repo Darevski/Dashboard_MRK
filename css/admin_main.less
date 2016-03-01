@@ -17,7 +17,23 @@
     transform: translateY(0);
   }
 }
-
+@keyframes fade-in-left {
+    0% {
+        opacity: 0;
+		display: none;
+		padding-left: 30px;
+    }
+	1% {
+        opacity: 0;
+		display: block;
+		padding-left: 30px;
+    }
+    100% {
+        opacity: 1;
+		display: block;
+		padding-left: 10px;
+    }
+}
 body
 {
     position: absolute;
@@ -117,7 +133,7 @@ body
     left: 740px;
     top: 240px;
 }
-#message-more, #message-type, #message-to, #message-text, #message-push
+#message-more, #message-type, #message-to, #message-text, #message-push, #message-manager
 {
     display: inline-block;
     height: 50px;
@@ -159,7 +175,12 @@ body
 }
 #message-text
 {
-    width: 520px;
+    width: 470px;
+}
+#message-manager
+{
+    width: 50px;
+    background-color: chartreuse;
 }
 #message-push
 {
@@ -188,7 +209,7 @@ body
 #message-text-input
 {
 	margin-left: 10px;
-	width: 490px;
+	width: 430px;
 	height: 18px;
 	margin-top: 11px;
 	outline: 0;
@@ -1048,4 +1069,195 @@ body
 	height: 40px;
 	line-height: 40px;
 	margin-top: 5px;
+}
+#message-whom-status ul li:hover .tooltip-left
+{
+	display: block;
+	animation: fade-in-left .75s ease;
+}
+#message-whom-status ul li:hover p
+{
+	margin-left: -188px;
+	transition: 0.8s;
+}
+#message-whom-status ul li p
+{
+	text-align: center;
+	width: 188px;
+	display: inline-block;
+	vertical-align: top;
+	height: 30px;
+	padding: 0;
+	margin: 0;
+	transition: 0.8s;
+	overflow: hidden;
+}
+#message-whom-status ul li
+{
+	list-style: none;
+	width: 188px;
+	border-left: 4px solid @color-delimeter;
+	transition: 0.5s;
+	height: 30px;
+	line-height: 30px;
+	font-size: 18px;
+	padding: 0 0 0 8px;
+	margin: 0;
+	overflow: hidden;
+}
+#message-whom-status ul
+{
+	list-style: none;
+	outline: none;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	width: 200px;
+	height: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+#message-whom-status
+{
+    opacity: 0;
+	background-color: @color-block;
+	box-shadow: 0px 0px 10px rgba(0,0,0,0.8);
+	position: fixed;
+	top: ~"calc( 50% - 150px)";
+	width: 200px;
+	height: 300px;
+	left: ~"calc( 100% - 200px )";
+	z-index: 11;
+    transition: 0.5s;
+	word-break: break-all;
+}
+.tooltip-left:before
+{
+	position: fixed;
+	content: "";
+	width: 0;
+	margin-top: 7px;
+	height: 0;
+	right: 200px;
+	border-top: 8px solid transparent;
+	border-left: 10px solid @color-main;
+	border-bottom: 8px solid transparent;
+}
+.tooltip-left
+{
+	color: @color-block;
+    position: fixed;
+    display: none;
+    line-height: 30px;
+    height: 30px;
+	background-color: @color-main;
+	box-shadow: 0 0 8px rgba(0, 0, 0, .4);
+	padding: 0 10px;
+	border-radius: 4px;
+	z-index: 12;
+}
+#notification-list-container ul li p:nth-child(n+2), #notification-list-header p:nth-child(n+2)
+{
+    width: 150px;
+}
+#notification-list-container ul li p:nth-child(1), #notification-list-header p:nth-child(1)
+{
+    width: 450px;
+}
+#notification-list-container ul li p:nth-child(5)
+{
+    width: 100px;
+}
+#notification-list-container ul li p:nth-child(1)
+{
+    width: 425px;
+	padding-left: 20px;
+    text-align: left;
+}
+#notification-list-header p
+{
+    height: 45px;
+    line-height: 50px;
+	border-top: 2px solid transparent;
+	transition: 0.2s;
+}
+#notification-list-header p, #notification-list-container ul li p
+{
+    display: inline-block;
+    vertical-align: top;
+    padding: 0;
+    margin: 0;
+    font-size: 18px;
+    text-align: center;
+}
+#notification-list-header
+{
+    height: 47px;
+    width: 100%;
+    background-color: @color-block;
+	border-bottom: 3px solid @color-delimeter;
+}
+#notification-list-container ul li:nth-child(even)
+{
+    background-color: @color-table-hover;
+}
+#notification-list-container ul li p
+{
+    height: 40px;
+    line-height: 40px;
+}
+#notification-list-container ul li
+{
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+	transition: 0.6s;
+    height: 40px;
+    width: 995px;
+    border-left: 5px solid @color-table-hover;
+    background-color: @color-block;
+    list-style: none;
+}
+#notification-list-container ul
+{
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+	height: 100%;
+}
+#notification-list-container
+{
+	margin-top: 5px;
+    height: 445px;
+    width: 100%;
+}
+#manager-container
+{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.delete-message-button:hover
+{
+    opacity: 1;
+    transition: 0.2s;
+}
+.delete-message-button
+{
+    transition: 0.2s;
+    opacity: 0.4;
+    width: 20px;
+    height: 20px;
+    margin-top: 10px;
+    margin-left: 30px;
+    background-image: url("icons/close.png");
+    background-position: center center;
+    background-size: 20px;
+    background-repeat: no-repeat;
 }

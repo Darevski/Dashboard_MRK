@@ -1,5 +1,6 @@
 var TIME_difference;
 var professorslist, lessonlist;
+var notificationlist;
 function LOAD_SkeletonsFullscreen(route, callback)
 {
     var body = document.body;
@@ -12,7 +13,7 @@ function LOAD_SkeletonsFullscreen(route, callback)
 		loader.style.opacity = "1";
 		setTimeout(function () {
 			NewXHR(route, null, function (data){
-				if (data.check != false)
+				if (data.status != "fail")
 					{
 						loader.style.opacity = "";
                         body.style.opacity = "0";
@@ -27,7 +28,7 @@ function LOAD_SkeletonsFullscreen(route, callback)
 				else
 					{
 						//exception handler
-						CreateEx("Обнаружена ошибка: " + data.status);
+						CreateEx(data.message);
 					}});
 		}, 600);
 	}, 600);	
@@ -118,7 +119,7 @@ function CreateGroup()
             NewXHR("/Admin/add_group", "json_input=" + JSON.stringify(group), function(ResponseText){
                 loader.style.opacity = "";
                 try {
-                    var answer = JSON.parse(ResponseText);            
+                    var answer = JSON.parse(ResponseText);
                     setTimeout(function () {
                         loader.remove();
                         if (answer.state == "success")
@@ -150,22 +151,27 @@ function LOAD_Message()
 		NewXHR("/Dashboard/get_faculty_list", null, function (Response){
 			try {
 					var answer = JSON.parse(Response);
-					var block = document.getElementById("message-filter-department").children[1];
-					var i =0;
-					while (answer[i] != undefined)
+					if (answer.state != "fail")
 						{
-							var el1 = CreateElem("li", null, "checkbox_list_item");
-							var el2 = CreateElem("label", null, "checkbox_label");
-							var el3 = CreateElem("input", null, "checkbox");
-							el3.setAttribute("onchange", "LOAD_whom_sent()");							
-							el3.setAttribute("type", "checkbox");
-							el3.setAttribute("value", answer[i].code);
-							el2.appendChild(el3);
-							el2.innerHTML += answer[i].name;
-							el1.appendChild(el2);
-							block.appendChild(el1);
-							i++;
+							var block = document.getElementById("message-filter-department").children[1];
+							var i =0;
+							while (answer[i] != undefined)
+								{
+									var el1 = CreateElem("li", null, "checkbox_list_item");
+									var el2 = CreateElem("label", null, "checkbox_label");
+									var el3 = CreateElem("input", null, "checkbox");
+									el3.setAttribute("onchange", "LOAD_whom_sent()");							
+									el3.setAttribute("type", "checkbox");
+									el3.setAttribute("value", answer[i].code);
+									el2.appendChild(el3);
+									el2.innerHTML += answer[i].name;
+									el1.appendChild(el2);
+									block.appendChild(el1);
+									i++;
+								}
 						}
+					else
+						CreateEx(answer.message);
 				}
 			catch (ex)
 				{
@@ -175,22 +181,27 @@ function LOAD_Message()
 		NewXHR("/Dashboard/get_specializations_list", null, function (Response){
 			try {
 					var answer = JSON.parse(Response);
-					var block = document.getElementById("message-filter-spec").children[1];
-					var i =0;
-					while (answer[i] != undefined)
-						{
-							var el1 = CreateElem("li", null, "checkbox_list_item");
-							var el2 = CreateElem("label", null, "checkbox_label");
-							var el3 = CreateElem("input", null, "checkbox");
-							el3.setAttribute("type", "checkbox");
-							el3.setAttribute("value", answer[i].code);
-							el3.setAttribute("onchange", "LOAD_whom_sent()");
-							el2.appendChild(el3);
-							el2.innerHTML += answer[i].name;
-							el1.appendChild(el2);
-							block.appendChild(el1);
-							i++;
-						}
+				if (answer.state != "fail")
+					{
+						var block = document.getElementById("message-filter-spec").children[1];
+						var i =0;
+						while (answer[i] != undefined)
+							{
+								var el1 = CreateElem("li", null, "checkbox_list_item");
+								var el2 = CreateElem("label", null, "checkbox_label");
+								var el3 = CreateElem("input", null, "checkbox");
+								el3.setAttribute("type", "checkbox");
+								el3.setAttribute("value", answer[i].code);
+								el3.setAttribute("onchange", "LOAD_whom_sent()");
+								el2.appendChild(el3);
+								el2.innerHTML += answer[i].name;
+								el1.appendChild(el2);
+								block.appendChild(el1);
+								i++;
+							}
+					}
+					else
+						CreateEx(answer.message);
 				}
 			catch (ex)
 				{
@@ -206,6 +217,188 @@ function LOAD_Swap()
 		LOAD_all_lessons();
 		LOAD_grouplist();
 	});
+}
+function DELETE_message(ident, el)
+{
+    var req = {};
+    req.id = ident;
+    NewXHR("Admin/delete_notification", "json_input=" + JSON.stringify(req), function (Response) {
+        try
+            {
+                var answer = JSON.parse(Response);
+                if (answer.state == "success")
+                    {
+						var i = 0;
+						while ((notificationlist[i] != undefined) & (notificationlist[i] != null))
+							{
+								if (notificationlist[i].id == ident)
+									notificationlist.splice(i, 1);
+								i++;
+							}
+                        el.parentElement.parentElement.style.height = "0px";
+						el.parentElement.parentElement.style.borderBottom = "0px solid transparent";
+						setTimeout(function () {
+							el.remove();
+						}, 800);
+                    }
+                else
+                    CreateEx(answer.message);
+            }
+        catch (ex)
+            {
+                CreateEx(ex.message);
+            }
+    });
+}
+function create_li_notification(input)
+{
+	var li = CreateElem("li");
+	
+	li.style.borderLeftStyle = "solid";
+	li.style.borderLeftWidth = "5px";
+	if (input.state == "note")
+		li.style.borderLeftColor = "#FFC107";
+	else if (input.state == "alert")
+		li.style.borderLeftColor = "#F44336";
+	else if (input.state == "info")
+		li.style.borderLeftColor = "#03A9F4";
+
+	var p = CreateElem("p");
+	p.innerHTML = input.text;
+	li.appendChild(p);
+
+	var p = CreateElem("p");
+    p.innerHTML = input.group_number;
+    if (input.group_number == "0")
+	   p.innerHTML = "Всем";
+	li.appendChild(p);
+
+	var p = CreateElem("p");
+	var d = new Date();
+	var temp = {};
+	d.setTime(Date.parse(input.starting_date));
+	temp.day = d.getDate();
+	temp.month = d.getMonth();
+	temp.year = d.getFullYear();
+	if (temp.day < 10)
+		temp.day = "0" + temp.day;
+	if (temp.month < 10)
+		temp.month = "0" + temp.month;
+	p.innerHTML = temp.day + "." + temp.month + "." + temp.year;
+	li.appendChild(p);
+
+	var p = CreateElem("p");
+	d.setTime(Date.parse(input.ending_date));
+	temp.day = d.getDate();
+	temp.month = d.getMonth();
+	temp.year = d.getFullYear();
+	if (temp.day < 10)
+		temp.day = "0" + temp.day;
+	if (temp.month < 10)
+		temp.month = "0" + temp.month;
+	p.innerHTML = temp.day + "." + temp.month + "." + temp.year;
+	li.appendChild(p);
+
+	var elem = CreateElem("div", null, "delete-message-button", "DELETE_message(" + input.id + ", this);", null);
+	var p = CreateElem("p");
+	p.appendChild(elem);
+	li.appendChild(p);
+	
+	return li;
+}
+function message_sort(str)
+{
+	function compare_number (a, b)
+	{
+		return a.group_number - b.group_number;
+	}
+	function compare_date_start (a, b)
+	{
+		var first = new Date(a.starting_date);
+		var second = new Date(b.starting_date);
+		return first - second;
+	}
+	function compare_date_end (a, b)
+	{
+		var first = new Date(a.ending_date);
+		var second = new Date(b.ending_date);
+		return first - second;
+	}
+	try {
+		var container = document.getElementById("notification-list-container").children[0];
+		var sort_indicator = document.getElementById("notification-list-header");
+		for (var i = 0; i < sort_indicator.childElementCount; i++)
+			sort_indicator.children[i].style.borderTop = "";
+		container.innerHTML = "";
+		var i =0;
+		switch (str)
+		{
+			case 'group':
+				notificationlist.sort(compare_number);
+				sort_indicator.children[1].style.borderTop = "2px solid rgb(3, 169, 244)"
+				break;
+			case 'start':
+				notificationlist.sort(compare_date_start);
+				sort_indicator.children[2].style.borderTop = "2px solid rgb(3, 169, 244)"
+				break;
+			case 'end':
+				notificationlist.sort(compare_date_end);
+				sort_indicator.children[3].style.borderTop = "2px solid rgb(3, 169, 244)"
+				break;
+			default:
+				throw Error("Ошибка сортировки");
+		}
+		while((notificationlist[i] != undefined) & (notificationlist[i] != null))
+			{
+				var li = create_li_notification(notificationlist[i]);
+				container.appendChild(li);
+				i++;
+			}
+	}
+	catch (ex)
+	{
+		CreateEx(ex.message);
+	}
+}
+function LOAD_Message_manager()
+{
+	try {
+    	NewXHR("/Admin/get_active_notifications", null, function (Response) {
+			try {
+				var answer = JSON.parse(Response);
+				if (answer.state != "fail")
+					{
+						LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_notification_manager.html", function () {
+							try {
+								var container = document.getElementById("notification-list-container").children[0];
+								var i =0;
+								notificationlist = [];
+								while((answer[i] != undefined) & (answer[i] != null))
+									{
+										notificationlist[notificationlist.length] = answer[i];
+										i++;
+									}
+								message_sort("group");
+							}
+							catch (ex)
+								{
+									CreateEx(ex.message);
+								}
+						});
+					}
+				else
+					CreateEx(answer.message);
+			}
+			catch (ex)
+				{
+					CreateEx(ex.message);
+				}
+    	});
+	}
+	catch (ex)
+		{
+			CreateEx(ex.message);
+		}
 }
 function LOAD_GroupChange()
 {
@@ -230,42 +423,38 @@ function LOAD_Reports()
 {
     LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Bugs.html");
 }
-function SEND_message(options, text)
+function SEND_message(options, text, number, callback)
 {
-    var body = document.body;
     var req = {};
-    req.parameters = options;
-    req.text = text;
-    var loader = CreateLoader(body, 1, 1);
-    body.appendChild(loader);
-    setTimeout(function () {
-        loader.style.opacity = "1";
-        setTimeout(function () {
-            NewXHR("/Admin/add_notification", "json_input=" + JSON.stringify(req), function(Response) {
+	//Checking for unexpected input
+	var answer = {};
+	answer.state = "fail";
+	if ((text == "") || (text == void(0)))
+		answer.message = "Не введен текст уведомления";
+	else if ((options.type == "") || (options.type == void(0)))
+			answer.message = "Не указан тип уведомления";
+	else if ((options.ending_date == "") || (options.ending_date == void(0)))
+			answer.message = "Не указана дата окончания";
+	else if ((options.target == "") || (options.target == void(0)))
+			answer.message = "Нет получателей";
+	if (answer.message != void(0))
+		callback(answer, number);
+	else
+		{
+			req.parameters = options;
+			req.text = text;
+			NewXHR("/Admin/add_notification", "json_input=" + JSON.stringify(req), function(Response) {
 				try 
 					{
-						var answer = JSON.parse(Response);
-						loader.style.opacity = "";
-						setTimeout(function () {
-							loader.remove();
-							if (answer.state == "success")
-								CreateEx("Успешно отправлено!");
-							else
-								CreateEx(answer.message);
-						}, 500);
+						callback(JSON.parse(Response), number);
 					}
 				catch (ex)
 					{
-						loader.style.opacity = "";
-						setTimeout(function () {
-							loader.remove();
-							CreateEx(ex.message);
-						}, 500);						
+						answer.message = ex.message;
+						callback(answer, number);
 					}
-            });
-        }, 500);
-    }, 10);
-    
+			});
+		}
 }
 function LOAD_whom_sent()
 {
@@ -285,7 +474,7 @@ function LOAD_whom_sent()
 			return el_array;
 	}
 	var options = {};
-	var option_not_null = false;
+	var option_null = true;
 	options.grade = Result_find(document.getElementById("message-filter-grade").getElementsByTagName("input"));
 	options.class = Result_find(document.getElementById("message-filter-after").getElementsByTagName("input"))
 	options.faculty = Result_find(document.getElementById("message-filter-department").children[1].getElementsByTagName("input"));
@@ -293,16 +482,25 @@ function LOAD_whom_sent()
   	NewXHR("/Dashboard/get_filtered_groups", "json_input=" + JSON.stringify(options), function (Response) {
 		try {
 			var answer = JSON.parse(Response);
-			var whom_list = document.getElementById("whom-sent");
-			whom_list.innerHTML = "";
-			var i =0;
-			if (answer.groups != null)
-				while (answer.groups[i] != undefined)
-					{
-						var elem = CreateElem("li", null, null, null, answer.groups[i]);
-						whom_list.appendChild(elem);
-						i++;
-					}
+			if (answer.state != "fail")
+				{
+					var whom_list = document.getElementById("whom-sent");
+					whom_list.innerHTML = "";
+					var i =0;
+					if (answer.groups != null)
+						while (answer.groups[i] != undefined)
+							{
+								var elem = CreateElem("li", null, null, null, answer.groups[i]);
+								whom_list.appendChild(elem);
+								i++;
+							}
+					if (answer.selected_all !== void(0))
+						document.getElementById("whom-sent").setAttribute("selected-all", "true");
+					else
+						document.getElementById("whom-sent").removeAttribute("selected-all");
+				}
+			else
+				CreateEx(answer.message);
 		}
 		catch (ex)
 			{
@@ -314,19 +512,146 @@ function LOAD_whom_sent()
 }
 function SEND_premessage_full()
 {
-    '{"parameters":{"type":"info","target":"32494"},"text":"123","ending_date":"2016-09-20"}'
-    var preset = {};
-    var elem = document.getElementById("message-more-type");
-    for(var i =1; i < 4; i++)
-        if (elem.children[i].getElementsByTagName("input")[0].checked)
-            preset.type = elem.children[i].getElementsByTagName("input")[0].value;
-    var elem = document.getElementById("whom-sent");
-    preset.ending_date = document.getElementById("message-datepicker").value;
-    for (var i = 0; i < elem.childElementCount; i++)
-        {
-            preset.target = elem.children[i].innerHTML;
-            SEND_message(preset, document.getElementById("message-more-text-input").value);
-        }
+
+    var body = document.body;
+    var loader = CreateLoader(body, 1, 1);
+    body.appendChild(loader);
+    setTimeout(function () {
+        loader.style.opacity = "1";
+		var elem = document.getElementById("message-whom-status");
+		if ((elem != undefined) & (elem != null))
+			{
+				elem.style.opacity = "";
+				setTimeout(function () { elem.remove(); }, 500);
+			}
+        setTimeout(function () {
+			var preset = {};
+			var elem = document.getElementById("message-more-type");
+			preset.type = "null";
+			for(var i =1; i < 4; i++)
+				if (elem.children[i].getElementsByTagName("input")[0].checked)
+					preset.type = elem.children[i].getElementsByTagName("input")[0].value;
+			var elem = document.getElementById("whom-sent");
+			if ( document.getElementById("message-datepicker").value == "" )
+				preset.ending_date = "tomorrow";
+			else
+				{
+					var date = new Date(document.getElementById("message-datepicker").value);
+					var temp = date.getUTCMonth() + 1;
+					if (temp < 10)
+						temp = "0" + temp;
+					preset.ending_date = date.getFullYear() + temp;
+					temp = date.getUTCDate();
+					if (temp < 10)
+						temp = "0" + temp;
+					preset.ending_date += temp;
+				}
+			if (elem.getAttribute("selected-all") == "true")
+				{
+					preset.target = "0";
+					SEND_message(preset, document.getElementById("message-more-text-input").value, null, function (Response) {
+						loader.style.opacity = "";
+						setTimeout(function () {
+							loader.remove();
+							setTimeout(function () {
+								if (Response.state == "success")
+									CreateEx("Успешно отправлено");
+								else
+									CreateEx(Response.message);
+							}, 100);
+						}, 550);
+					});
+				}
+			else if (document.getElementById("whom-sent").childElementCount > 0)
+				{
+					var states = CreateElem("div", "message-whom-status");
+					var states_ul = CreateElem("ul");
+					var elem = document.getElementById("whom-sent");
+					for (var i = 0; i < elem.childElementCount; i++)
+						{
+							var states_li = CreateElem("li");
+							var states_p = CreateElem("p", null, null, null, elem.children[i].innerHTML);
+							var states_status = CreateElem("state", null, null, null, "Обработка");
+							states_li.appendChild(states_p);
+							states_li.appendChild(states_status);
+							states_ul.appendChild(states_li);
+						}
+					states.appendChild(states_ul);
+					var close_button = CreateElem("div", "button-close");
+					close_button.onclick = function () {
+						document.getElementById('message-whom-status').style.opacity = "";
+						setTimeout( function() {
+							document.getElementById('message-whom-status').remove();
+						}, 600);
+					};
+					close_button.style.top = "calc( 100% - 25px )";
+					states.appendChild(close_button);
+					body.appendChild(states);
+					setTimeout(function () { states.style.opacity = "1"; }, 100);
+					states.style.top = "calc( 50% - " + (15 * (states_ul.childElementCount + 2)) + "px)";
+					states.style.height = 30 * (states_ul.childElementCount + 1) + "px";
+					var counter = 0;
+                    var counter_ok = 0;
+					for (var i = 0; i < elem.childElementCount; i++)
+						{
+							preset.target = elem.children[i].innerHTML;
+                            states.children[0].children[i].children[1].innerHTML = "Отправка";
+                            states.children[0].children[i].style.borderLeft = "4px solid #03a9f4";
+							SEND_message(preset, document.getElementById("message-more-text-input").value, i, function (Response, number){
+                                if (Response.state == "success")
+                                    {
+                                        counter_ok++;
+                                        states.children[0].children[number].children[1].innerHTML = "Успешно";
+                                        states.children[0].children[number].style.borderLeft = "4px solid #c0ca33";
+                                    }
+                                else
+                                    {
+										var error_more = CreateElem("span", null, "tooltip-left", null, Response.message);
+										states.children[0].children[number].insertBefore(error_more, states.children[0].children[number].children[0]);
+										error_more.style.display = "inline-block";
+										for (var k =0; k<4; k++)
+											error_more.style.marginLeft = "-" + (error_more.offsetWidth + 20) + "px";
+										error_more.style.display = "";
+										states.children[0].children[number].children[2].innerHTML = "Ошибка";
+                                        if (Response.code !== void(0))
+											states.children[0].children[number].children[2].innerHTML = "Ошибка #" + Response.code;
+                                        states.children[0].children[number].style.borderLeft = "4px solid #f4511e";
+                                    }
+								counter++;
+                                if (counter == elem.childElementCount)
+                                    {
+                                        loader.style.opacity = "";
+                                        setTimeout(function () {
+                                            loader.remove();
+                                            setTimeout(function () {
+                                                if (counter == counter_ok)
+													{
+                                                    	CreateEx("Успешно отправлено");
+														states.style.opacity = "";
+														setTimeout(function () {
+															states.remove();
+														}, 550);
+													}
+                                                else
+                                                    CreateEx("При отправке возникли ошибки");
+                                            }, 100);
+                                        }, 550);
+                                    }
+							});
+						}
+				}
+			else
+				{
+					loader.style.opacity = "";
+					setTimeout(function () {
+						loader.remove();
+						setTimeout(function () {
+							CreateEx("Отсутствуют получатели");
+						}, 100);
+					}, 550);
+				}
+        }, 500);
+    }, 10);
 }
 function SHOW_message_types()
 {
@@ -357,21 +682,49 @@ function SET_message_type(value)
 }
 function SEND_message_small()
 {
-	var options = {};
-	options.type = document.getElementById("message-type").dataset.messagetype;
-	options.target = document.getElementById("message-to-input").value;
-	SEND_message(options, document.getElementById("message-text-input").value);
+    var body = document.body;
+    var loader = CreateLoader(body, 1, 1);
+    body.appendChild(loader);
+    setTimeout(function () {
+        loader.style.opacity = "1";
+        setTimeout(function () {
+			var options = {};
+			options.type = document.getElementById("message-type").dataset.messagetype;
+			if (document.getElementById("message-to-input").value == "")
+				options.target = "0";
+			else
+				options.target = document.getElementById("message-to-input").value;
+			options.ending_date = "tomorrow";
+			SEND_message(options, document.getElementById("message-text-input").value, null, function (Response){
+				loader.style.opacity = "";
+				setTimeout(function () {
+					loader.remove();
+					setTimeout(function () {
+						if (Response.state == "success")
+							CreateEx("Успешно отправлено!");
+						else
+							CreateEx(Response.message);
+					}, 100);
+				}, 500);
+			});
+        }, 500);
+    }, 10);
 }
 function LOAD_grouplist()
 {
 	NewXHR("URL_TO_LOAD_GROUP_LIST", null, function (Response){
 		try{
 			var answer = JSON.parse(Response);
-			for (var i =0; i < answer.groups.length; i++)
+			if (answer.state != "fail")
 				{
-					var el = CreateElem("li", null, null, "SET_group_from_list(this)", answer.groups[i]);
-					document.getElementById("swap-group-choice").appendChild(el);
+					for (var i =0; i < answer.groups.length; i++)
+						{
+							var el = CreateElem("li", null, null, "SET_group_from_list(this)", answer.groups[i]);
+							document.getElementById("swap-group-choice").appendChild(el);
+						}
 				}
+			else
+				CreateEx(answer.message);
 		}
 		catch (ex)
 			{
@@ -386,11 +739,16 @@ function LOAD_daylist()
 	NewXHR("URL_TO_LOAD_DAY_LIST", "json_input=" + JSON.stringify(req), function (Response){
 		try{
 			var answer = JSON.parse(Response);
-			for (var i =0; i < answer.days.length; i++)
+			if (answer.status != "fail")
 				{
-					var el = CreateElem("li", null, null, "SET_day_from_list(this)", answer.days[i]);
-					document.getElementById("swap-day-choice").appendChild(el);
+					for (var i =0; i < answer.days.length; i++)
+						{
+							var el = CreateElem("li", null, null, "SET_day_from_list(this)", answer.days[i]);
+							document.getElementById("swap-day-choice").appendChild(el);
+						}
 				}
+			else
+				CreateEx(answer.message);
 		}
 		catch (ex)
 			{
@@ -414,14 +772,19 @@ function LOAD_all_lessons()
 		var block = document.getElementById("lesson-list");
 		try{
 			var answer = JSON.parse(Response);
-			block.innerHTML = "";
-			for (var i = 0; i < answer.lessons.length; i++)
+			if (answer.state != fail)
 				{
-					var el = document.createElement("option");
-					el.setAttribute("value", answer.lessons[i].name);
-					el.innerHTML = answer.lessons[i].id;
-					block.appendChild(el);
+					block.innerHTML = "";
+					for (var i = 0; i < answer.lessons.length; i++)
+						{
+							var el = document.createElement("option");
+							el.setAttribute("value", answer.lessons[i].name);
+							el.innerHTML = answer.lessons[i].id;
+							block.appendChild(el);
+						}
 				}
+			else
+				CreateEx(answer.message);
 		}
 		catch (ex)
 			{
@@ -437,13 +800,18 @@ function LOAD_lessonlist()
 	NewXHR("URL_TO_LOAD_LESSON_LIST", "json_input=" + JSON.stringify(body), function (Response) {
 		try{
 			var answer = JSON.parse(Response);
-			for (var i =0; i<answer.lessons.length; i++)
+			if (answer.state != "fail")
 				{
-					var el = document.createElement("option");
-					el.setAttribute("value", answer.lessons[i].id);
-					el.innerHTML = answer.lessons[i].name;
-					document.getElementById("lesson-to-swap").appendChild(el);
+					for (var i =0; i<answer.lessons.length; i++)
+						{
+							var el = document.createElement("option");
+							el.setAttribute("value", answer.lessons[i].id);
+							el.innerHTML = answer.lessons[i].name;
+							document.getElementById("lesson-to-swap").appendChild(el);
+						}
 				}
+			else
+				CreateEx(answer.message);
 		}
 		catch (ex)
 			{
@@ -494,21 +862,26 @@ function LOAD_shedule_list()
 	NewXHR("URL_TO_LOAD_LISTS_SHEDULE", null, function (Response) {
 	try {
 		var answer = JSON.parse(Response);
-		professorslist = [];
-		var dl = CreateElem("datalist", "lesson-list");
-		for (var i=0; i < answer.professors.length; i++)
+		if (answer.state != "fail")
 			{
-				professorslist[i] = {};
-				professorslist[i].name = answer.professors[i].name;
-				professorslist[i].id = answer.professors[i].id;
-				professorslist[i].lesson = answer.professors[i].lesson;
-				professorslist[i].lesson_id = answer.professors[i].lesson_id;
-				var el = CreateElem("option");
-				el.innerHTML = professorslist[i].lesson_id;
-				el.setAttribute("value", professorslist[i].lesson);
-				dl.appendChild(el);
+				professorslist = [];
+				var dl = CreateElem("datalist", "lesson-list");
+				for (var i=0; i < answer.professors.length; i++)
+					{
+						professorslist[i] = {};
+						professorslist[i].name = answer.professors[i].name;
+						professorslist[i].id = answer.professors[i].id;
+						professorslist[i].lesson = answer.professors[i].lesson;
+						professorslist[i].lesson_id = answer.professors[i].lesson_id;
+						var el = CreateElem("option");
+						el.innerHTML = professorslist[i].lesson_id;
+						el.setAttribute("value", professorslist[i].lesson);
+						dl.appendChild(el);
+					}
+				document.body.appendChild(dl);
 			}
-		document.body.appendChild(dl);
+		else
+			CreateEx(answer.message);
 	}
 	catch (ex)
 	{
@@ -534,56 +907,67 @@ function LOAD_shedule_edit(day, numerator)
 			NewXHR("URL_TO_GET_SHEDULE", "json_input=" +  JSON.stringify(req), function (Response) {
 				try{
 					var answer = JSON.parse(Response);
-					var tbl = CreateElem("table", null, "admin-table");
-					var thead = tbl.createTHead(-1);
-					var row = thead.insertRow(-1);
-					for (var i = 0; i<8; i++)
+					if (answer.state != "fail")
 						{
-							var cell = row.insertCell(-1);
-							if (i != 0)
-								cell.innerHTML = i + " пара";
-						}
-					var tbody = tbl.createTBody(-1);
-					var row1 = tbody.insertRow(-1);
-					var row2 = tbody.insertRow(-1);
-					var cell = row1.insertCell(-1);
-					cell.innerHTML = "Дисциплина";
-					var cell = row2.insertCell(-1);
-					cell.innerHTML = "Преподаватель";					
-					for (var i =0; i<7; i++)
-						{
+							var tbl = CreateElem("table", null, "admin-table");
+							var thead = tbl.createTHead(-1);
+							var row = thead.insertRow(-1);
+							for (var i = 0; i<8; i++)
+								{
+									var cell = row.insertCell(-1);
+									if (i != 0)
+										cell.innerHTML = i + " пара";
+								}
+							var tbody = tbl.createTBody(-1);
+							var row1 = tbody.insertRow(-1);
+							var row2 = tbody.insertRow(-1);
 							var cell = row1.insertCell(-1);
-							var el = CreateElem("input");
-							el.setAttribute("type", "text");
-							el.setAttribute("list", "dl");
-							el.setAttribute("placeholder", "Название предмета...");
-							if (answer[i] != null)
-									el.value = answer[i].lesson;
-							cell.appendChild(el);
+							cell.innerHTML = "Дисциплина";
 							var cell = row2.insertCell(-1);
-							var el = CreateElem("input");
-							el.setAttribute("type", "text");
-							el.setAttribute("list", "pl" + i + 1);
-							el.setAttribute("placeholder", "Преподаватель...");
-							target.appendChild(CreateElem("datalist", "pl" + i + 1));
-							el.onkeypress = function () {
-								var block = document.getElementById(this.getAttribute("list"));
-								block.innerHTML = "";
-								for (var i =0; i<professorslist.length; i++)
-										if(professorslist[i].name.indexOf(this.value) + 1)
-										{
-											var elem = CreateElem("option");
-											elem.setAttribute("value", professorslist[i].name);
-											block.appendChild(elem);
-										}
-							}
-							if (answer[i] != null)
-									el.value = answer[i].professor;
-							cell.appendChild(el);
+							cell.innerHTML = "Преподаватель";					
+							for (var i =0; i<7; i++)
+								{
+									var cell = row1.insertCell(-1);
+									var el = CreateElem("input");
+									el.setAttribute("type", "text");
+									el.setAttribute("list", "dl");
+									el.setAttribute("placeholder", "Название предмета...");
+									if (answer[i] != null)
+											el.value = answer[i].lesson;
+									cell.appendChild(el);
+									var cell = row2.insertCell(-1);
+									var el = CreateElem("input");
+									el.setAttribute("type", "text");
+									el.setAttribute("list", "pl" + i + 1);
+									el.setAttribute("placeholder", "Преподаватель...");
+									target.appendChild(CreateElem("datalist", "pl" + i + 1));
+									el.onkeypress = function () {
+										var block = document.getElementById(this.getAttribute("list"));
+										block.innerHTML = "";
+										for (var i =0; i<professorslist.length; i++)
+												if(professorslist[i].name.indexOf(this.value) + 1)
+												{
+													var elem = CreateElem("option");
+													elem.setAttribute("value", professorslist[i].name);
+													block.appendChild(elem);
+												}
+									}
+									if (answer[i] != null)
+											el.value = answer[i].professor;
+									cell.appendChild(el);
+								}
+							target.appendChild(tbl);
+							loader.style.opacity = "";
+							setTimeout(function () { loader.remove(); }, 500);
 						}
-					target.appendChild(tbl);
-					loader.style.opacity = "";
-					setTimeout(function () { loader.remove(); }, 500);
+					else
+						{
+							loader.style.opacity = "";
+							setTimeout(function () {
+								loader.remove();
+								CreateEx(answer.message);
+							}, 500);
+						}
 				}
 				catch (ex)
 					{
@@ -705,6 +1089,7 @@ function SEND_shedule_edit(numerator, day)
 		}, 500);
 	}, 10);	
 }
+/* TODO
 function LOAD_classrooms()
 {
 	var body = document.body;
@@ -730,4 +1115,4 @@ function LOAD_classrooms()
 			});
 		}, 500);
 	}, 10);
-}
+}*/

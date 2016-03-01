@@ -23,12 +23,11 @@ class Model
     // Загрузука конфига С параметрами базы данных
 
     /**
-     * Загрузка конфигурации из файла, подключение базы данных
+     * Получение конфигурации для подключение к БД, получение объекта для работы с бд
      * @see $database созданный объект SafeSQL для работы с БД
      */
     function __construct(){
-        $data = parse_ini_file($_SERVER['DOCUMENT_ROOT'].'/Application/Config.ini',true);
-        $data_base_opt = $data['Data_Base_config'];
+        $data_base_opt = Config::get_instance()->get_database_config();
         /** @var Safe_SQL database singleton */
         $this->database = Safe_SQL::get_instance($data_base_opt);
     }

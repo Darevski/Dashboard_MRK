@@ -9,8 +9,8 @@
  */
 
 namespace Application\Exceptions;
-use Application\Controllers;
-
+use Application\Core\Config;
+use Application\Core\View;
 /**
  * Обработка исключений связанных с несуществующими страницами,ошибками доступа и т.д., вывод страниц ошибок
  * Class UFO_Except
@@ -23,31 +23,61 @@ class UFO_Except extends Main_Except
      * @param UFO_Except $error полученнное исключенение
      */
     function classification_error(UFO_except $error){
-        $code = $error->code;
+        $code = $error->getCode();
         switch ($code) {
             case 404:   //Отсутсвие страницы
-                $data['Error_status'] = '404 Bad Gateway';
-                $data['Message'] = 'Увы такой страницы не существует';
-                $data['Code'] = 404;
+                $data['title'] = '404 Bad Gateway';
+                $data['message'] = 'Увы такой страницы не существует';
+                $data['error_code'] = 404;
                 break;
             case 601:   //Не совпадение хэша с логином при проверке
                 $_SESSION = array();
-                $data['Error_status'] = 'Warning Security problem';
-                $data['Message'] = $error->message;
-                $data['Code'] = 401;
+                $data['title'] = 'Warning Security problem';
+                $data['message'] = $error->message;
+                $data['error_code'] = 401;
                 break;
             case 401:
-                $data['Error_status'] = '401 Unauthorized';
-                $data['Message'] = $error->message;
-                $data['Code'] = 401;
+                $data['title'] = '401 Unauthorized';
+                $data['message'] = $error->message;
+                $data['error_code'] = 401;
                 break;
             case 403:
-                $data['Error_status'] = '403 Forbidden';
-                $data['Message'] = $error->message;
-                $data['Code'] = 403;
+                $data['title'] = '403 Forbidden';
+                $data['message'] = $error->message;
+                $data['error_code'] = 403;
+                break;
+            case 400:
+                $data['title'] = '400 Bad Request';
+                $data['message'] = $error->message;
+                $data['error_code'] = 400;
+                break;
+            default:
+                $data['title'] = '400 Bad Request';
+                $data['message'] = $error->message;
+                $data['error_code'] = 400;
                 break;
         }
-        $controller = new Controllers\Controller_UFO();
-        $controller->display($data);
+        $this->print_error($data);
+    }
+
+    /**
+     * выводит информацию об ошибке в браузер
+     * @param $data
+     */
+    private function print_error($data){
+        // Вывод в json строку
+        $json['state'] = 'fail';
+        $json['message'] = $data['message'];
+        $json['error_code'] =$data['error_code'];
+        $data['json']=View::get_json($json);
+        // Вывод кода ответа сервера
+        $data['response_code'] = $data['error_code'];
+        // 'Видимый' вывод при дебаге
+        if (Config::get_instance()->get_build()['debug'])
+            $data['display_view'] = true;
+        else
+            $data['display_view'] = 'none';
+
+        View::display('Error_View.php',$data);
     }
 }

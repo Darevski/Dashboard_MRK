@@ -17,21 +17,6 @@ use Application\Core\Model;
  * @package Application\Models
  */
 class Model_Auth extends Model{
-    /**
-     * Переменная хранящая имя таблицы используемой для пользователей в БД
-     * @var string
-     */
-    private $table;
-
-    // установка имени таблицы по умолчанию
-    /**
-     * @internal Application\Core\Controller::__construct()
-     * @param string $table наименование таблицы пользователей в БД
-     */
-    public function __construct($table= 'users'){
-        parent::__construct();
-        $this->table = $table;
-    }
 
     /**
      * Проверяет вводимый логин и пароль, при совпадении генерирует хэщ, который записывается в бд
@@ -41,9 +26,9 @@ class Model_Auth extends Model{
      */
     public function check_password($login,$password){
         $password= md5($password);
-        $result = $this->database->getRow("SELECT * FROM $this->table WHERE login = ?s and password = ?s",$login,$password);
+        $result = $this->database->getRow("SELECT * FROM users WHERE login = ?s and password = ?s",$login,$password);
         if (isset($result)){
-            $request = "UPDATE $this->table SET hash=?s WHERE login=?s and password =?s";
+            $request = "UPDATE users SET hash=?s WHERE login=?s and password =?s";
             $new_hash =$this->gen_Hash(15);
             $this->database->query ($request,$new_hash,$login,$password);
             return $new_hash;
@@ -75,7 +60,7 @@ class Model_Auth extends Model{
      */
 
     public function take_privilege($login,$hash){
-        $result = $this->database->getRow("SELECT * FROM $this->table WHERE login = ?s and hash = ?s",$login,$hash);
+        $result = $this->database->getRow("SELECT * FROM users WHERE login = ?s and hash = ?s",$login,$hash);
         if (isset($result))
             return $result['privilege'];
         else
@@ -87,7 +72,7 @@ class Model_Auth extends Model{
      * @param string $login
      */
     public function clear_hash($login){
-        $request = "UPDATE $this->table SET hash=?s WHERE login=?s";
+        $request = "UPDATE users SET hash=?s WHERE login=?s";
         $this->database->query ($request,'',$login);
     }
 

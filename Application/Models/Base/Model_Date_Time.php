@@ -68,7 +68,7 @@ class Model_Date_Time extends Model
      * @param string $format по умолчанию Y-m-d
      * @return bool
      */
-    public function validateDate($date,$format = 'Y-m-d')
+    public function validateDate($date,$format = 'Ymd')
     {
         $date_format = DateTime::createFromFormat($format, $date);
         return $date_format && $date_format->format($format) == $date;

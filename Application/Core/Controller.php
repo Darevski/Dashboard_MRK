@@ -7,6 +7,7 @@
  * @author Darevski
  */
 namespace Application\Core;
+
 use Application\Models;
 use Application\Exceptions\UFO_Except;
 
@@ -16,44 +17,67 @@ use Application\Exceptions\UFO_Except;
  * @package Application\Core
  */
 class Controller {
+    // Переменные с объектами моделей
     /**
-     * переменная хранящая модель, под определенный класс
-     * @var $model
+     * @var Models\Model_List_Departments
      */
-    protected $model;
+    protected $depart_list;
     /**
-     * переменная хранящая объект вида
-     * @var $view
+     * @var Models\Model_Notifications
+     */
+    protected $notification_model;
+    /**
+     * @var Models\Model_List_Groups
+     */
+    protected $list_group_model;
+    /**
+     * @var Models\Model_TimeTable
+     */
+    protected $timetable_model;
+    /**
+     * @var Models\Model_Professors
+     */
+    protected $professor_model;
+    /**
+     * @var View
      */
     protected $view;
 
     /**
-     * переменная хранящая авторизационную модель данных
-     * @var
+     * Модель авторизационных данных
+     * @var Models\Base\Model_Auth
      */
     protected $auth_model;
 
     /**
-     * Записывает объекты моделей в переменные
+     * Создает объекты моделей
+     * @see $professor_model - объект логики, связанный с преподавателями
+     * @see $timetable_model - объект логики, связанный с рассписанием
+     * @see $list_group_model - объект логики, связанный с группами
+     * @see $notification_model - объект логики, связанный с уведомлениями
+     * @see $depart_list - объект логики, связанный с кафедрами/отделениями
      * @see $auth_model - объект модели авторизации
-     * @see $view - объект вида
      * @see $model - объект базовой модели
      */
-    function __construct()
-    {
-        $this->model = new Model();
+    function __construct(){
+        $this->professor_model = new Models\Model_Professors();
+        $this->timetable_model = new Models\Model_TimeTable();
+        $this->list_group_model = new Models\Model_List_Groups();
+        $this->notification_model = new Models\Model_Notifications();
+        $this->depart_list = new Models\Model_List_Departments();
         $this->auth_model= new Models\Base\Model_Auth();
         $this->view = new View();
     }
 
     /**
-     * Удаление из строки спецсимволов, тэгов и т.д.
+     * Удаление из переменной спецсимволов, тэгов и т.д.
      * @param string $variable входное значение строки
      * @return string $result результат преобразования
      */
-    protected function security_variable($variable){
-        $result=htmlentities($variable);
-        $result=strip_tags($result);
+    protected function security_variable($variable)
+    {
+        $result = htmlentities($variable);
+        $result = strip_tags($result);
         return $result;
     }
 
@@ -67,7 +91,7 @@ class Controller {
         foreach ($array as &$value){
             if (is_array($value))
                 $value=$this->secure_array($value);
-            else{
+            else {
                 $value=htmlentities($value);
                 $value=strip_tags($value);
             }
@@ -94,14 +118,4 @@ class Controller {
         else
             return false;
     }
-
-    /**
-     * Выводит json строку со временем на сервере
-     * string now_time
-     */
-    public function action_get_time(){
-        $date['now_time'] = date("U");
-        $this->view->output_json($date);
-    }
-
 }

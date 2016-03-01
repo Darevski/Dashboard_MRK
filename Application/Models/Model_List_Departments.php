@@ -23,6 +23,7 @@ class Model_List_Departments extends Model_Dashboard
     public function get_faculty_list(){
         $query = "SELECT faculty_list.name,code FROM faculty_list";
         $result=$this->database->getAll($query);
+        $result['state']='success';
         return $result;
     }
 
@@ -33,6 +34,7 @@ class Model_List_Departments extends Model_Dashboard
     public function get_departments_list(){
         $query = "SELECT id,depart_name FROM departments_list";
         $result=$this->database->getAll($query);
+        $result['state']='success';
         return $result;
     }
 
@@ -43,6 +45,7 @@ class Model_List_Departments extends Model_Dashboard
     public function get_specializations_list(){
         $query = "SELECT specialization_list.name,code FROM specialization_list";
         $result=$this->database->getAll($query);
+        $result['state']='success';
         return $result;
     }
 

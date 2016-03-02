@@ -17,9 +17,29 @@ $loader->addNamespace('Application\Controllers',$_SERVER['DOCUMENT_ROOT'].'/Appl
 $loader->addNamespace('Application\Exceptions',$_SERVER['DOCUMENT_ROOT'].'/Application/Exceptions');
 $loader->addNamespace('Application\Models',$_SERVER['DOCUMENT_ROOT'].'/Application/Models');
 
+
+$router = new Core\AltoRouter();
+
+$router->map('GET|POST','/', 'home');
+$router->map('GET|POST','/[a:controller]/[a:action]','auth');
+$router->addRoutes(array(
+    array('GET|POST','/admin/[a:controller]/[a:action]', 'admin'),
+    array('GET|POST','/admin/','admin#start'),
+    array('GET|POST','/admin','admin#start')
+));
+
+$router->addRoutes(array(
+    array('GET|POST','/dashboard/[a:controller]/[a:action]','dashboard'),
+    array('GET|POST','/dashboard/','dashboard#start'),
+    array('GET|POST','/dashboard','dashboard#start')
+));
+// Просмотр текущего запроса
+
+$route_result = $router->match();
+
 Try{
     $Route = new Core\Route();
-    $Route->start();
+    $Route->start($route_result);
 }
 catch (Exceptions\UFO_Except $error){
     $error->classification_error($error);

@@ -7,9 +7,7 @@
  * @author Darevski
  */
 namespace Application\Core;
-use Application\Controllers;
 use Application\Exceptions;
-
 /**
  * Класс преобразования URL запросов в управляющие команды
  *
@@ -18,6 +16,16 @@ use Application\Exceptions;
  */
 class Route
 {
+    /**
+     * Определяет директорию расположения контроллеров для динамического создания объектов контроллеров
+     */
+    const namespace_controllers = 'Application\Controllers\\';
+
+    /**
+     * Префикс имени класса контроллеров
+     */
+    const prefix_controller = 'Controller_';
+
     /**
      * Переменная храняшая имя контролера
      * @var string $controller_name
@@ -31,44 +39,55 @@ class Route
     private $action_name ;
 
     /**
-     * Получение имени контроллера и его действия из URL запроса
-     * @throws Exceptions\UFO_Except при отсутсвии контроллера указанного в URL вбрасывается исключение
-     * отсутсвия страницы (404)
+     * Создает объект запрошенного пользователем контроллера и вызывает его действие
+     * @param array mixed информация об контроллере и экшене из запроса пользователя
+     * @throws Exceptions\UFO_Except при отсутсвии контроллера(метода указанного в контроллере) указанного в запросе
+     * вбрасывается исключение отсутсвия страницы (404)
      */
-    function start()
+    function start($route_result)
     {
-        //Установка значений контроллера и действия по умолчанию
-        $this->starting_Values();
-        // Разбор Запроса
-        $this->Exploding_URI();
+        if (!isset($route_result['target']))
+            throw new Exceptions\UFO_Except('Роутинг не обнаружил совпадений',404);
 
+        // Установка именов контроллеров и действий полученных из запроса
+        if (isset($route_result['params']['controller']) && isset($route_result['params']['action'])){
+            // Выбор директории расположения контроллеров для Администратора и обычного пользователя
+            if ($route_result['target'] == 'admin')
+                $namespace = self::namespace_controllers.'Admin\\';
+            else if ($route_result['target'] == 'dashboard')
+                $namespace = self::namespace_controllers.'Dashboard\\';
+            else
+                $namespace = self::namespace_controllers;
 
-        // Добавление префиксов
-        $controller_name = 'Controller_'.$this->correct_name($this->controller_name);;
-        $action_name = 'action_'.$this-> action_name;
-
-
-        // Проверка на наличие файла контроллера
-        $controller_file = $controller_name.'.php';
-        $controller_path = "Application/Controllers/".$controller_file;
-
-        if(file_exists($controller_path))
-            require_once "Application/Controllers/".$controller_file;
+            $this->controller_name=$namespace.self::prefix_controller.$route_result['params']['controller'];
+            $this->action_name=$route_result['params']['action'];
+        }
+        // При отсутсвии контроллеров в запросе и при обращение к модулям администратора или рассписания
+        // происходит установка контроллеров указанных в конфиге роутинга
+        else if($route_result['target'] !== 'home'){
+            $control_info= explode('#',$route_result['target']);
+            $this->controller_name =self::namespace_controllers.self::prefix_controller.$control_info[0];
+            $this->action_name = $control_info[1];
+        }
+        // При обращении к корню сайта, для контроллера устанавливаются значения на оснавании привелегий пользователя
         else
-            throw new Exceptions\UFO_Except("Controller $controller_name does not exist", 404);
+            $this->starting_Values();
 
 
-        // Создание Контроллера
-        $controller_name = 'Application\\Controllers\\'.$controller_name;
-        $controller = new $controller_name;
-
-        $action = $action_name;
-        // Проверка наличия в контроллере экшена
-        if(method_exists($controller, $action))
-            // Запуск действия контроллера при его наличии
-            $controller->$action();
+        // Преобразование пространства имен в путь до файла
+        $file = preg_replace('/\\\/','/',$this->controller_name).'.php';
+        //Проверка на существование файла класса
+        if (file_exists($file)){
+            $controller = new $this->controller_name;
+            $action = 'action_'.$this->action_name;
+            // При существовании метода в объекте происходит его вызов, при отсутствии происходит вброс исключения
+            if (method_exists($controller,$action))
+                $controller->$action();
+            else
+                throw new Exceptions\UFO_Except ("Метод $action не существует в классе $this->controller_name",404);
+        }
         else
-            throw new Exceptions\UFO_Except("Action $action in $controller_name controller does not exist",404);
+            throw new Exceptions\UFO_Except("Класc $this->controller_name не существует",404);
     }
 
     /**
@@ -81,53 +100,17 @@ class Route
         $controller = new Controller();
         //Получение привелегии пользователя
         $auth_state=$controller->state_authorization();
+        $namespace = self::namespace_controllers.self::prefix_controller;
         $this->action_name = 'start';
         if ($auth_state == false)
-            $this->controller_name = 'Dashboard';
+            $this->controller_name = $namespace.'Dashboard';
         else
             switch ($auth_state){
                 case 'Admin':
-                    $this->controller_name = 'Admin';
+                    $this->controller_name = $namespace.'Admin';
                     break;
                 default:
-                    $this->controller_name = 'Dashboard';
+                    $this->controller_name = $namespace.'Dashboard';
             }
     }
-
-    /**
-     * Разбор URI запроса на имя контроллера и действия
-     * @see $controller_name устанавливаемое свойство - имя контролера
-     * @see $action_name устанавливаемое свойсво - действие контроллера
-     * @throws Exceptions\UFO_Except при обращениии к несуществующему файлу вброс 404 исключения
-     */
-    private function Exploding_URI(){
-
-        if (preg_match('/\.\w+$/',$_SERVER['REQUEST_URI']))
-            //Вброс исключения при обращениии к несуществующим файлам
-            throw new Exceptions\UFO_Except("File is not exist",404);
-
-        $routes = explode('/', $_SERVER['REQUEST_URI']);
-        // Имя контроллера
-        if ( !empty($routes[1]) )
-            $this->controller_name = $routes[1];
-        // Экшен
-        if ( !empty($routes[2]) )
-            $this->action_name = $routes[2];
-    }
-
-    /**
-     * Преобразование строки к виду Большаябукваоставшийсямелкийтекст
-     * @param string $name
-     * @return string
-     */
-    private function correct_name($name){
-        $first_letter = substr($name,0,1);
-        $remaining_letters = substr($name,1,strlen($name)-1);
-        $first_letter=strtoupper($first_letter);
-        $remaining_letters= strtolower($remaining_letters);
-        return $first_letter.$remaining_letters;
-    }
-
-
-
 }

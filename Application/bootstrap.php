@@ -21,7 +21,7 @@ $loader->addNamespace('Application\Models',$_SERVER['DOCUMENT_ROOT'].'/Applicati
 $router = new Core\AltoRouter();
 
 $router->map('GET|POST','/', 'home');
-$router->map('GET|POST','/[a:controller]/[a:action]','auth');
+$router->map('GET|POST','/[a:controller]/[a:action]','service');
 $router->addRoutes(array(
     array('GET|POST','/admin/[a:controller]/[a:action]', 'admin'),
     array('GET|POST','/admin/','admin#start'),

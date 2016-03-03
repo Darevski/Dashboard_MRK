@@ -26,6 +26,7 @@ class Route
      */
     const prefix_controller = 'Controller_';
 
+    const prefix_action = 'action_';
     /**
      * Переменная храняшая имя контролера
      * @var string $controller_name
@@ -79,7 +80,7 @@ class Route
         //Проверка на существование файла класса
         if (file_exists($file)){
             $controller = new $this->controller_name;
-            $action = 'action_'.$this->action_name;
+            $action = self::prefix_action.$this->action_name;
             // При существовании метода в объекте происходит его вызов, при отсутствии происходит вброс исключения
             if (method_exists($controller,$action))
                 $controller->$action();
@@ -103,14 +104,14 @@ class Route
         $namespace = self::namespace_controllers.self::prefix_controller;
         $this->action_name = 'start';
         if ($auth_state == false)
-            $this->controller_name = $namespace.'Dashboard';
+            $this->controller_name = $namespace.'dashboard';
         else
             switch ($auth_state){
                 case 'Admin':
-                    $this->controller_name = $namespace.'Admin';
+                    $this->controller_name = $namespace.'admin';
                     break;
                 default:
-                    $this->controller_name = $namespace.'Dashboard';
+                    $this->controller_name = $namespace.'dashboard';
             }
     }
 }

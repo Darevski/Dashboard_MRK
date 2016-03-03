@@ -35,7 +35,7 @@ class SQL_Except extends Main_Except
 
         // "Видимый" ответ сервера при дебаге
         if (Config::get_instance()->get_build()['debug']){
-            $data['display_view'] = true;
+            $data['display_view'] = 'block';
             // При отладочной версии приложения вывод сообщения об ошибке
             $data['debug_message'] = self::getMessage();
         }

@@ -9,6 +9,7 @@
 namespace Application\Models;
 
 use Application\Models\Base\Model_Dashboard;
+use Application\Exceptions\Models_Processing_Except;
 /**
  * Класс логики связанный со списком групп, его изменение и вывод.
  * Class Model_ListGroups
@@ -18,27 +19,30 @@ use Application\Models\Base\Model_Dashboard;
 class Model_List_Groups extends Model_Dashboard
 {
     /**
+     * DO NOT USE not implemented, crashing application
      * Вносит в список групп групу с указанным курсом
      * @param integer $grade - курс
      * @param integer $group_number - номер групы
      *
      * @return mixed array string state:success||fail , string message
+     * @throws Models_Processing_Except
      */
     public function group_add($grade,$group_number){
-        // Проверка на уже записанную группу
-        $search_query = "SELECT * FROM groups_list WHERE group_number = ?i";
-        $result_of_search = $this->database->getAll($search_query,$group_number);
 
-        if (count($result_of_search)==0){
-            $query = "INSERT INTO groups_list SET grade=?i,group_number=?i";
-            $this->database->query($query,$grade,$group_number);
-            $result["state"] = "success";
-        }
+        if (!is_int($group_number))
+            throw new Models_Processing_Except("Номер группы - $group_number не является числом");
 
-        else{
-            $result["state"] = "fail";
-            $result["message"] = "Группа №$group_number уже существует в списке";
-        }
+        if (!is_int($grade))
+            throw new Models_Processing_Except("Номер курса $grade не является числом");
+
+        // проверка на ввод уже существующей группы
+        if ($this->isset_group($group_number))
+            throw new Models_Processing_Except("Группа - $group_number уже существует");
+
+        $query = "INSERT INTO groups_list SET grade=?i,group_number=?i";
+        $this->database->query($query,$grade,$group_number);
+        $result["state"] = "success";
+
         return $result;
     }
 

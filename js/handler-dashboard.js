@@ -14,18 +14,17 @@ function CHECK_Shedule()
 			{
 				var req = {};
 				req.group_number = getVar("group");
-            	NewXHR("/dashboard/timetable/get_actual","json_input=" + JSON.stringify(req), function(ResponseText) {
-                if (ResponseText.check != false) {
-                    var answer = JSON.parse(ResponseText);
-                        if (answer.md5 != getVar("shedule"))
-                            LOAD_Shedule(answer);
-                }
-                else
-                    {
-                        //exception handler
-                        CreateEx("Обнаружена ошибка: " + ResponseText.status);
-                    }
-            });
+				var query = new Request("/dashboard/timetable/get_actual", req);
+				query.callback = function (Response) {
+					if (Response.state != "fail") {
+						var answer = JSON.parse(Response);
+							if (answer.md5 != getVar("shedule"))
+								LOAD_Shedule(answer);
+					}
+					else
+						CreateEx("Обнаружена ошибка: " + Response.message);
+            	}
+				query.do();
 			}
 	if (!getVar("group"))
 		GroupChoice();
@@ -171,75 +170,73 @@ function LOAD_Professor_BASIC(lesson_num)
 								var req = {};
 								req.group_number = getVar("group");
 								req.lesson_number = lesson_num;
-                            NewXHR("/dashboard/timetable/get_lesson_info","json_input=" + JSON.stringify(req), function(ResponseText) {
-                                if (ResponseText.check != false) {
-                                    var answer = JSON.parse(ResponseText);
-                                    var div_info = document.createElement("div");
-                                    div_info.id = "professor-info";
-                                    var professor_list = "";
-                                    if (answer.multiple)
-                                        div_info.style.width = "100%";
-                                    if (answer.multiple)
-                                        for (var i=0; i< answer.professor.length; i++)
-                                            {
-                                                professor_list += '<a onclick="LOAD_Professors(' + answer.professor_id[i] + ')">' + answer.professor[i] + '</a>';
-                                                if (i + 1 != answer.professor.length)
-                                                    professor_list += ", ";
-                                            }
-                                    else
-                                        professor_list = answer.professor;
-                                    console.log(professor_list);
-                                    div_info.appendChild(CreateElem("div", "professor-name", null, null, professor_list));
-                                    div_info.appendChild(CreateElem("div", "professor-department", null, null, answer.department));
-                                    var pdiv = CreateElem("div", "pdiv", null, null, null);
+								var query = new Request("/dashboard/timetable/get_lesson_info", req);
+								query.callback = function (Response) {
+									var answer = JSON.parse(Response);
+									if (answer.state != "fail")
+										{
+											var div_info = document.createElement("div");
+											div_info.id = "professor-info";
+											var professor_list = "";
+											if (answer.multiple)
+												div_info.style.width = "100%";
+											if (answer.multiple)
+												for (var i=0; i< answer.professor.length; i++)
+													{
+														professor_list += '<a onclick="LOAD_Professors(' + answer.professor_id[i] + ')">' + answer.professor[i] + '</a>';
+														if (i + 1 != answer.professor.length)
+															professor_list += ", ";
+													}
+											else
+												professor_list = answer.professor;
+											div_info.appendChild(CreateElem("div", "professor-name", null, null, professor_list));
+											div_info.appendChild(CreateElem("div", "professor-department", null, null, answer.department));
+											var pdiv = CreateElem("div", "pdiv", null, null, null);
 
-                                    var classroom_list = "";
-                                    if (answer.multiple)
-                                        for (var i=0; i< answer.classroom.length; i++)
-                                            {
-                                                classroom_list += answer.classroom[i];
-                                                if (i + 1 != answer.classroom.length)
-                                                    classroom_list += ", ";
-                                            }
-                                    else
-                                        {
-                                            if (answer.classroom)
-                                                classroom_list = answer.classroom;
-                                        }
-                                    console.log(classroom_list);
-                                    pdiv.appendChild(CreateElem("p", null, null, null, answer.lesson_name));
-                                    div_info.appendChild(CreateElem("div", "time", null, null, answer.time));
-                                    div_info.appendChild(pdiv);
-                                    div_info.appendChild(CreateElem("div", "classroom", null, null, "Аудитории: " +  classroom_list));
-                                    var photo = CreateElem("div", "professor-photo", null, "LOAD_Professors(" + answer.professor_id + ")", null);
-                                    
-                                    if (!answer.multiple)
-                                        {
-                                            var img = document.createElement("img");
-                                            img.setAttribute("src", answer.photo_url);
-                                            photo.appendChild(img);
-                                        }
-                                    setTimeout(function()
-                                              {
-                                        block.appendChild(div_info);
-                                        if (!answer.multiple)
-                                            block.appendChild(photo);
-                                        loader.style.opacity = "";
-                                        if (professor_loader_start == null)
-                                            setTimeout(function() { delVar("inprogress_basic"); loader.remove(); }, 500);
-                                        else
-                                            {
-                                                professor_loader_start.style.opacity = "";
-                                                setTimeout(function() { delVar("inprogress_basic"); professor_loader_start.remove(); professor_loader_start = null; }, 500);
-                                            }
-                                    }, 600);
-                                }
-                                else
-                                    {
-                                        //exception handler
-                                        CreateEx("Обнаружена ошибка: " + ResponseText.status);
-                                    }
-                            });
+											var classroom_list = "";
+											if (answer.multiple)
+												for (var i=0; i< answer.classroom.length; i++)
+													{
+														classroom_list += answer.classroom[i];
+														if (i + 1 != answer.classroom.length)
+															classroom_list += ", ";
+													}
+											else
+												{
+													if (answer.classroom)
+														classroom_list = answer.classroom;
+												}
+											pdiv.appendChild(CreateElem("p", null, null, null, answer.lesson_name));
+											div_info.appendChild(CreateElem("div", "time", null, null, answer.time));
+											div_info.appendChild(pdiv);
+											div_info.appendChild(CreateElem("div", "classroom", null, null, "Аудитории: " +  classroom_list));
+											var photo = CreateElem("div", "professor-photo", null, "LOAD_Professors(" + answer.professor_id + ")", null);
+
+											if (!answer.multiple)
+												{
+													var img = document.createElement("img");
+													img.setAttribute("src", answer.photo_url);
+													photo.appendChild(img);
+												}
+											setTimeout(function()
+													  {
+												block.appendChild(div_info);
+												if (!answer.multiple)
+													block.appendChild(photo);
+												loader.style.opacity = "";
+												if (professor_loader_start == null)
+													setTimeout(function() { delVar("inprogress_basic"); loader.remove(); }, 500);
+												else
+													{
+														professor_loader_start.style.opacity = "";
+														setTimeout(function() { delVar("inprogress_basic"); professor_loader_start.remove(); professor_loader_start = null; }, 500);
+													}
+											}, 600);
+										}
+									else
+										CreateEx(answer.message);
+                            }
+							query.do();
                             }, 600);
                         }, 600);
 					}, 500);
@@ -260,19 +257,18 @@ function CHECK_alerts()
 			{
 				var req = {};
 				req.group_number = getVar("group");
-            	NewXHR("/dashboard/notifications/get_for_group","json_input=" + JSON.stringify(req), function(ResponseText) {
-                if (ResponseText.check != false)
-                    {
-                        var answer = JSON.parse(ResponseText);
-                        if (answer.md5 != getVar("alerts"))
-                            LOAD_alerts(answer);
-                    }
-                else
-                    {
-                        //exception handler
-                        CreateEx("Обнаружена ошибка: " + ResponseText.status);
-                    }
-            });
+				var query = new Request("/dashboard/notifications/get_for_group", req);
+				query.callback = function (Response) {
+					var answer = JSON.parse(Response);
+					if (answer.state != "fail")
+						{
+							if (answer.md5 != getVar("alerts"))
+								LOAD_alerts(answer);
+						}
+					else
+							CreateEx("Обнаружена ошибка: " + answer.message);
+            	}
+				query.do();
 			}
 	if (!getVar("group"))
 		GroupChoice();
@@ -340,38 +336,35 @@ Output:
 function GET_time()
 {
     var Date_now = new Date();
-    NewXHR("/service/get_time", null, function(ResponseText) {
-        if (ResponseText.check != false)
-            {
-                var answer = JSON.parse(ResponseText);
-                TIME_difference = answer.now_time - ((Date_now.getTime() - Date_now.getMilliseconds()) / 1000);                
-            }
-        else
-            {
-                //exception handler
-                CreateEx("Обнаружена ошибка: " + ResponseText.status);
-            } 
-        var time_toset = Date_now.getTime() + TIME_difference;
-        Date_now.setTime(time_toset);
-        var str_time = Date_now.toTimeString();
-        document.getElementById("time-now").innerHTML = "";
-        for (var i =0; i<5; i++)
-            document.getElementById("time-now").innerHTML += str_time[i];
-    	var DASHBOARD_TIME = setInterval(function () {
+	var query = new Request("/service/get_time");
+	query.callback = function (Response) {
+		var answer = JSON.parse(Response);
+		if (answer.state != "fail")
+				TIME_difference = answer.now_time - ((Date_now.getTime() - Date_now.getMilliseconds()) / 1000);
+		else
+			CreateEx(answer.message);
+		var time_toset = Date_now.getTime() + TIME_difference;
+		Date_now.setTime(time_toset);
+		var str_time = Date_now.toTimeString();
+		document.getElementById("time-now").innerHTML = "";
+		for (var i =0; i<5; i++)
+			document.getElementById("time-now").innerHTML += str_time[i];
+		var DASHBOARD_TIME = setInterval(function () {
 		if (CHECK_stop)
-                clearInterval(DASHBOARD_TIME);
-        else
-            {
-                var Date_now = new Date();
-                var time_toset = Date_now.getTime() + TIME_difference;
-                Date_now.setTime(time_toset);
-                var str_time = Date_now.toTimeString();
-                document.getElementById("time-now").innerHTML = "";
-                for (var i =0; i<5; i++)
-                    document.getElementById("time-now").innerHTML += str_time[i];
-            }
-	}, 20000);
-    });
+				clearInterval(DASHBOARD_TIME);
+		else
+			{
+				var Date_now = new Date();
+				var time_toset = Date_now.getTime() + TIME_difference;
+				Date_now.setTime(time_toset);
+				var str_time = Date_now.toTimeString();
+				document.getElementById("time-now").innerHTML = "";
+				for (var i =0; i<5; i++)
+					document.getElementById("time-now").innerHTML += str_time[i];
+			}
+		}, 10000);
+    }
+	query.do();
 }
 
 /*** --- Выполняет загрузку информации в скелет главного меню, запускает циклические проверки
@@ -435,10 +428,11 @@ function LOAD_fullShedule()
 		setTimeout(function() {
 			var req = {};
 			req.group_number = getVar("group");
-			NewXHR("/dashboard/timetable/get_week", "json_input=" + JSON.stringify(req), function (ResponseText) {
-                if (ResponseText.check != false)
+			var query = new Request("/dashboard/timetable/get_week", req);
+			query.callback = function (Response) {
+				var answer = JSON.parse(Response);
+                if (answer.state != "fail")
                     {
-                        var answer = JSON.parse(ResponseText);
                         var dashmin = Math.min(answer.even.min,answer.uneven.min);
                         var dashmax = Math.max(answer.even.max,answer.uneven.max);
 						var div_button = CreateElem("div", "button-close", null, "Dashboard_Load()", null); //!!!!!!
@@ -531,12 +525,8 @@ function LOAD_fullShedule()
                             body.style.opacity = "";
                         }, 600);
                     }
-                else
-                    {
-                        //exception handler
-                        CreateEx("Обнаружена ошибка: " + ResponseText.status);
-                    }
-			});
+			}
+		query.do();
 		}, 600);
 	} ,600);
 }
@@ -566,9 +556,10 @@ function LOAD_Professors(id)
             screen.style.overflowY = "hidden";
             var div_left = CreateElem("div", "left-side");
             var temp_ul = CreateElem("ul");
-            NewXHR("/dashboard/professors/get_list", null, function (ResponseText){
-                if (ResponseText.check != false) {
-                    var answer = JSON.parse(ResponseText);
+			var query = new Request("/dashboard/professors/get_list");
+			query.callback = function (Response) {
+				var answer = JSON.parse(Response);
+                if (answer.state != "fail") {
                     var i =0;
                     while (answer[i] != null)
                         {
@@ -601,12 +592,8 @@ function LOAD_Professors(id)
                         },600);
                     },600);
                 }
-                else
-                    {
-                        //exception handler
-                        CreateEx("Обнаружена ошибка: " + ResponseText.status);
-                    }
-            });
+            }
+		query.do();
 	   }, 600);
 	}, 600);
 }
@@ -635,11 +622,12 @@ function LOAD_Professor(id)
 				loader.style.opacity = "1";
 				var req = {};
 				req.professor_id = id;
-				NewXHR("/dashboard/professors/get_professor_state", "json_input=" + JSON.stringify(req), function (ResponseText) {
-                    if (ResponseText.check != false)
+				var query1 = new Request("/dashboard/professors/get_professor_state", req);
+				query1.callback = function (Response) {
+					var answer = JSON.parse(Response);
+                    if (answer.state != "fail")
 					{
                         setTimeout(function () {
-							var answer = JSON.parse(ResponseText);
 
 							var teacher_photo = CreateElem("div", "teacher-photo");
 
@@ -654,10 +642,12 @@ function LOAD_Professor(id)
 							teacher_info.appendChild(CreateElem("p", "teacher-now", null, null, "Апанасевич С.А. сегодня не преподает"));
 							var req = {};
 							req.professor_id = id;
-							NewXHR("/dashboard/professors/get_professor_timetable", "json_input=" + JSON.stringify(req), function (ResponseText) {
-								if (ResponseText.check != false) {
+							var query2 = new Request("/dashboard/professors/get_professor_timetable", req);
+							query2.callback = function (Response) {
+								answer = JSON.parse(Response);
+								if (answer.state != "fail")
+								{
 
-									answer = JSON.parse(ResponseText);
 									var dashmin = Math.min(answer.even.min,answer.uneven.min);
 									var dashmax = Math.max(answer.even.max,answer.uneven.max);
 									
@@ -741,21 +731,13 @@ function LOAD_Professor(id)
 										block.style.opacity = "";
 										delVar("inprogress_professor");
 									}, 600);
+								}
 							}
-						   else
-						   {
-								//exception handler
-								CreateEx("Обнаружена ошибка: " + ResponseText.status);
-						   }
-							});
+							query2.do();
                         }, 600);
                     }
-                    else
-                        {
-                            //exception handler
-                            CreateEx("Обнаружена ошибка: " + ResponseText.status);
-                        }
-				});
+				}
+			query1.do();
 			},600);
 		}
 }
@@ -780,18 +762,12 @@ function AuthLoad()
 		body.appendChild(loader);
 		body.style.opacity = "";
 		setTimeout(function() {
-            NewXHR("/Application/Views/Skeletons/Main_Auth.html", null, function (ResponseText) {
-                if (ResponseText.check != false)
-                    {
-                        body.style.opacity = "0";
-                        setTimeout(function () { loader.remove(); body.innerHTML = ResponseText; body.style.opacity = ""; }, 600);
-                    }
-                else
-                    {
-                        //exception handler
-                        CreateEx("Обнаружена ошибка: " + ResponseText.status);
-                    }
-			});
+			var query = new Request("/Application/Views/Skeletons/Main_Auth.html");
+			query.callback = function (Response) {
+				body.style.opacity = "0";
+				setTimeout(function () { loader.remove(); body.innerHTML = Response; body.style.opacity = ""; }, 600);
+			}
+			query.do();
 		}, 600);
 	} ,600);
 }
@@ -807,30 +783,21 @@ function AuthTry()
     if (!getVar("inprogress_Auth"))
         {
             setVar("inprogress_Auth", 1);
-            NewXHR("service/authorization","login=" + encodeURIComponent(document.getElementById("Auth-login").value) + '&password=' + encodeURIComponent(document.getElementById("Auth-password").value), function (ResponseText) {
-                delVar("inprogress_Auth")
-                if (ResponseText.check != false) {
-					if (ResponseText == "")
-							document.getElementsByTagName("form")[0].submit();
-                        else
-                            {
-                                CreateEx("Неопознанная ошибка ответа");
-                            }
-                    }
-                else
-                    {
-                        if (ResponseText.status == 403)
-                            {
-                                var block = document.getElementById("AuthAnswer");
-                                block.innerHTML = "Неверные данные";
-                                block.style.marginTop = "0px";
-                                setTimeout(function () { block.style.marginTop = ""; setTimeout(function() { block.innerHTML = ""; }, 500); }, 2000);
-                            }
-                        else
-                            {
-                                CreateEx("Ошибка подключения");
-                            }
-                    }
-            });
+			var query = new Request("service/authorization");
+			query.body = "login=" + encodeURIComponent(document.getElementById("Auth-login").value) + "&password=" + encodeURIComponent(document.getElementById("Auth-password").value);
+			query.noJSON = true;
+            query.callback = function (Response) {
+                delVar("inprogress_Auth");
+				if (Response == "")
+						document.getElementsByTagName("form")[0].submit();
+					else
+						{
+							var block = document.getElementById("AuthAnswer");
+							block.innerHTML = "Неверные данные";
+							block.style.marginTop = "0px";
+							setTimeout(function () { block.style.marginTop = ""; setTimeout(function() { block.innerHTML = ""; }, 500); }, 2000);
+						}
+			}
+			query.do();
         }
 }

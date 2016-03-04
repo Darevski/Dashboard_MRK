@@ -12,24 +12,19 @@ function LOAD_SkeletonsFullscreen(route, callback)
         document.body.appendChild(loader);
 		loader.style.opacity = "1";
 		setTimeout(function () {
-			NewXHR(route, null, function (data){
-				if (data.status != "fail")
-					{
+			var query = new Request(route);
+			query.callback = function (Response) {
 						loader.style.opacity = "";
-                        body.style.opacity = "0";
+						body.style.opacity = "0";
 						setTimeout(function () {
-                            body.style.opacity = "";
-							body.innerHTML = data;							
+							body.style.opacity = "";
+							body.innerHTML = Response;							
 							loader.remove();
 							if ((callback != undefined) || (callback != null))
 								callback();
 						}, 600);
-					}
-				else
-					{
-						//exception handler
-						CreateEx(data.message);
-					}});
+			}
+			query.do();
 		}, 600);
 	}, 600);	
 }
@@ -116,23 +111,25 @@ function CreateGroup()
             group.group_number = document.getElementsByName("number")[0].value;
             group.grade = document.getElementsByName("grade")[0].value;
             try {
-            NewXHR("/Admin/add_group", "json_input=" + JSON.stringify(group), function(ResponseText){
-                loader.style.opacity = "";
-                try {
-                    var answer = JSON.parse(ResponseText);
-                    setTimeout(function () {
-                        loader.remove();
-                        if (answer.state == "success")
-                            CreateEx("Группа успешно создана!");
-                        else
-                            CreateEx("Произошла ошибка:" + answer.message);
-                    }, 500);
-                }
-                catch (ex)
-                    {
-                        setTimeout(function () { loader.remove(); CreateEx("Ошибка: " + ex.message); }, 500);
-                    }
-            });
+				var query = new Request("/Admin/add_group", group);
+				query.callback = function (Response) {
+                	loader.style.opacity = "";
+					try {
+						var answer = JSON.parse(ResponseText);
+						setTimeout(function () {
+							loader.remove();
+							if (answer.state == "success")
+								CreateEx("Группа успешно создана!");
+							else
+								CreateEx("Произошла ошибка:" + answer.message);
+						}, 500);
+					}
+					catch (ex)
+						{
+							setTimeout(function () { loader.remove(); CreateEx("Ошибка: " + ex.message); }, 500);
+						}
+				}
+				query.do();
             }
             catch (ex)
                 {
@@ -148,7 +145,8 @@ function CreateGroup()
 function LOAD_Message()
 {
     LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Message.html", function () {
-		NewXHR("/dashboard/units/get_faculty_list", null, function (Response){
+		var query1 = new Request("/dashboard/units/get_faculty_list");
+		query1.callback = function (Response) {
 			try {
 					var answer = JSON.parse(Response);
 					if (answer.state != "fail")
@@ -177,8 +175,10 @@ function LOAD_Message()
 				{
 					CreateEx("Ошибка" + ex.message);
 				}
-		});
-		NewXHR("/dashboard/units/get_spec_list", null, function (Response){
+		}
+		query1.do();
+		var query2 = new Request("/dashboard/units/get_spec_list");
+		query2.callback = function (Response) {
 			try {
 					var answer = JSON.parse(Response);
 				if (answer.state != "fail")
@@ -207,7 +207,8 @@ function LOAD_Message()
 				{
 					CreateEx("Ошибка" + ex.message);
 				}
-		});
+		}
+		query2.do();
         LOAD_whom_sent();
 	});
 }
@@ -222,7 +223,8 @@ function DELETE_message(ident, el)
 {
     var req = {};
     req.id = ident;
-    NewXHR("admin/notifications/delete", "json_input=" + JSON.stringify(req), function (Response) {
+	var query = new Request("/admin/notifications/delete", req);
+	query.callback = function (Response) {
         try
             {
                 var answer = JSON.parse(Response);
@@ -248,7 +250,8 @@ function DELETE_message(ident, el)
             {
                 CreateEx(ex.message);
             }
-    });
+	}
+	query.do();
 }
 function create_li_notification(input)
 {
@@ -363,7 +366,8 @@ function message_sort(str)
 function LOAD_Message_manager()
 {
 	try {
-    	NewXHR("/admin/notifications/get_active", null, function (Response) {
+		var query = new Request("/admin/notifications/get_active", req);
+		query.callback = function (Response) {
 			try {
 				var answer = JSON.parse(Response);
 				if (answer.state != "fail")
@@ -393,7 +397,8 @@ function LOAD_Message_manager()
 				{
 					CreateEx(ex.message);
 				}
-    	});
+		}
+		query.do();
 	}
 	catch (ex)
 		{
@@ -443,7 +448,8 @@ function SEND_message(options, text, number, callback)
 		{
 			req.parameters = options;
 			req.text = text;
-			NewXHR("/admin/notifications/add", "json_input=" + JSON.stringify(req), function(Response) {
+			var query = new Request("/admin/notifications/add", req);
+			query.callback = function (Response) {
 				try 
 					{
 						callback(JSON.parse(Response), number);
@@ -453,7 +459,8 @@ function SEND_message(options, text, number, callback)
 						answer.message = ex.message;
 						callback(answer, number);
 					}
-			});
+			}
+			query.do();
 		}
 }
 function LOAD_whom_sent()
@@ -479,7 +486,8 @@ function LOAD_whom_sent()
 	options.class = Result_find(document.getElementById("message-filter-after").getElementsByTagName("input"))
 	options.faculty = Result_find(document.getElementById("message-filter-department").children[1].getElementsByTagName("input"));
 	options.spec = Result_find(document.getElementById("message-filter-spec").children[1].getElementsByTagName("input"));
-  	NewXHR("/dashboard/groups/filter_apply", "json_input=" + JSON.stringify(options), function (Response) {
+	var query = new Request("/dashboard/groups/filter_apply", options);
+	query.callback = function (Response) {
 		try {
 			var answer = JSON.parse(Response);
 			if (answer.state != "fail")
@@ -507,8 +515,8 @@ function LOAD_whom_sent()
 				CreateEx(ex.message);
 				console.log(ex);
 			}
-    });
-
+	}
+	query.do();
 }
 function SEND_premessage_full()
 {
@@ -712,7 +720,8 @@ function SEND_message_small()
 }
 function LOAD_grouplist()
 {
-	NewXHR("URL_TO_LOAD_GROUP_LIST", null, function (Response){
+	var query = new Request("URL_TO_LOAD_GROUP_LIST");
+	query.callback = function (Response) {
 		try{
 			var answer = JSON.parse(Response);
 			if (answer.state != "fail")
@@ -730,14 +739,16 @@ function LOAD_grouplist()
 			{
 				CreateEx(ex.message);
 			}
-	});
+	}
+	query.do();
 }
 function LOAD_daylist()
 {
 	var req = {};
 	req.group = document.getElementById("swap-group-choice").dataset.group;
-	NewXHR("URL_TO_LOAD_DAY_LIST", "json_input=" + JSON.stringify(req), function (Response){
-		try{
+	var query = new Request("URL_TO_LOAD_DAY_LIST");
+	query.callback = function (Response) {
+		try {
 			var answer = JSON.parse(Response);
 			if (answer.status != "fail")
 				{
@@ -754,7 +765,8 @@ function LOAD_daylist()
 			{
 				CreateEx(ex.message);
 			}
-	});	
+	}
+	query.do();
 }
 function SET_group_from_list(group)
 {
@@ -768,7 +780,8 @@ function SET_day_from_list(day)
 }
 function LOAD_all_lessons()
 {
-	NewXHR("URL_TO_LOAD_ALL_LESSONS", null, function (Response) {
+	var query = new Request("URL_TO_LOAD_ALL_LESSONS");
+	query.callback = function (Response) {
 		var block = document.getElementById("lesson-list");
 		try{
 			var answer = JSON.parse(Response);
@@ -790,14 +803,16 @@ function LOAD_all_lessons()
 			{
 				CreateEx(ex.message);
 			}
-	});
+	}
+	query.do();
 }
 function LOAD_lessonlist()
 {
-	var body = {};
-	body.group = document.getElementById("swap-group-choice").dataset.group;
-	body.day = document.getElementById("swap-day-choice").dataset.day;
-	NewXHR("URL_TO_LOAD_LESSON_LIST", "json_input=" + JSON.stringify(body), function (Response) {
+	var req = {};
+	req.group = document.getElementById("swap-group-choice").dataset.group;
+	req.day = document.getElementById("swap-day-choice").dataset.day;
+	var query = new Request("URL_TO_LOAD_LESSON_LIST", req);
+	query.callback = function (Response) {
 		try{
 			var answer = JSON.parse(Response);
 			if (answer.state != "fail")
@@ -817,7 +832,8 @@ function LOAD_lessonlist()
 			{
 				CreateEx(ex.message);
 			}
-	});
+	}
+	query.do();
 }
 function SEND_swap()
 {
@@ -837,7 +853,8 @@ function SEND_swap()
 					{
 						req.new = document.getElementById("lesson-list").children[i].innerHTML;
 					}
-			NewXHR("URL_TO_SEND_SWAP", "json_input=" + JSON.stringify(req), function (Response) {
+			var query = new Request("URL_TO_SEND_SWAP", req);
+			query.callback = function (Response) {
 				loader.style.opacity = "";
 				setTimeout(function () {
 					loader.remove();
@@ -853,41 +870,44 @@ function SEND_swap()
 							CreateEx(ex.message);
 						}
 				}, 500);
-			});
+			}
+			query.do();
 		}, 500);
 	}, 10);
 }
 function LOAD_shedule_list()
 {
-	NewXHR("URL_TO_LOAD_LISTS_SHEDULE", null, function (Response) {
-	try {
-		var answer = JSON.parse(Response);
-		if (answer.state != "fail")
-			{
-				professorslist = [];
-				var dl = CreateElem("datalist", "lesson-list");
-				for (var i=0; i < answer.professors.length; i++)
-					{
-						professorslist[i] = {};
-						professorslist[i].name = answer.professors[i].name;
-						professorslist[i].id = answer.professors[i].id;
-						professorslist[i].lesson = answer.professors[i].lesson;
-						professorslist[i].lesson_id = answer.professors[i].lesson_id;
-						var el = CreateElem("option");
-						el.innerHTML = professorslist[i].lesson_id;
-						el.setAttribute("value", professorslist[i].lesson);
-						dl.appendChild(el);
-					}
-				document.body.appendChild(dl);
-			}
-		else
-			CreateEx(answer.message);
+	var query = new Request("URL_TO_LOAD_LISTS_SHEDULE");
+	query.callback = function (Response) {
+		try {
+			var answer = JSON.parse(Response);
+			if (answer.state != "fail")
+				{
+					professorslist = [];
+					var dl = CreateElem("datalist", "lesson-list");
+					for (var i=0; i < answer.professors.length; i++)
+						{
+							professorslist[i] = {};
+							professorslist[i].name = answer.professors[i].name;
+							professorslist[i].id = answer.professors[i].id;
+							professorslist[i].lesson = answer.professors[i].lesson;
+							professorslist[i].lesson_id = answer.professors[i].lesson_id;
+							var el = CreateElem("option");
+							el.innerHTML = professorslist[i].lesson_id;
+							el.setAttribute("value", professorslist[i].lesson);
+							dl.appendChild(el);
+						}
+					document.body.appendChild(dl);
+				}
+			else
+				CreateEx(answer.message);
+		}
+		catch (ex)
+		{
+			CreateEx(ex.message);
+		}
 	}
-	catch (ex)
-	{
-		CreateEx(ex.message);
-	}
-		   });
+	query.do();
 }
 function LOAD_shedule_edit(day, numerator)
 {
@@ -904,7 +924,8 @@ function LOAD_shedule_edit(day, numerator)
 			req.day = {};
 			req.day.number = day;
 			req.day.numerator = numerator;
-			NewXHR("URL_TO_GET_SHEDULE", "json_input=" +  JSON.stringify(req), function (Response) {
+			var query = new Request("URL_TO_GET_SHEDULE", req);
+			query.callback = function (Response) {
 				try{
 					var answer = JSON.parse(Response);
 					if (answer.state != "fail")
@@ -975,7 +996,8 @@ function LOAD_shedule_edit(day, numerator)
 						setTimeout(function () { loader.remove(); }, 500);						
 						CreateEx(ex.message);
 					}
-			});
+			}
+			query.do();
 		},500);
 	}, 10);
 }
@@ -1060,12 +1082,13 @@ function SEND_shedule_edit(numerator, day)
 							req.shedule[j].professor_id = Response;
 						});			
 					}
-				NewXHR("URL_TO_SEND_SHEDULE_EDIT", "json_input=" + JSON.stringify(req), function (ResponseText) {
+				var query = new Request("URL_TO_SEND_SHEDULE_EDIT", req);
+				query.callback = function (Response) {
 					loader.style.opacity = "";
 					setTimeout(function () {
 						loader.remove();
 						try{
-						var ans = ResponseText;
+						var ans = Response;
 						if (ans.success)
 							CreateEx("Успешно");
 						else
@@ -1076,7 +1099,8 @@ function SEND_shedule_edit(numerator, day)
 							CreateEx(ex.message);
 						}
 					}, 500);
-				});
+				}
+				query.do();
 			}
 			catch (ex)
 				{

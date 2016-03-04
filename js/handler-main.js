@@ -50,48 +50,59 @@ Input:
 Output:
 	CALLBACK - возвращение значения в функцию
 ***/
-function NewXHR(route, body, callback)
+function Request(route, body)
 {
-	var xhr = new XMLHttpRequest(); // creating XMLHttpRequest object
-	var ERROR_STATE = false; // setup error checker
-	xhr.open('POST', route, true); //configurating xhr
-	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'); //setting xhr headers
-	xhr.onreadystatechange = function() // listening
-	{
-		if (xhr.readyState == 4)
-			if (xhr.status == 200) // if all OK
-			{
-				var json_response = document.createElement("html");
-				json_response.innerHTML = xhr.responseText;
-				var answer = json_response.getElementsByTagName("json")[0];
-				if (answer != void(0))
-					callback(answer.innerHTML);
+	this.body = body;
+	this.route = route;
+	this.noJSON = false;
+	this.callback = function () {};
+}
+Request.prototype = {
+	do: function () {
+		var callback = this.callback;
+		var xhr = new XMLHttpRequest();
+		var already_processed = false;
+		xhr.open('POST', this.route, true);
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function()
+		{
+			if (xhr.readyState == 4)
+				if (xhr.status == 200)
+				{
+					var json_response = document.createElement("html");
+					json_response.innerHTML = xhr.responseText;
+					var answer = json_response.getElementsByTagName("json")[0];
+					if (answer != void(0))
+						callback(answer.innerHTML);
+					else
+						callback(xhr.responseText);
+				}
 				else
-					callback(xhr.responseText);
-			}
-			else
-			{
-                if (!ERROR_STATE)
-				   {
-						var json_response = document.createElement("html");
-						json_response.innerHTML = xhr.responseText;
-						var answer = json_response.getElementsByTagName("json")[0];
-						if (answer != void(0))
-							callback(answer.innerHTML);
-						else
-							{
-								var ans = {};
-								ans.check = false;
-								ans.status = xhr.status;
-								ans.readyState = xhr.readyState;
-								ans.ResponseText = xhr.responseText;
-								callback(ans);
-							}
-						ERROR_STATE = true;
-				   }
-			}
+				{
+					if (!already_processed)
+					   {
+							var json_response = document.createElement("html");
+							json_response.innerHTML = xhr.responseText;
+							var answer = json_response.getElementsByTagName("json")[0];
+							if (answer != void(0))
+								callback(answer.innerHTML);
+							else
+								{
+									var ans = {};
+									ans.state = "fail";
+									ans.message = xhr.responseText;
+									console.error = xhr.response;
+									callback(ans);
+								}
+							already_processed = true;
+					   }
+				}
+		}
+		if (this.noJSON)
+			xhr.send(this.body);
+		else
+			xhr.send("json_input=" + JSON.stringify(this.body));
 	}
-	xhr.send(body); // send request
 }
 
 /*** --- Удаляет сообщение JS
@@ -194,24 +205,20 @@ function Dashboard_Load()
 		body.style.opacity = "";
         document.body.appendChild(loader);
 		loader.style.opacity = "1";
-        NewXHR("/Application/Views/Skeletons/Main_Dashboard.html", null, function (data){
-            if (data.status != "fail")
-                setTimeout(function () {
-                    loader.style.opacity = "";
-                    body.style.opacity = "0";
-                    setTimeout(function () {
-                        loader.remove();
-                        body.style.opacity = "";
-                        body.innerHTML = data;
-                        Dashboard_CHECK();
-                    }, 600);
-                }, 600);
-            else
-                {
-                    //exception handler
-                    CreateEx(data.message);
-                }
-    });
+		var query = new Request("/Application/Views/Skeletons/Main_Dashboard.html");
+		query.callback = function (Response) {
+			setTimeout(function () {
+				loader.style.opacity = "";
+				body.style.opacity = "0";
+				setTimeout(function () {
+					loader.remove();
+					body.style.opacity = "";
+					body.innerHTML = Response;
+					Dashboard_CHECK();
+				}, 600);
+			}, 600);
+    	}
+		query.do();
 	}, 600);
 }
 /*** --- Генерирует меню выбора группы
@@ -232,56 +239,51 @@ function GroupChoice()
         setTimeout( function() {
             if (document.getElementById("main-container") != undefined)
                 document.getElementById("main-container").remove();
-            NewXHR("/dashboard/groups/get_list", null, function(ResponseText) {
-                if (ResponseText.status != "fail") {
-                    var answer = JSON.parse(ResponseText);
-                    var div_container = document.createElement("div");
-                    div_container.id = "container-gr";
-                    var div_header = document.createElement("div");
-                    div_header.id = "header";
-                    div_header.innerHTML = "Пожалуйста, выберите группу";
-                    div_container.appendChild(div_header);
-                    for (var i = 1; i <= 4; i++)
-                        {
-                            var div_list = document.createElement("div");
-                            div_list.className = "grade-list";
-                            var p_temp = document.createElement("p");
-                            p_temp.innerHTML = i + " курс";
-                            div_list.appendChild(p_temp);
-                            var ul_temp = document.createElement("ul");
-                            div_list.appendChild(ul_temp);
-                            if (answer[i] != null)
-                                {
-                                    var j = 0;
-                                    while (answer[i][j] != null)
-                                        {
-                                            var li_temp = document.createElement("li");
-                                            li_temp.innerHTML = answer[i][j];
-                                            ul_temp.appendChild(li_temp);
-                                            j++;
-                                        }
-                                }
-                            div_container.appendChild(div_list);
-                        }
-                    loader.style.opacity = "";
-                    setTimeout( function () {
-                        loader.remove();
-                        body.appendChild(div_container);
-                        for (var i =0; i< document.getElementsByTagName("ul").length; i++)
-                                document.getElementsByTagName("ul")[i].onclick = function(e) {
-                                            setTimeout(function() {
-                                                setVar("group", e.target.innerHTML);
-                                                setTimeout(Dashboard_Load(), 600);
-                                            }, 600);
-                                };
-                    }, 600);
-                }
-                else
-                    {
-                        //exception handler
-                        CreateEx(data.message);
-                    }
-            });
+			var query = new Request("/dashboard/groups/get_list");
+			query.callback = function (Response) {
+				var answer = JSON.parse(Response);
+				var div_container = document.createElement("div");
+				div_container.id = "container-gr";
+				var div_header = document.createElement("div");
+				div_header.id = "header";
+				div_header.innerHTML = "Пожалуйста, выберите группу";
+				div_container.appendChild(div_header);
+				for (var i = 1; i <= 4; i++)
+					{
+						var div_list = document.createElement("div");
+						div_list.className = "grade-list";
+						var p_temp = document.createElement("p");
+						p_temp.innerHTML = i + " курс";
+						div_list.appendChild(p_temp);
+						var ul_temp = document.createElement("ul");
+						div_list.appendChild(ul_temp);
+						if (answer[i] != null)
+							{
+								var j = 0;
+								while (answer[i][j] != null)
+									{
+										var li_temp = document.createElement("li");
+										li_temp.innerHTML = answer[i][j];
+										ul_temp.appendChild(li_temp);
+										j++;
+									}
+							}
+						div_container.appendChild(div_list);
+					}
+				loader.style.opacity = "";
+				setTimeout( function () {
+					loader.remove();
+					body.appendChild(div_container);
+					for (var i =0; i< document.getElementsByTagName("ul").length; i++)
+							document.getElementsByTagName("ul")[i].onclick = function(e) {
+										setTimeout(function() {
+											setVar("group", e.target.innerHTML);
+											setTimeout(Dashboard_Load(), 600);
+										}, 600);
+							};
+				}, 600);
+			}
+			query.do();
         }, 600);
     }, 200);
 

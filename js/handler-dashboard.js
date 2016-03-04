@@ -14,7 +14,7 @@ function CHECK_Shedule()
 			{
 				var req = {};
 				req.group_number = getCookie("group");
-            	NewXHR("/Dashboard/get_actual_dashboard","json_input=" + JSON.stringify(req), function(ResponseText) {
+            	NewXHR("/dashboard/timetable/get_actual","json_input=" + JSON.stringify(req), function(ResponseText) {
                 if (ResponseText.check != false) {
                     var answer = JSON.parse(ResponseText);
                         if (answer.md5 != getCookie("shedule"))
@@ -171,7 +171,7 @@ function LOAD_Professor_BASIC(lesson_num)
 								var req = {};
 								req.group_number = getCookie("group");
 								req.lesson_number = lesson_num;
-                            NewXHR("/Dashboard/get_lesson_info","json_input=" + JSON.stringify(req), function(ResponseText) {
+                            NewXHR("/dashboard/timetable/get_lesson_info","json_input=" + JSON.stringify(req), function(ResponseText) {
                                 if (ResponseText.check != false) {
                                     var answer = JSON.parse(ResponseText);
                                     var div_info = document.createElement("div");
@@ -260,7 +260,7 @@ function CHECK_alerts()
 			{
 				var req = {};
 				req.group_number = getCookie("group");
-            	NewXHR("/Dashboard/get_notifications_by_group","json_input=" + JSON.stringify(req), function(ResponseText) {
+            	NewXHR("/dashboard/notifications/get_for_group","json_input=" + JSON.stringify(req), function(ResponseText) {
                 if (ResponseText.check != false)
                     {
                         var answer = JSON.parse(ResponseText);
@@ -340,7 +340,7 @@ Output:
 function GET_time()
 {
     var Date_now = new Date();
-    NewXHR("Dashboard/get_time", null, function(ResponseText) {
+    NewXHR("/service/get_time", null, function(ResponseText) {
         if (ResponseText.check != false)
             {
                 var answer = JSON.parse(ResponseText);
@@ -435,7 +435,7 @@ function LOAD_fullShedule()
 		setTimeout(function() {
 			var req = {};
 			req.group_number = getCookie("group");
-			NewXHR("/Dashboard/get_week_dashboard", "json_input=" + JSON.stringify(req), function (ResponseText) {
+			NewXHR("/dashboard/timetable/get_week", "json_input=" + JSON.stringify(req), function (ResponseText) {
                 if (ResponseText.check != false)
                     {
                         var answer = JSON.parse(ResponseText);
@@ -566,7 +566,7 @@ function LOAD_Professors(id)
             screen.style.overflowY = "hidden";
             var div_left = CreateElem("div", "left-side");
             var temp_ul = CreateElem("ul");
-            NewXHR("/Dashboard/get_list_professors", null, function (ResponseText){
+            NewXHR("/dashboard/professors/get_list", null, function (ResponseText){
                 if (ResponseText.check != false) {
                     var answer = JSON.parse(ResponseText);
                     var i =0;
@@ -635,7 +635,7 @@ function LOAD_Professor(id)
 				loader.style.opacity = "1";
 				var req = {};
 				req.professor_id = id;
-				NewXHR("Dashboard/get_professor_state", "json_input=" + JSON.stringify(req), function (ResponseText) {
+				NewXHR("/dashboard/professors/get_professor_state", "json_input=" + JSON.stringify(req), function (ResponseText) {
                     if (ResponseText.check != false)
 					{
                         setTimeout(function () {
@@ -652,8 +652,9 @@ function LOAD_Professor(id)
 							teacher_info.appendChild(CreateElem("p", "teacher-name", null, null, answer.name));
 							teacher_info.appendChild(CreateElem("p", "teacher-dep", null, null, answer.department));
 							teacher_info.appendChild(CreateElem("p", "teacher-now", null, null, "Апанасевич С.А. сегодня не преподает"));
-							
-							NewXHR("Dashboard/get_professor_timetable", "professor_id=" + id, function (ResponseText) {
+							var req = {};
+							req.professor_id = id;
+							NewXHR("/dashboard/professors/get_professor_timetable", "json_input=" + JSON.stringify(req), function (ResponseText) {
 								if (ResponseText.check != false) {
 
 									answer = JSON.parse(ResponseText);
@@ -806,7 +807,7 @@ function AuthTry()
     if (!getCookie("inprogress_Auth"))
         {
             setCookie("inprogress_Auth", 1);
-            NewXHR("Auth/Enter","login=" + encodeURIComponent(document.getElementById("Auth-login").value) + '&password=' + encodeURIComponent(document.getElementById("Auth-password").value), function (ResponseText) {
+            NewXHR("service/authorization","login=" + encodeURIComponent(document.getElementById("Auth-login").value) + '&password=' + encodeURIComponent(document.getElementById("Auth-password").value), function (ResponseText) {
                 deleteCookie("inprogress_Auth")
                 if (ResponseText.check != false) {
 					if (ResponseText == "")

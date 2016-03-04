@@ -254,7 +254,7 @@ function GroupChoice()
         setTimeout( function() {
             if (document.getElementById("main-container") != undefined)
                 document.getElementById("main-container").remove();
-            NewXHR("/Dashboard/get_list_group", null, function(ResponseText) {
+            NewXHR("/dashboard/groups/get_list", null, function(ResponseText) {
                 if (ResponseText.status != "fail") {
                     var answer = JSON.parse(ResponseText);
                     var div_container = document.createElement("div");

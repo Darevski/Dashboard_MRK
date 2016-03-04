@@ -2,50 +2,22 @@
 /**
  * Created by PhpStorm.
  * User: darevski
- * Date: 29.09.15
- * Time: 18:43
- * @author Darevski
+ * Date: 03.03.16
+ * Time: 11:29
  */
 
-namespace Application\Controllers;
-use Application\Core;
+namespace Application\Controllers\Admin;
+
+use Application\Controllers\Controller_admin;
 use Application\Exceptions\UFO_Except;
-use Application\Models;
 
 /**
- * Контроллер Администратора обеспечивает действия связанные с привелегией "администратор"
- * Class Controller_Admin
- * @package Application\Controllers
+ * Class Controller_notifications
+ * Контроллер отвечающий за функционал администратора связанный с уведомлениями
+ * @package Application\Controllers\Admin
  */
-class Controller_Admin extends Core\Controller{
-
-    /**
-     * Проверка разрешения на доступ к данной информации по индефикатору пользователя
-     * @throws UFO_Except при не совпадении индификатора пользователя вброс исключения с ошибкой доступа
-     */
-    function __construct(){
-        parent::__construct();
-        $this->validate();
-    }
-
-    /**
-     * Проверка наличия индификатора пользователя, проверка на соответсвиие индификатора значению Admin
-     * @throws UFO_Except - при не совпадении вброс исключения, с сообщением о недоступности
-     */
-    private function validate(){
-        // Получение значения привелегии
-        $result = $this->state_authorization();
-        if ($result !== 'Admin')
-            throw new UFO_Except ('У вас не достаточно прав для просмотра данного контента', 403);
-    }
-
-    /**
-     * Базовое действие контроллера
-     */
-    public function action_start(){
-        $this->view->generate("Admin_View.php");
-    }
-
+class Controller_notifications extends Controller_admin
+{
     /**
      * Добавление В базу данных нового уведомления
      * Входные данные через Post строку
@@ -60,7 +32,7 @@ class Controller_Admin extends Core\Controller{
      * @throws UFO_Except code 400 при неверных post данных или при их отсутвии
      * @api
      */
-    function action_add_notification(){
+    function action_add(){
         //$_POST['json_input'] = '{"parameters":{"type":"info","target":32494,"ending_date":"20170301"},"text":"123"}';
 
         if (isset($_POST['json_input'])) {
@@ -93,7 +65,7 @@ class Controller_Admin extends Core\Controller{
      * @throws UFO_Except code 400 при неверных post данных или при их отсутвии
      * @api
      */
-    function action_delete_notification(){
+    function action_delete(){
         //$_POST['json_input'] = '{"id":22}';
         if (isset($_POST['json_input'])){
             $data = json_decode($_POST['json_input'],JSON_UNESCAPED_UNICODE);
@@ -121,7 +93,7 @@ class Controller_Admin extends Core\Controller{
      * [state] = 'success'
      * @api
      */
-    function action_get_active_notifications(){
+    function action_get_active(){
         $result = $this->notification_model->get_active_notifications();
         $this->view->output_json($result);
     }

@@ -148,7 +148,7 @@ function CreateGroup()
 function LOAD_Message()
 {
     LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Message.html", function () {
-		NewXHR("/Dashboard/get_faculty_list", null, function (Response){
+		NewXHR("/dashboard/units/get_faculty_list", null, function (Response){
 			try {
 					var answer = JSON.parse(Response);
 					if (answer.state != "fail")
@@ -178,7 +178,7 @@ function LOAD_Message()
 					CreateEx("Ошибка" + ex.message);
 				}
 		});
-		NewXHR("/Dashboard/get_specializations_list", null, function (Response){
+		NewXHR("/dashboard/units/get_spec_list", null, function (Response){
 			try {
 					var answer = JSON.parse(Response);
 				if (answer.state != "fail")
@@ -222,7 +222,7 @@ function DELETE_message(ident, el)
 {
     var req = {};
     req.id = ident;
-    NewXHR("Admin/delete_notification", "json_input=" + JSON.stringify(req), function (Response) {
+    NewXHR("admin/notifications/delete", "json_input=" + JSON.stringify(req), function (Response) {
         try
             {
                 var answer = JSON.parse(Response);
@@ -363,7 +363,7 @@ function message_sort(str)
 function LOAD_Message_manager()
 {
 	try {
-    	NewXHR("/Admin/get_active_notifications", null, function (Response) {
+    	NewXHR("/admin/notifications/get_active", null, function (Response) {
 			try {
 				var answer = JSON.parse(Response);
 				if (answer.state != "fail")
@@ -443,7 +443,7 @@ function SEND_message(options, text, number, callback)
 		{
 			req.parameters = options;
 			req.text = text;
-			NewXHR("/Admin/add_notification", "json_input=" + JSON.stringify(req), function(Response) {
+			NewXHR("/admin/notifications/add", "json_input=" + JSON.stringify(req), function(Response) {
 				try 
 					{
 						callback(JSON.parse(Response), number);
@@ -479,7 +479,7 @@ function LOAD_whom_sent()
 	options.class = Result_find(document.getElementById("message-filter-after").getElementsByTagName("input"))
 	options.faculty = Result_find(document.getElementById("message-filter-department").children[1].getElementsByTagName("input"));
 	options.spec = Result_find(document.getElementById("message-filter-spec").children[1].getElementsByTagName("input"));
-  	NewXHR("/Dashboard/get_filtered_groups", "json_input=" + JSON.stringify(options), function (Response) {
+  	NewXHR("/dashboard/groups/filter_apply", "json_input=" + JSON.stringify(options), function (Response) {
 		try {
 			var answer = JSON.parse(Response);
 			if (answer.state != "fail")

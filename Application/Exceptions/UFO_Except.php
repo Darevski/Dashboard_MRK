@@ -28,6 +28,7 @@ class UFO_Except extends Main_Except
             case 404:   //Отсутсвие страницы
                 $data['title'] = '404 Bad Gateway';
                 $data['message'] = 'Увы такой страницы не существует';
+                $data['debug_message'] = $error->message;
                 $data['error_code'] = 404;
                 break;
             case 601:   //Не совпадение хэша с логином при проверке

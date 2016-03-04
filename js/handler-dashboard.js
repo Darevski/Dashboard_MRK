@@ -9,15 +9,15 @@ Output:
 ***/
 function CHECK_Shedule()
 {
-    if (!getCookie("inprogress_shedule"))
-        if (getCookie("group"))
+    if (!getVar("inprogress_shedule"))
+        if (getVar("group"))
 			{
 				var req = {};
-				req.group_number = getCookie("group");
+				req.group_number = getVar("group");
             	NewXHR("/dashboard/timetable/get_actual","json_input=" + JSON.stringify(req), function(ResponseText) {
                 if (ResponseText.check != false) {
                     var answer = JSON.parse(ResponseText);
-                        if (answer.md5 != getCookie("shedule"))
+                        if (answer.md5 != getVar("shedule"))
                             LOAD_Shedule(answer);
                 }
                 else
@@ -27,7 +27,7 @@ function CHECK_Shedule()
                     }
             });
 			}
-	if (!getCookie("group"))
+	if (!getVar("group"))
 		GroupChoice();
 }
 
@@ -39,11 +39,11 @@ Output:
 ***/
 function LOAD_Shedule(answer)
 {
-	if (!getCookie("group"))
+	if (!getVar("group"))
 		GroupChoice();
 	else
 		{
-			setCookie("inprogress_shedule", "1");
+			setVar("inprogress_shedule", "1");
 			var block = document.getElementById("ActualShedule");
             var loader = CreateLoader(block);
 			document.getElementById("switch1").style.opacity = "0";
@@ -107,14 +107,14 @@ function LOAD_Shedule(answer)
 					document.getElementById("switch2").style.display = "";
 					setTimeout(function()
 							  {							
-                                setCookie("shedule", answer.md5);
+                                setVar("shedule", answer.md5);
                                 block.appendChild(div_shedule_now);
                                 block.appendChild(div_shedule_next);
                                 Open_Shedule("today");
                                 document.getElementById("switch1").style.opacity = "";
                                 document.getElementById("switch2").style.opacity = "";
                                 loader.style.opacity = "";
-                                setTimeout(function() { deleteCookie("inprogress_shedule"); loader.remove(); }, 500);
+                                setTimeout(function() { delVar("inprogress_shedule"); loader.remove(); }, 500);
 					}, 600);
 				}, 600);
 			}, 600);
@@ -151,13 +151,13 @@ Output:
 ***/
 function LOAD_Professor_BASIC(lesson_num)
 {
-	if (!getCookie("group"))
+	if (!getVar("group"))
 		GroupChoice();
 	else
 		{
-			if (!getCookie("inprogress_basic"))
+			if (!getVar("inprogress_basic"))
 				{
-					setCookie("inprogress_basic", "1");
+					setVar("inprogress_basic", "1");
 					var block = document.getElementById("ProfessorNow");
                     var loader = CreateLoader(block);
 					block.className = "inline-block-main";
@@ -169,7 +169,7 @@ function LOAD_Professor_BASIC(lesson_num)
                             block.innerHTML = "";
                             setTimeout(function() {
 								var req = {};
-								req.group_number = getCookie("group");
+								req.group_number = getVar("group");
 								req.lesson_number = lesson_num;
                             NewXHR("/dashboard/timetable/get_lesson_info","json_input=" + JSON.stringify(req), function(ResponseText) {
                                 if (ResponseText.check != false) {
@@ -226,11 +226,11 @@ function LOAD_Professor_BASIC(lesson_num)
                                             block.appendChild(photo);
                                         loader.style.opacity = "";
                                         if (professor_loader_start == null)
-                                            setTimeout(function() { deleteCookie("inprogress_basic"); loader.remove(); }, 500);
+                                            setTimeout(function() { delVar("inprogress_basic"); loader.remove(); }, 500);
                                         else
                                             {
                                                 professor_loader_start.style.opacity = "";
-                                                setTimeout(function() { deleteCookie("inprogress_basic"); professor_loader_start.remove(); professor_loader_start = null; }, 500);
+                                                setTimeout(function() { delVar("inprogress_basic"); professor_loader_start.remove(); professor_loader_start = null; }, 500);
                                             }
                                     }, 600);
                                 }
@@ -255,16 +255,16 @@ Output:
 ***/
 function CHECK_alerts()
 {
-    if (!getCookie("inprogress_alerts"))
-        if (getCookie("group"))
+    if (!getVar("inprogress_alerts"))
+        if (getVar("group"))
 			{
 				var req = {};
-				req.group_number = getCookie("group");
+				req.group_number = getVar("group");
             	NewXHR("/dashboard/notifications/get_for_group","json_input=" + JSON.stringify(req), function(ResponseText) {
                 if (ResponseText.check != false)
                     {
                         var answer = JSON.parse(ResponseText);
-                        if (answer.md5 != getCookie("alerts"))
+                        if (answer.md5 != getVar("alerts"))
                             LOAD_alerts(answer);
                     }
                 else
@@ -274,7 +274,7 @@ function CHECK_alerts()
                     }
             });
 			}
-	if (!getCookie("group"))
+	if (!getVar("group"))
 		GroupChoice();
 }
 
@@ -286,7 +286,7 @@ Output:
 ***/
 function LOAD_alerts(answer)
 {
-    setCookie("inprogress_alerts", "1");
+    setVar("inprogress_alerts", "1");
 	var block = document.getElementById("Alerts");
     var loader = CreateLoader(block);
 	document.body.appendChild(loader);
@@ -304,13 +304,13 @@ function LOAD_alerts(answer)
 					temp_ul.appendChild(temp_li);
 					i++;
 				}
-			setCookie("alerts", answer.md5);
+			setVar("alerts", answer.md5);
 			setTimeout(function()
 					  {
 				block.appendChild(p_block);
 				block.appendChild(temp_ul);
                 loader.style.opacity = "";
-				setTimeout(function() { deleteCookie("inprogress_alerts"); loader.remove(); }, 500);
+				setTimeout(function() { delVar("inprogress_alerts"); loader.remove(); }, 500);
 			}, 600);
         }, 600);
     }, 600);
@@ -325,7 +325,7 @@ Output:
 function DoOnLoad()
 {
 	ClearBody();
-	if (!getCookie("group"))
+	if (!getVar("group"))
 		GroupChoice();
 	else
         Dashboard_Load();
@@ -385,11 +385,11 @@ function Dashboard_CHECK()
     professor_loader_start = CreateLoader(document.getElementById("ProfessorNow"));
     document.body.appendChild(professor_loader_start);
     professor_loader_start.style.opacity = "1";
-	deleteCookie("shedule");
-	deleteCookie("alerts");
-	deleteCookie("inprogress_alerts");
-	deleteCookie("inprogress_shedule");
-	deleteCookie("inprogress_basic");
+	delVar("shedule");
+	delVar("alerts");
+	delVar("inprogress_alerts");
+	delVar("inprogress_shedule");
+	delVar("inprogress_basic");
 	CHECK_alerts();
 	GET_time();
 	CHECK_Shedule();
@@ -400,7 +400,7 @@ function Dashboard_CHECK()
 						clearInterval(DASHBOARD_CHECKER);
 					else
 						{
-							if (getCookie("group") == false)
+							if (getVar("group") == false)
 								{
 									CHECK_stop = true;
 									GroupChoice();
@@ -434,7 +434,7 @@ function LOAD_fullShedule()
 		body.style.opacity = "";
 		setTimeout(function() {
 			var req = {};
-			req.group_number = getCookie("group");
+			req.group_number = getVar("group");
 			NewXHR("/dashboard/timetable/get_week", "json_input=" + JSON.stringify(req), function (ResponseText) {
                 if (ResponseText.check != false)
                     {
@@ -442,7 +442,7 @@ function LOAD_fullShedule()
                         var dashmin = Math.min(answer.even.min,answer.uneven.min);
                         var dashmax = Math.max(answer.even.max,answer.uneven.max);
 						var div_button = CreateElem("div", "button-close", null, "Dashboard_Load()", null); //!!!!!!
-						var header = CreateElem("div", "header", null, null, "Расписание группы " + getCookie("group")); //!!!!!!
+						var header = CreateElem("div", "header", null, null, "Расписание группы " + getVar("group")); //!!!!!!
 						var screen = CreateElem("div", "screen"); //!!!!!!
 						var table1 = CreateElem("table", null, "table-full"); //!!!!
 						var caption = CreateElem("caption", null, null, null, "Числитель");
@@ -550,7 +550,7 @@ Output:
 function LOAD_Professors(id)
 {
 	var body = document.body;
-	deleteCookie("inprogress_professor");
+	delVar("inprogress_professor");
 	CHECK_stop = true;
     body.style.opacity = "0";
     var loader = CreateLoader(body, 1);
@@ -619,9 +619,9 @@ Output:
 ***/
 function LOAD_Professor(id)
 {
-	if (!getCookie("inprogress_professor"))
+	if (!getVar("inprogress_professor"))
 		{
-			setCookie("inprogress_professor", "1");
+			setVar("inprogress_professor", "1");
 			var block = document.getElementById("right-side");
             var loader = CreateLoader(block, 1);
             loader.style.opacity = "0";
@@ -739,7 +739,7 @@ function LOAD_Professor(id)
 									setTimeout(function () {
 										loader.remove();
 										block.style.opacity = "";
-										deleteCookie("inprogress_professor");
+										delVar("inprogress_professor");
 									}, 600);
 							}
 						   else
@@ -773,7 +773,7 @@ function AuthLoad()
     body.style.opacity = "0";
     var loader = CreateLoader(body, 1);
 	loader.style.opacity = "1";
-    deleteCookie("inprogress_Auth");
+    delVar("inprogress_Auth");
 	setTimeout(function(){
 		ClearBody();
 		CHECK_stop = true;
@@ -804,11 +804,11 @@ Output:
 ***/
 function AuthTry()
 {
-    if (!getCookie("inprogress_Auth"))
+    if (!getVar("inprogress_Auth"))
         {
-            setCookie("inprogress_Auth", 1);
+            setVar("inprogress_Auth", 1);
             NewXHR("service/authorization","login=" + encodeURIComponent(document.getElementById("Auth-login").value) + '&password=' + encodeURIComponent(document.getElementById("Auth-password").value), function (ResponseText) {
-                deleteCookie("inprogress_Auth")
+                delVar("inprogress_Auth")
                 if (ResponseText.check != false) {
 					if (ResponseText == "")
 							document.getElementsByTagName("form")[0].submit();

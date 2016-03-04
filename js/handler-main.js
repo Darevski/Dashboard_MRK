@@ -15,10 +15,9 @@ Input:
 Output:
 	VALUE of NAME ::: FALSE
 ***/
-function getCookie(name) {
-  var matches = document.cookie.match(
-      new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
-  return matches ? decodeURIComponent(matches[1]) : false;
+function getVar(name) {
+	var item = localStorage.getItem(name);
+  	return item!=null ? item : false;
 }
 
 /*** --- Устанавливает COOKIE
@@ -29,27 +28,8 @@ Input:
 Output:
 	none
 ***/
-function setCookie(name, value, options) {
-  options = options || {};
-  var expires = options.expires;
-  if (typeof expires == "number" && expires) {
-    var d = new Date();
-    d.setTime(d.getTime() + expires * 1000);
-    expires = options.expires = d;
-  }
-  if (expires && expires.toUTCString) {
-    options.expires = expires.toUTCString();
-  }
-  value = encodeURIComponent(value);
-  var updatedCookie = name + "=" + value;
-  for (var propName in options) {
-    updatedCookie += "; " + propName;
-    var propValue = options[propName];
-    if (propValue !== true) {
-      updatedCookie += "=" + propValue;
-    }
-  }
-  document.cookie = updatedCookie;
+function setVar(name, value) {
+	localStorage.setItem(name, value);
 }
 
 /*** --- Удаляет COOKIE
@@ -58,10 +38,8 @@ Input:
 Output:
 	none
 ***/
-function deleteCookie(name) {
-  setCookie(name, "", {
-    expires: -1
-  })
+function delVar(name) {
+	delete localStorage[name];
 }
 
 /*** --- Создает новый запрос
@@ -240,12 +218,12 @@ function Dashboard_Load()
 Input:
 	none
 Output:
-	SetCookie
+	setVar
 ***/
 function GroupChoice()
 {
 	CHECK_stop = true;
-	deleteCookie("group");
+	delVar("group");
     var body = document.body;
     var loader = CreateLoader(body, 1);
     body.appendChild(loader);
@@ -292,7 +270,7 @@ function GroupChoice()
                         for (var i =0; i< document.getElementsByTagName("ul").length; i++)
                                 document.getElementsByTagName("ul")[i].onclick = function(e) {
                                             setTimeout(function() {
-                                                setCookie("group", e.target.innerHTML);
+                                                setVar("group", e.target.innerHTML);
                                                 setTimeout(Dashboard_Load(), 600);
                                             }, 600);
                                 };

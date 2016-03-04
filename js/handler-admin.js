@@ -900,7 +900,7 @@ function LOAD_shedule_edit(day, numerator)
 		setTimeout(function () {
 			target.innerHTML = "";
 			var req = {};
-			req.group = getCookie("group");
+			req.group = getVar("group");
 			req.day = {};
 			req.day.number = day;
 			req.day.numerator = numerator;
@@ -1045,7 +1045,7 @@ function SEND_shedule_edit(numerator, day)
 				var req = {};
 				req.numerator = numerator;
 				req.day = day;
-				req.group = getCookie("group");
+				req.group = getVar("group");
 				req.shedule = [];
 				for (var j =1; j < tbl.rows[i].cells.length; j++)
 					{

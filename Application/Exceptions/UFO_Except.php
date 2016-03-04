@@ -19,6 +19,10 @@ use Application\Core\View;
 class UFO_Except extends Main_Except
 {
     /**
+     * @var string Хранит в себе дебаг сообщение об ошибке
+     */
+    private $debug_message;
+    /**
      * Определение кода ошибки, вывод соответсвующей страницы
      * @param UFO_Except $error полученнное исключенение
      */
@@ -28,7 +32,7 @@ class UFO_Except extends Main_Except
             case 404:   //Отсутсвие страницы
                 $data['title'] = '404 Bad Gateway';
                 $data['message'] = 'Увы такой страницы не существует';
-                $data['debug_message'] = $error->message;
+                $this->debug_message = $error->message;
                 $data['error_code'] = 404;
                 break;
             case 601:   //Не совпадение хэша с логином при проверке
@@ -74,8 +78,10 @@ class UFO_Except extends Main_Except
         // Вывод кода ответа сервера
         $data['response_code'] = $data['error_code'];
         // 'Видимый' вывод при дебаге
-        if (Config::get_instance()->get_build()['debug'])
-            $data['display_view'] = true;
+        if (Config::get_instance()->get_build()['debug']) {
+            $data['debug_message'] = $this->debug_message;
+            $data['display_view'] = 'block';
+        }
         else
             $data['display_view'] = 'none';
 

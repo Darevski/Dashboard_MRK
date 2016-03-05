@@ -4,87 +4,25 @@ var notificationlist;
 function LOAD_SkeletonsFullscreen(route, callback)
 {
     var body = document.body;
-    var loader = CreateLoader(body, 1, 1);
-	body.style.opacity = "0";
-	setTimeout(function (){
-		ClearBody();
-		body.style.opacity = "";
-        document.body.appendChild(loader);
-		loader.style.opacity = "1";
-		setTimeout(function () {
-			var query = new Request(route);
-			query.callback = function (Response) {
-						loader.style.opacity = "";
-						body.style.opacity = "0";
-						setTimeout(function () {
-							body.style.opacity = "";
-							body.innerHTML = Response;							
-							loader.remove();
-							if ((callback != undefined) || (callback != null))
-								callback();
-						}, 600);
-			}
-			query.do();
-		}, 600);
-	}, 600);	
-}
-function LOAD_import_shedule()
-{
-    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Upload.html");
-}
-function UPDATE_shedule_from_load()
-{
-    function upload(file) {
-		var xhr = new XMLHttpRequest();
-		var block = document.getElementById("fileupload");
-		var loader = CreateLoader(block, 1);
-		var body = document.body;
-		block.style.height = "200px";
-		body.appendChild(loader);
-		loader.style.opacity = "1";
-      // обработчик для закачки
-      xhr.upload.onprogress = function(event) {
-		  document.getElementById("upload-status").style.width = ((event.loaded / event.total) * 400) + "px";
-	  }
-      // обработчики успеха и ошибки
-      // если status == 200, то это успех, иначе ошибка
-      xhr.onload = xhr.onerror = function() {
-        if (this.status == 200) {
-			try {
-					var answer = JSON.parse(xhr.responseText);	
-					loader.style.opacity = "";
-					setTimeout(function () {
-						block.style.height = "";
-						loader.remove();
-						if (answer.success)
-							CreateEx("Успешно");
-						else
-							CreateEx(answer.message);
-					}, 500);
-				}
-			catch (ex)
-				{
-					loader.style.opacity = "";
-					setTimeout(function () {
-						block.style.height = "";
-						loader.remove();
-						CreateEx("Произошла ошибка обработки");
-					}, 500);
-				}
-        } else {
-			loader.style.opacity = "";
-			setTimeout(function () {
-				block.style.height = "";
-				loader.remove();
-				CreateEx("Произошла ошибка " + this.status);
-			}, 500);
-        }
-      };
-      xhr.open("POST", "URL_TO_UPLOAD", true);
-      xhr.send(file);
-    }
-    var csvfile = document.getElementById("filename").files[0];
-    upload(csvfile);
+	var loader = new PreLoader();
+	
+	loader.before = function () { ClearBody(); }
+	loader.inprogress = function () {
+		
+		var query = new Request(route);
+		query.callback = function (Response) {
+			
+			var temp = document.createElement("div"); // заглушка, поскольку innerHTML += вызывает перезагрузку DOM элементов,
+			temp.innerHTML = Response; // что приводит к потере контроля за PreLoader
+			for (var i = 0; i < temp.childNodes.length; i++)
+				document.body.appendChild(temp.childNodes[i]); // TODO: найти более удачный способ решения
+			loader.purge();
+			
+			(callback != null) && (callback());
+		}
+		query.do();
+	}
+	loader.create();
 }
 function DoOnLoad()
 {
@@ -93,54 +31,6 @@ function DoOnLoad()
 function LOAD_AdminDash()
 {
     LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Dashboard.html");
-}
-function LOAD_GroupAdd()
-{
-    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Group_Create.html");
-}
-function CreateGroup()
-{
-    var body = document.body;
-    var block = document.getElementById("group-creator");
-    var loader = CreateLoader(body, 1, 1);
-    body.appendChild(loader);
-    setTimeout(function () {
-        loader.style.opacity = "1";    
-        setTimeout(function () {
-            var group = {};
-            group.group_number = document.getElementsByName("number")[0].value;
-            group.grade = document.getElementsByName("grade")[0].value;
-            try {
-				var query = new Request("/Admin/add_group", group);
-				query.callback = function (Response) {
-                	loader.style.opacity = "";
-					try {
-						var answer = JSON.parse(ResponseText);
-						setTimeout(function () {
-							loader.remove();
-							if (answer.state == "success")
-								CreateEx("Группа успешно создана!");
-							else
-								CreateEx("Произошла ошибка:" + answer.message);
-						}, 500);
-					}
-					catch (ex)
-						{
-							setTimeout(function () { loader.remove(); CreateEx("Ошибка: " + ex.message); }, 500);
-						}
-				}
-				query.do();
-            }
-            catch (ex)
-                {
-                    loader.style.opacity = "";
-                    setTimeout(function () {
-                        loader.remove();
-                        CreateEx("Произошла ошибка:" + answer.message);
-                    }, 500);
-                }
-        }, 500);        
-    }, 10);
 }
 function LOAD_Message()
 {
@@ -210,13 +100,6 @@ function LOAD_Message()
 		}
 		query2.do();
         LOAD_whom_sent();
-	});
-}
-function LOAD_Swap()
-{
-    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Swap.html", function () {
-		LOAD_all_lessons();
-		LOAD_grouplist();
 	});
 }
 function DELETE_message(ident, el)
@@ -366,7 +249,7 @@ function message_sort(str)
 function LOAD_Message_manager()
 {
 	try {
-		var query = new Request("/admin/notifications/get_active", req);
+		var query = new Request("/admin/notifications/get_active");
 		query.callback = function (Response) {
 			try {
 				var answer = JSON.parse(Response);
@@ -404,29 +287,6 @@ function LOAD_Message_manager()
 		{
 			CreateEx(ex.message);
 		}
-}
-function LOAD_GroupChange()
-{
-    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Shedule_Edit.html", function (){
-		LOAD_shedule_list();
-		PRELOAD_shedule_edit(0, 1);
-	});
-}
-function LOAD_ProfessorEdit()
-{
-    alert();
-}
-function LOAD_PrintDialog()
-{
-    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Print.html");
-}
-function LOAD_RoomsEdit()
-{
-    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Classroom_Edit.html");
-}
-function LOAD_Reports()
-{
-    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Bugs.html");
 }
 function SEND_message(options, text, number, callback)
 {
@@ -522,17 +382,14 @@ function SEND_premessage_full()
 {
 
     var body = document.body;
-    var loader = CreateLoader(body, 1, 1);
-    body.appendChild(loader);
-    setTimeout(function () {
-        loader.style.opacity = "1";
+	var loader = new PreLoader();
+	loader.inprogress = function () {
 		var elem = document.getElementById("message-whom-status");
 		if ((elem != undefined) & (elem != null))
 			{
 				elem.style.opacity = "";
-				setTimeout(function () { elem.remove(); }, 500);
+				elem.remove();
 			}
-        setTimeout(function () {
 			var preset = {};
 			var elem = document.getElementById("message-more-type");
 			preset.type = "null";
@@ -558,16 +415,11 @@ function SEND_premessage_full()
 				{
 					preset.target = "0";
 					SEND_message(preset, document.getElementById("message-more-text-input").value, null, function (Response) {
-						loader.style.opacity = "";
-						setTimeout(function () {
-							loader.remove();
-							setTimeout(function () {
-								if (Response.state == "success")
-									CreateEx("Успешно отправлено");
-								else
-									CreateEx(Response.message);
-							}, 100);
-						}, 550);
+						loader.purge();
+						if (Response.state == "success")
+							CreateEx("Успешно отправлено");
+						else
+							CreateEx(Response.message);
 					});
 				}
 			else if (document.getElementById("whom-sent").childElementCount > 0)
@@ -628,38 +480,28 @@ function SEND_premessage_full()
 								counter++;
                                 if (counter == elem.childElementCount)
                                     {
-                                        loader.style.opacity = "";
-                                        setTimeout(function () {
-                                            loader.remove();
-                                            setTimeout(function () {
-                                                if (counter == counter_ok)
-													{
-                                                    	CreateEx("Успешно отправлено");
-														states.style.opacity = "";
-														setTimeout(function () {
-															states.remove();
-														}, 550);
-													}
-                                                else
-                                                    CreateEx("При отправке возникли ошибки");
-                                            }, 100);
-                                        }, 550);
+										loader.purge();
+										if (counter == counter_ok)
+											{
+												CreateEx("Успешно отправлено");
+												states.style.opacity = "";
+												setTimeout(function () {
+													states.remove();
+												}, 550);
+											}
+										else
+											CreateEx("При отправке возникли ошибки");
                                     }
 							});
 						}
 				}
 			else
 				{
-					loader.style.opacity = "";
-					setTimeout(function () {
-						loader.remove();
-						setTimeout(function () {
-							CreateEx("Отсутствуют получатели");
-						}, 100);
-					}, 550);
+					loader.purge();
+					CreateEx("Отсутствуют получатели");
 				}
-        }, 500);
-    }, 10);
+	}
+	loader.create();
 }
 function SHOW_message_types()
 {
@@ -690,34 +532,120 @@ function SET_message_type(value)
 }
 function SEND_message_small()
 {
-    var body = document.body;
-    var loader = CreateLoader(body, 1, 1);
-    body.appendChild(loader);
-    setTimeout(function () {
-        loader.style.opacity = "1";
-        setTimeout(function () {
+    var loader = new PreLoader();
+	
+	loader.inprogress = function() {
+		
 			var options = {};
+		
 			options.type = document.getElementById("message-type").dataset.messagetype;
 			if (document.getElementById("message-to-input").value == "")
 				options.target = "0";
 			else
 				options.target = document.getElementById("message-to-input").value;
+		
 			options.ending_date = "tomorrow";
+		
 			SEND_message(options, document.getElementById("message-text-input").value, null, function (Response){
-				loader.style.opacity = "";
-				setTimeout(function () {
-					loader.remove();
-					setTimeout(function () {
-						if (Response.state == "success")
-							CreateEx("Успешно отправлено!");
-						else
-							CreateEx(Response.message);
-					}, 100);
-				}, 500);
+				
+				loader.purge();
+				if (Response.state == "success")
+					CreateEx("Успешно отправлено!");
+				else
+					CreateEx(Response.message);
 			});
-        }, 500);
+    }
+	loader.create();
+}
+
+/*
+function LOAD_GroupAdd()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Group_Create.html");
+}
+function CreateGroup()
+{
+    var body = document.body;
+    var block = document.getElementById("group-creator");
+    var loader = CreateLoader(body, 1, 1);
+    body.appendChild(loader);
+    setTimeout(function () {
+        loader.style.opacity = "1";    
+        setTimeout(function () {
+            var group = {};
+            group.group_number = document.getElementsByName("number")[0].value;
+            group.grade = document.getElementsByName("grade")[0].value;
+            try {
+				var query = new Request("/Admin/add_group", group);
+				query.callback = function (Response) {
+                	loader.style.opacity = "";
+					try {
+						var answer = JSON.parse(ResponseText);
+						setTimeout(function () {
+							loader.remove();
+							if (answer.state == "success")
+								CreateEx("Группа успешно создана!");
+							else
+								CreateEx("Произошла ошибка:" + answer.message);
+						}, 500);
+					}
+					catch (ex)
+						{
+							setTimeout(function () { loader.remove(); CreateEx("Ошибка: " + ex.message); }, 500);
+						}
+				}
+				query.do();
+            }
+            catch (ex)
+                {
+                    loader.style.opacity = "";
+                    setTimeout(function () {
+                        loader.remove();
+                        CreateEx("Произошла ошибка:" + answer.message);
+                    }, 500);
+                }
+        }, 500);        
     }, 10);
 }
+
+
+
+function LOAD_Swap()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Swap.html", function () {
+		LOAD_all_lessons();
+		LOAD_grouplist();
+	});
+}
+
+
+
+function LOAD_GroupChange()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Shedule_Edit.html", function (){
+		LOAD_shedule_list();
+		PRELOAD_shedule_edit(0, 1);
+	});
+}
+function LOAD_ProfessorEdit()
+{
+    alert();
+}
+function LOAD_PrintDialog()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Print.html");
+}
+function LOAD_RoomsEdit()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Classroom_Edit.html");
+}
+function LOAD_Reports()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Bugs.html");
+}
+
+
+
 function LOAD_grouplist()
 {
 	var query = new Request("URL_TO_LOAD_GROUP_LIST");
@@ -1113,7 +1041,6 @@ function SEND_shedule_edit(numerator, day)
 		}, 500);
 	}, 10);	
 }
-/* TODO
 function LOAD_classrooms()
 {
 	var body = document.body;
@@ -1139,4 +1066,64 @@ function LOAD_classrooms()
 			});
 		}, 500);
 	}, 10);
-}*/
+}
+
+function LOAD_import_shedule()
+{
+    LOAD_SkeletonsFullscreen("/Application/Views/Skeletons/Admin_Upload.html");
+}
+function UPDATE_shedule_from_load()
+{
+    function upload(file) {
+		var xhr = new XMLHttpRequest();
+		var block = document.getElementById("fileupload");
+		var loader = CreateLoader(block, 1);
+		var body = document.body;
+		block.style.height = "200px";
+		body.appendChild(loader);
+		loader.style.opacity = "1";
+      // обработчик для закачки
+      xhr.upload.onprogress = function(event) {
+		  document.getElementById("upload-status").style.width = ((event.loaded / event.total) * 400) + "px";
+	  }
+      // обработчики успеха и ошибки
+      // если status == 200, то это успех, иначе ошибка
+      xhr.onload = xhr.onerror = function() {
+        if (this.status == 200) {
+			try {
+					var answer = JSON.parse(xhr.responseText);	
+					loader.style.opacity = "";
+					setTimeout(function () {
+						block.style.height = "";
+						loader.remove();
+						if (answer.success)
+							CreateEx("Успешно");
+						else
+							CreateEx(answer.message);
+					}, 500);
+				}
+			catch (ex)
+				{
+					loader.style.opacity = "";
+					setTimeout(function () {
+						block.style.height = "";
+						loader.remove();
+						CreateEx("Произошла ошибка обработки");
+					}, 500);
+				}
+        } else {
+			loader.style.opacity = "";
+			setTimeout(function () {
+				block.style.height = "";
+				loader.remove();
+				CreateEx("Произошла ошибка " + this.status);
+			}, 500);
+        }
+      };
+      xhr.open("POST", "URL_TO_UPLOAD", true);
+      xhr.send(file);
+    }
+    var csvfile = document.getElementById("filename").files[0];
+    upload(csvfile);
+}
+*/

@@ -1,6 +1,6 @@
 var CHECK_stop = false; /*	Создает и устанавливает значение необходимости остановки опроса изменения значний у сервера	*/
 var TIME_difference;
-var professor_loader_start;
+var base_check_inprogress;
 /*** --- Выполняет проверку необходимости обновления блока расписания
 Input:
 	none
@@ -43,80 +43,100 @@ function LOAD_Shedule(answer)
 	else
 		{
 			setVar("inprogress_shedule", "1");
-			var block = document.getElementById("ActualShedule");
-            var loader = CreateLoader(block);
+			
 			document.getElementById("switch1").style.opacity = "0";
 			document.getElementById("switch2").style.opacity = "0";
-			loader.style.opacity = "1";
-			document.body.appendChild(loader);
-			setTimeout( function() {
-				document.getElementById("switch1").style.display = "none";
-				document.getElementById("switch2").style.display = "none";
-				block.innerHTML = "";
-				setTimeout(function() {
-					var div_shedule_now = document.createElement("div");
-					div_shedule_now.id = "Shedule-now";
-					var temp_p = document.createElement("p");
-					temp_p.innerHTML = "Расписание на " + answer.today.day_name;
-					div_shedule_now.appendChild(temp_p);
-					var temp_ul = document.createElement("ul");
-					document.getElementById("ProfessorNow").className += " NothingNow";
-					for (var i = 1; i <= 7; i++)
-							if (answer.today[i] != null)
-								{
-									if (answer.today[i].state == true)
-										{
-											var temp_li = document.createElement("li");
-											temp_li.setAttribute("onclick", "LOAD_Professor_BASIC(" + i + ")");
-											temp_li.className = "li-now";
-											var temp_span = document.createElement("span");
-											temp_span.innerHTML = i + ". " + answer.today[i].lesson_name;
-											temp_li.appendChild(temp_span);
-											temp_ul.appendChild(temp_li);
-											LOAD_Professor_BASIC(i);
-										}
-									else
-										{
-											var temp_li = document.createElement("li");
-											temp_li.setAttribute("onclick", "LOAD_Professor_BASIC(" + i + ")");
-											var temp_span = document.createElement("span");
-											temp_span.innerHTML = i + ". " + answer.today[i].lesson_name;
-											temp_li.appendChild(temp_span);
-											temp_ul.appendChild(temp_li);
-										}
-								}
-					div_shedule_now.appendChild(temp_ul);
-					var div_shedule_next = document.createElement("div");
-					div_shedule_next.id = "Shedule-next";
-					var temp_p = document.createElement("p");
-					temp_p.innerHTML = "Расписание на " + answer.tomorrow.day_name;
-					div_shedule_next.appendChild(temp_p);
-					var temp_ul = document.createElement("ul");
-					for (var i = 1; i <= 7; i++)
-							if (answer.tomorrow[i] != null)
-								{
-									var temp_li = document.createElement("li");
-									var temp_span = document.createElement("span");
-									temp_span.innerHTML = i + ". " + answer.tomorrow[i].lesson_name;
-									temp_li.appendChild(temp_span);
-									temp_ul.appendChild(temp_li);
-								}
-					div_shedule_next.appendChild(temp_ul);
-					document.getElementById("switch1").style.display = "";
-					document.getElementById("switch2").style.display = "";
-					setTimeout(function()
-							  {							
-                                setVar("shedule", answer.md5);
-                                block.appendChild(div_shedule_now);
-                                block.appendChild(div_shedule_next);
-                                Open_Shedule("today");
-                                document.getElementById("switch1").style.opacity = "";
-                                document.getElementById("switch2").style.opacity = "";
-                                loader.style.opacity = "";
-                                setTimeout(function() { delVar("inprogress_shedule"); loader.remove(); }, 500);
-					}, 600);
-				}, 600);
-			}, 600);
+			
+			var block = document.getElementById("ActualShedule");
+			
+			var loader = new PreLoader(block);			
+			loader.fullscreen = false;
+			loader.inprogress = function () {
+
+			document.getElementById("switch1").style.display = "none";
+			document.getElementById("switch2").style.display = "none";
+
+			block.innerHTML = "";
+			document.getElementById("ProfessorNow").className += " NothingNow";
+
+			var div_shedule_now = document.createElement("div");
+			div_shedule_now.id = "Shedule-now";
+
+			var temp_p = document.createElement("p");
+			temp_p.innerHTML = "Расписание на " + answer.today.day_name;
+			div_shedule_now.appendChild(temp_p);
+
+			var temp_ul = document.createElement("ul");
+
+			for (var i = 1; i <= 7; i++)
+				if (answer.today[i] != null)
+					{
+						if (answer.today[i].state)
+							{
+								var temp_li = document.createElement("li");
+								temp_li.setAttribute("onclick", "LOAD_Professor_BASIC(" + i + ")");
+								temp_li.className = "li-now";
+
+								var temp_span = document.createElement("span");
+								temp_span.innerHTML = i + ". " + answer.today[i].lesson_name;
+
+								temp_li.appendChild(temp_span);
+								temp_ul.appendChild(temp_li);
+
+								LOAD_Professor_BASIC(i);
+							}
+						else
+							{
+								var temp_li = document.createElement("li");
+								temp_li.setAttribute("onclick", "LOAD_Professor_BASIC(" + i + ")");
+
+								var temp_span = document.createElement("span");
+								temp_span.innerHTML = i + ". " + answer.today[i].lesson_name;
+
+								temp_li.appendChild(temp_span);
+								temp_ul.appendChild(temp_li);
+							}
+					}
+			div_shedule_now.appendChild(temp_ul);
+
+			var div_shedule_next = document.createElement("div");
+			div_shedule_next.id = "Shedule-next";
+
+			var temp_p = document.createElement("p");
+			temp_p.innerHTML = "Расписание на " + answer.tomorrow.day_name;
+			div_shedule_next.appendChild(temp_p);
+
+			var temp_ul = document.createElement("ul");
+			for (var i = 1; i <= 7; i++)
+				if (answer.tomorrow[i] != null)
+					{
+						var temp_li = document.createElement("li");
+						var temp_span = document.createElement("span");
+						temp_span.innerHTML = i + ". " + answer.tomorrow[i].lesson_name;
+
+						temp_li.appendChild(temp_span);
+						temp_ul.appendChild(temp_li);
+					}
+			div_shedule_next.appendChild(temp_ul);
+
+			document.getElementById("switch1").style.display = "";
+			document.getElementById("switch2").style.display = "";
+
+			setVar("shedule", answer.md5);
+			delVar("inprogress_shedule");
+
+			block.appendChild(div_shedule_now);
+			block.appendChild(div_shedule_next);
+
+			document.getElementById("switch1").style.opacity = "";
+			document.getElementById("switch2").style.opacity = "";
+
+			Open_Shedule("today");
+
+			loader.purge();
+
+			}
+			loader.create();
 		}
 }
 
@@ -157,89 +177,91 @@ function LOAD_Professor_BASIC(lesson_num)
 			if (!getVar("inprogress_basic"))
 				{
 					setVar("inprogress_basic", "1");
+					
 					var block = document.getElementById("ProfessorNow");
-                    var loader = CreateLoader(block);
-					block.className = "inline-block-main";
-                    if (professor_loader_start == null)
-					   document.body.appendChild(loader);
-                    setTimeout( function() {
-                        loader.style.opacity = "1";
-                        setTimeout( function() {
-                            block.innerHTML = "";
-                            setTimeout(function() {
-								var req = {};
-								req.group_number = getVar("group");
-								req.lesson_number = lesson_num;
-								var query = new Request("/dashboard/timetable/get_lesson_info", req);
-								query.callback = function (Response) {
-									var answer = JSON.parse(Response);
-									if (answer.state != "fail")
-										{
-											var div_info = document.createElement("div");
-											div_info.id = "professor-info";
-											var professor_list = "";
-											if (answer.multiple)
-												div_info.style.width = "100%";
-											if (answer.multiple)
-												for (var i=0; i< answer.professor.length; i++)
-													{
-														professor_list += '<a onclick="LOAD_Professors(' + answer.professor_id[i] + ')">' + answer.professor[i] + '</a>';
-														if (i + 1 != answer.professor.length)
-															professor_list += ", ";
-													}
-											else
-												professor_list = answer.professor;
-											div_info.appendChild(CreateElem("div", "professor-name", null, null, professor_list));
-											div_info.appendChild(CreateElem("div", "professor-department", null, null, answer.department));
-											var pdiv = CreateElem("div", "pdiv", null, null, null);
+                    block.className = "inline-block-main";
+					
+					var loader = new PreLoader(block);
+					loader.fullscreen = false;
+					loader.inprogress = function () {
+						
+						block.innerHTML = "";
 
-											var classroom_list = "";
-											if (answer.multiple)
-												for (var i=0; i< answer.classroom.length; i++)
-													{
-														classroom_list += answer.classroom[i];
-														if (i + 1 != answer.classroom.length)
-															classroom_list += ", ";
-													}
-											else
-												{
-													if (answer.classroom)
-														classroom_list = answer.classroom;
-												}
-											pdiv.appendChild(CreateElem("p", null, null, null, answer.lesson_name));
-											div_info.appendChild(CreateElem("div", "time", null, null, answer.time));
-											div_info.appendChild(pdiv);
-											div_info.appendChild(CreateElem("div", "classroom", null, null, "Аудитории: " +  classroom_list));
-											var photo = CreateElem("div", "professor-photo", null, "LOAD_Professors(" + answer.professor_id + ")", null);
+							var req = {};
+							req.group_number = getVar("group");
+							req.lesson_number = lesson_num;
 
-											if (!answer.multiple)
+							var query = new Request("/dashboard/timetable/get_lesson_info", req);
+							query.callback = function (Response) {
+
+								var answer = JSON.parse(Response);
+								if (answer.state != "fail")
+									{
+										var div_info = document.createElement("div");
+										div_info.id = "professor-info";
+
+										var professor_list = "";
+										if (answer.multiple)
+											div_info.style.width = "100%";
+										if (answer.multiple)
+											for (var i=0; i< answer.professor.length; i++)
 												{
-													var img = document.createElement("img");
-													img.setAttribute("src", answer.photo_url);
-													photo.appendChild(img);
+													professor_list += '<a onclick="LOAD_Professors(' + answer.professor_id[i] + ')">' + answer.professor[i] + '</a>';
+													if (i + 1 != answer.professor.length)
+														professor_list += ", ";
 												}
-											setTimeout(function()
-													  {
-												block.appendChild(div_info);
-												if (!answer.multiple)
-													block.appendChild(photo);
-												loader.style.opacity = "";
-												if (professor_loader_start == null)
-													setTimeout(function() { delVar("inprogress_basic"); loader.remove(); }, 500);
-												else
-													{
-														professor_loader_start.style.opacity = "";
-														setTimeout(function() { delVar("inprogress_basic"); professor_loader_start.remove(); professor_loader_start = null; }, 500);
-													}
-											}, 600);
-										}
-									else
-										CreateEx(answer.message);
-                            }
-							query.do();
-                            }, 600);
-                        }, 600);
-					}, 500);
+										else
+											professor_list = answer.professor;
+
+										div_info.appendChild(CreateElem("div", "professor-name", null, null, professor_list));
+										div_info.appendChild(CreateElem("div", "professor-department", null, null, answer.department));
+
+										var pdiv = CreateElem("div", "pdiv");
+										var classroom_list = "";
+
+										if (answer.multiple)
+											for (var i=0; i< answer.classroom.length; i++)
+												{
+													classroom_list += answer.classroom[i];
+													if (i + 1 != answer.classroom.length)
+														classroom_list += ", ";
+												}
+										else
+											if (answer.classroom)
+												classroom_list = answer.classroom;
+
+										pdiv.appendChild(CreateElem("p", null, null, null, answer.lesson_name));
+
+										div_info.appendChild(CreateElem("div", "time", null, null, answer.time));
+										div_info.appendChild(pdiv);
+										div_info.appendChild(CreateElem("div", "classroom", null, null, "Аудитории: " +  classroom_list));
+
+										var photo = CreateElem("div", "professor-photo", null, "LOAD_Professors(" + answer.professor_id + ")", null);
+
+										if (!answer.multiple)
+											{
+												var img = document.createElement("img");
+												img.setAttribute("src", answer.photo_url);
+												photo.appendChild(img);
+											}
+
+										block.appendChild(div_info);
+
+										if (!answer.multiple)
+											block.appendChild(photo);
+										
+										loader.purge();
+										delVar("inprogress_basic");
+										
+										if (base_check_inprogress != null)
+											base_check_inprogress = null;
+									}
+								else
+									CreateEx(answer.message);
+						}
+						query.do();
+					}
+				   loader.create();
 				}
 		}
 }
@@ -283,33 +305,36 @@ Output:
 function LOAD_alerts(answer)
 {
     setVar("inprogress_alerts", "1");
+	
 	var block = document.getElementById("Alerts");
-    var loader = CreateLoader(block);
-	document.body.appendChild(loader);
-    loader.style.opacity = "1";
-	setTimeout( function() {
+	var loader = new PreLoader(block);
+	
+	loader.fullscreen = false;
+	loader.inprogress = function () {
+		
 		block.innerHTML = "";
-        setTimeout(function() {
-			var p_block = CreateElem("p", null, null, null, "Уведомления");
-			var temp_ul = CreateElem("ul");
-			var data = '<p>Уведомления</p><ul>';
-			var i = 0;
-			while (answer[i])
-				{
-					var temp_li = CreateElem("li", null, answer[i].state, null, answer[i].text);
-					temp_ul.appendChild(temp_li);
-					i++;
-				}
-			setVar("alerts", answer.md5);
-			setTimeout(function()
-					  {
-				block.appendChild(p_block);
-				block.appendChild(temp_ul);
-                loader.style.opacity = "";
-				setTimeout(function() { delVar("inprogress_alerts"); loader.remove(); }, 500);
-			}, 600);
-        }, 600);
-    }, 600);
+		var p_block = CreateElem("p", null, null, null, "Уведомления");
+		var temp_ul = CreateElem("ul");
+		
+		var data = '<p>Уведомления</p><ul>';
+		var i = 0;
+		
+		while (answer[i])
+			{
+				var temp_li = CreateElem("li", null, answer[i].state, null, answer[i].text);
+				temp_ul.appendChild(temp_li);
+				i++;
+			}
+		
+		setVar("alerts", answer.md5);
+		delVar("inprogress_alerts");
+		
+		block.appendChild(p_block);
+		block.appendChild(temp_ul);
+		
+		loader.purge();
+	}
+	loader.create();
 }
 
 /*** --- Выполяется при первоначальной загрузке страницы, выбирает необходимый блок загрузки
@@ -375,36 +400,35 @@ Output:
 ***/
 function Dashboard_CHECK()
 {
-    professor_loader_start = CreateLoader(document.getElementById("ProfessorNow"));
-    document.body.appendChild(professor_loader_start);
-    professor_loader_start.style.opacity = "1";
+    base_check_inprogress = true;
+	
 	delVar("shedule");
 	delVar("alerts");
 	delVar("inprogress_alerts");
 	delVar("inprogress_shedule");
 	delVar("inprogress_basic");
+	
 	CHECK_alerts();
 	GET_time();
 	CHECK_Shedule();
-	//setTimeout(function () { document.body.style.opacity =""; }, 3500);
-	var DASHBOARD_CHECKER = setInterval(function ()
-			   {
-					if (CHECK_stop)
-						clearInterval(DASHBOARD_CHECKER);
-					else
-						{
-							if (getVar("group") == false)
-								{
-									CHECK_stop = true;
-									GroupChoice();
-								}
-							else
-								{
-									CHECK_alerts();
-									CHECK_Shedule();
-								}
-						}
-			   }, 30000);
+	
+	var DASHBOARD_CHECKER = setInterval(function () {		
+		if (CHECK_stop)
+			clearInterval(DASHBOARD_CHECKER);
+		else
+			{
+				if (getVar("group") == false)
+					{
+						CHECK_stop = true;
+						GroupChoice();
+					}
+				else
+					{
+						CHECK_alerts();
+						CHECK_Shedule();
+					}
+			}
+   }, 30000);
 }
 
 /*** --- Загружает полное расписание группы на экран
@@ -416,36 +440,35 @@ Output:
 function LOAD_fullShedule()
 {
 	var body = document.body;
-    body.style.opacity = "0";
-    var loader = CreateLoader(body, 1);
-	loader.style.opacity = "1";
-    
-	setTimeout(function(){
-		ClearBody();
-		CHECK_stop = true;
-		body.appendChild(loader);
-		body.style.opacity = "";
-		setTimeout(function() {
+	var loader = new PreLoader();
+	
+	loader.before = function () { ClearBody(); CHECK_stop = true; }
+	loader.inprogress = function () {
 			var req = {};
 			req.group_number = getVar("group");
+		
 			var query = new Request("/dashboard/timetable/get_week", req);
 			query.callback = function (Response) {
+				
 				var answer = JSON.parse(Response);
                 if (answer.state != "fail")
                     {
                         var dashmin = Math.min(answer.even.min,answer.uneven.min);
                         var dashmax = Math.max(answer.even.max,answer.uneven.max);
-						var div_button = CreateElem("div", "button-close", null, "Dashboard_Load()", null); //!!!!!!
-						var header = CreateElem("div", "header", null, null, "Расписание группы " + getVar("group")); //!!!!!!
-						var screen = CreateElem("div", "screen"); //!!!!!!
-						var table1 = CreateElem("table", null, "table-full"); //!!!!
+						
+						var div_button = CreateElem("div", "button-close", null, "Dashboard_Load()", null);
+						var header = CreateElem("div", "header", null, null, "Расписание группы " + getVar("group"));
+						var screen = CreateElem("div", "screen");
+						var table1 = CreateElem("table", null, "table-full");
 						var caption = CreateElem("caption", null, null, null, "Числитель");
+						
 						table1.appendChild(caption);
 						
 						var thead = table1.createTHead(-1);
 						var row = thead.insertRow(-1);
 						var cell = row.insertCell(-1);
 						cell.innerHTML = "День недели";
+						
 						var day_name = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
 						for (var i = dashmin; i<=dashmax; i++)
 							{
@@ -459,6 +482,7 @@ function LOAD_fullShedule()
                                 var row = tablebody.insertRow(-1);
 								var cell = row.insertCell(-1);
 								cell.innerHTML = day_name[i-1];
+								
                                 for (var j=dashmin; j<=dashmax; j++)
 									{
 										var cell = row.insertCell(-1);
@@ -473,20 +497,24 @@ function LOAD_fullShedule()
 
 						screen.appendChild(table1);
 						
-						var table1 = CreateElem("table", null, "table-full"); //!!!!
+						var table1 = CreateElem("table", null, "table-full");
 						var caption = CreateElem("caption", null, null, null, "Знаменатель");
+						
 						table1.appendChild(caption);
 						table1.style.marginBottom = "20px";
+						
 						var thead = table1.createTHead(-1);
 						var row = thead.insertRow(-1);
 						var cell = row.insertCell(-1);
 						cell.innerHTML = "День недели";
+						
 						var day_name = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
 						for (var i = dashmin; i<=dashmax; i++)
 							{
 								var cell = row.insertCell(-1);
 								cell.innerHTML = i + " пара";
 							}
+						
 						var tablebody = table1.createTBody(-1);
 						
                         for (var i =1; i<7; i++)
@@ -505,30 +533,24 @@ function LOAD_fullShedule()
 											}
 									}
                             }
+						
 						screen.appendChild(table1);
-						
-						
-						
-                        body.style.opacity = "0";
-                        setTimeout(function() {
-                            ClearBody();
-                            body.appendChild(div_button);
-							body.appendChild(header);
-							body.appendChild(screen);
-                            var blocks = document.getElementsByClassName("more-info");
-                            for (var i = 0; i<blocks.length; i++)
-                                {
-                                    blocks[i].style.display = "block";
-                                    blocks[i].style.top = -5 - blocks[i].offsetHeight + "px";
-                                    blocks[i].style.display = "";
-                                }
-                            body.style.opacity = "";
-                        }, 600);
+						body.appendChild(div_button);
+						body.appendChild(header);
+						body.appendChild(screen);
+						var blocks = document.getElementsByClassName("more-info");
+						for (var i = 0; i<blocks.length; i++)
+							{
+								blocks[i].style.display = "block";
+								blocks[i].style.top = -5 - blocks[i].offsetHeight + "px";
+								blocks[i].style.display = "";
+							}
+						loader.purge();
                     }
 			}
 		query.do();
-		}, 600);
-	} ,600);
+	}
+	loader.create();
 }
 
 /*** --- Загружает скелет преподавателей на экран
@@ -540,62 +562,58 @@ Output:
 function LOAD_Professors(id)
 {
 	var body = document.body;
+	var loader = new PreLoader();
+	
 	delVar("inprogress_professor");
 	CHECK_stop = true;
-    body.style.opacity = "0";
-    var loader = CreateLoader(body, 1);
-	setTimeout(function () {
-		ClearBody();
-        body.style.opacity = "";
-		body.appendChild(loader);		
-        loader.style.opacity = "1";
-        setTimeout(function () {
-            var div_button = CreateElem("div", "button-close", null, "Dashboard_Load()", null); //!!!!!!
-            var header = CreateElem("div", "header", null, null, "Информация о преподавателе"); //!!!!!!
-            var screen = CreateElem("div", "screen"); //!!!!!!
-            screen.style.overflowY = "hidden";
-            var div_left = CreateElem("div", "left-side");
-            var temp_ul = CreateElem("ul");
-			var query = new Request("/dashboard/professors/get_list");
-			query.callback = function (Response) {
-				var answer = JSON.parse(Response);
-                if (answer.state != "fail") {
-                    var i =0;
-                    while (answer[i] != null)
-                        {
-                            var temp_li = CreateElem("li", null, null, null, answer[i].professor);
-                            temp_li.setAttribute("number", answer[i].id);
-                            temp_ul.appendChild(temp_li);
-                            i++;
-                        }
-                    var div_right = CreateElem("div", "right-side");
-                    div_left.appendChild(temp_ul);
-                    screen.appendChild(div_left);
-                    screen.appendChild(div_right);
-                    if ((id == undefined) || (id == null))
-                        id = answer[0].id;
-                    setTimeout(function() {
-                        loader.style.opacity = "";
-                        body.style.opacity = "0";
-                        setTimeout(function () {
-                            loader.remove();
-                            body.appendChild(div_button);
-                            body.appendChild(header);
-                            body.appendChild(screen);
-                            body.style.opacity = "";
-                            LOAD_Professor(id);
-                            for (i = 0; i< document.getElementsByTagName("ul").length; i++)
-                                {
-                                    document.getElementsByTagName("ul")[i].onclick = function(e) { if (e.target.getAttribute("number") != null) LOAD_Professor(e.target.getAttribute("number")); };
-                                }
-                            setTimeout( function () { body.style.opacity = "";}, 1000 );
-                        },600);
-                    },600);
-                }
-            }
+    loader.before = function () { ClearBody(); }
+	
+	loader.inprogress = function () {
+		var div_button = CreateElem("div", "button-close", null, "Dashboard_Load()", null);
+		var header = CreateElem("div", "header", null, null, "Информация о преподавателе");
+		
+		var screen = CreateElem("div", "screen");
+		var div_left = CreateElem("div", "left-side");
+		
+		var temp_ul = CreateElem("ul");
+		var query = new Request("/dashboard/professors/get_list");
+		
+		screen.style.overflowY = "hidden";
+		
+		query.callback = function (Response) {	
+			var answer = JSON.parse(Response);
+			if (answer.state != "fail") {
+				var i = 0;
+				while (answer[i] != null)
+					{
+						var temp_li = CreateElem("li", null, null, null, answer[i].professor);
+						temp_li.setAttribute("number", answer[i].id);
+						temp_ul.appendChild(temp_li);
+						i++;
+					}
+				var div_right = CreateElem("div", "right-side");
+				
+				div_left.appendChild(temp_ul);
+				
+				screen.appendChild(div_left);
+				screen.appendChild(div_right);
+				
+				if ((id == undefined) || (id == null))
+					id = answer[0].id;
+				body.appendChild(div_button);
+				body.appendChild(header);
+				body.appendChild(screen);
+				LOAD_Professor(id);
+				for (i = 0; i< document.getElementsByTagName("ul").length; i++)
+					{
+						document.getElementsByTagName("ul")[i].onclick = function(e) { if (e.target.getAttribute("number") != null) LOAD_Professor(e.target.getAttribute("number")); };
+					}
+				loader.purge();
+			}
+		}
 		query.do();
-	   }, 600);
-	}, 600);
+	}
+	loader.create();
 }
 
 /*** --- Загружает информацию конкретного преподавателя в скелет
@@ -608,27 +626,30 @@ function LOAD_Professor(id)
 {
 	if (!getVar("inprogress_professor"))
 		{
-			setVar("inprogress_professor", "1");
 			var block = document.getElementById("right-side");
-            var loader = CreateLoader(block, 1);
-            loader.style.opacity = "0";
-			block.style.transition = "0.5s";
-			block.style.opacity = "0";
-			setTimeout(function () {
-				block.innerHTML = "";
-                loader.style.top = "50px";
-                loader.style.backgroundColor = "transparent";
-				document.getElementById("screen").appendChild(loader);
-				loader.style.opacity = "1";
-				var req = {};
-				req.professor_id = id;
-				var query1 = new Request("/dashboard/professors/get_professor_state", req);
-				query1.callback = function (Response) {
-					var answer = JSON.parse(Response);
-                    if (answer.state != "fail")
-					{
-                        setTimeout(function () {
+            var loader = new PreLoader(block);
 
+			setVar("inprogress_professor", "1");
+			block.style.transition = "0.5s";
+			loader.transparent = true;
+			loader.fullscreen = false;
+			
+			loader.before = function () { block.style.opacity = 0; }
+			loader.inprogress = function () {
+				
+				setTimeout(function () {
+
+					block.innerHTML = "";
+
+					var req = {};
+					req.professor_id = id;
+
+					var query1 = new Request("/dashboard/professors/get_professor_state", req);
+					query1.callback = function (Response) {
+
+						var answer = JSON.parse(Response);
+						if (answer.state != "fail")
+						{
 							var teacher_photo = CreateElem("div", "teacher-photo");
 
 							var teacher_img = CreateElem("img");
@@ -640,9 +661,11 @@ function LOAD_Professor(id)
 							teacher_info.appendChild(CreateElem("p", "teacher-name", null, null, answer.name));
 							teacher_info.appendChild(CreateElem("p", "teacher-dep", null, null, answer.department));
 							teacher_info.appendChild(CreateElem("p", "teacher-now", null, null, "Апанасевич С.А. сегодня не преподает"));
+
 							var req = {};
 							req.professor_id = id;
 							var query2 = new Request("/dashboard/professors/get_professor_timetable", req);
+
 							query2.callback = function (Response) {
 								answer = JSON.parse(Response);
 								if (answer.state != "fail")
@@ -650,11 +673,11 @@ function LOAD_Professor(id)
 
 									var dashmin = Math.min(answer.even.min,answer.uneven.min);
 									var dashmax = Math.max(answer.even.max,answer.uneven.max);
-									
+
 									var table1 = CreateElem("table", null, "table-full");
 									var caption = CreateElem("caption", null, null, null, "Числитель");
 									table1.appendChild(caption);
-									
+
 									var thead = table1.createTHead(-1);
 									var row = thead.insertRow(-1);
 									var cell = row.insertCell(-1);
@@ -686,7 +709,7 @@ function LOAD_Professor(id)
 									table2.style.marginBottom = "20px";
 									var caption = CreateElem("caption", null, null, null, "Знаменатель");
 									table2.appendChild(caption);
-									
+
 									var thead = table2.createTHead(-1);
 									var row = thead.insertRow(-1);
 									var cell = row.insertCell(-1);
@@ -713,11 +736,14 @@ function LOAD_Professor(id)
 														}
 												}
 										}
-									
+
 									block.appendChild(teacher_photo);
 									block.appendChild(teacher_info);
 									block.appendChild(table1);
 									block.appendChild(table2);
+
+									loader.purge();
+
 									var blocks = document.getElementsByClassName("more-info");
 									for (var i = 0; i<blocks.length; i++)
 										{
@@ -725,20 +751,18 @@ function LOAD_Professor(id)
 											blocks[i].style.top = -5 - blocks[i].offsetHeight + "px";
 											blocks[i].style.display = "";
 										}
-									loader.style.opacity = "";
-									setTimeout(function () {
-										loader.remove();
-										block.style.opacity = "";
-										delVar("inprogress_professor");
-									}, 600);
+
+									block.style.opacity = "";
+									delVar("inprogress_professor");
 								}
 							}
 							query2.do();
-                        }, 600);
-                    }
-				}
-			query1.do();
-			},600);
+						}
+					}
+					query1.do();
+				}, 500);
+			}
+			loader.create();
 		}
 }
 
@@ -750,26 +774,25 @@ Output:
 ***/
 function AuthLoad()
 {
-    CHECK_stop = true;
-    var body = document.body;
-    body.style.opacity = "0";
-    var loader = CreateLoader(body, 1);
-	loader.style.opacity = "1";
-    delVar("inprogress_Auth");
-	setTimeout(function(){
-		ClearBody();
-		CHECK_stop = true;
-		body.appendChild(loader);
-		body.style.opacity = "";
-		setTimeout(function() {
-			var query = new Request("/Application/Views/Skeletons/Main_Auth.html");
-			query.callback = function (Response) {
-				body.style.opacity = "0";
-				setTimeout(function () { loader.remove(); body.innerHTML = Response; body.style.opacity = ""; }, 600);
-			}
-			query.do();
-		}, 600);
-	} ,600);
+	CHECK_stop = true;
+	delVar("inprogress_Auth");
+	
+	var loader = new PreLoader();
+	
+	loader.before = function () { ClearBody(); }
+	loader.inprogress = function () {
+		var query = new Request("/Application/Views/Skeletons/Main_Auth.html");
+		query.callback = function (Response) {
+
+			var temp = document.createElement("div"); // заглушка, поскольку innerHTML += вызывает перезагрузку DOM элементов,
+			temp.innerHTML = Response; // что приводит к потере контроля за PreLoader
+			document.body.appendChild(temp.children[0]); // TODO: найти более удачный способ решения
+			loader.purge();
+			
+		}
+		query.do();
+	}
+	loader.create();
 }
 
 /*** --- Проверяет авторизацию, авторизирует в случае успеха

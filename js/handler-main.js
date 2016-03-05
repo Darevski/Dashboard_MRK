@@ -141,16 +141,9 @@ function CreateEx(message)
 	layer1.appendChild(layer2);
 	layer1.style.opacity = "0";
 	document.body.appendChild(layer1);
-	setTimeout(function () { layer1.style.opacity = "1"; }, 0);
+	setTimeout(function () { layer1.style.opacity = 1; }, 10);
 }
-
-/*** --- Создает LOADER
-Input:
-	X - начальное отклонение x, относительно (100% - 1000px) / 2
-	Y - начальное отклонение y, относительно (100% - 500px) / 2
-Output:
-	LOADER - возвращает LOADER типа ELEMENT
-***/
+/*
 function CreateLoader(block, allBlock, fullscreen)
 {
     var loader = document.createElement("div");
@@ -187,6 +180,55 @@ function CreateLoader(block, allBlock, fullscreen)
     loader.appendChild(span_loader);
     loader.zIndex = 10;
     return loader;
+}*/
+
+function PreLoader(block)
+{
+	this.fullscreen = true;
+	this.transparent = false;
+	this.loader = null;
+	this.block = (block) ? block : document.body;
+	this.before = function () {};
+	this.inprogress = function () {};
+}
+PreLoader.prototype = {
+	create: function () {
+		this.loader = document.createElement("div");
+		this.loader.style.opacity = 0;
+		this.loader.style.transition = "1s";
+		if (this.fullscreen)
+			{
+				this.loader.style.left = "0";
+				this.loader.style.top = "0";			
+				this.loader.style.width = "100%";
+				this.loader.style.height = "100%";
+			}
+		else
+			{
+				this.loader.style.width = this.block.offsetWidth + "px";
+				this.loader.style.height = this.block.offsetHeight + "px";
+				this.loader.style.left = this.block.getBoundingClientRect().left + "px";
+				this.loader.style.top = this.block.getBoundingClientRect().top + "px";
+			}
+		(this.transparent) && (this.loader.style.backgroundColor = "transparent");
+		this.loader.className='loader';
+		var span_loader = document.createElement("span");
+		span_loader.className = "loader-container";
+		for (var i =0; i<4; i++)
+			span_loader.appendChild(document.createElement("div"));
+		this.loader.appendChild(span_loader);
+		this.loader.zIndex = 10;
+		this.before();
+		var _this = this;
+		document.body.appendChild(this.loader);
+		setTimeout( function () { _this.loader.style.opacity = 1; }, 10);
+		setTimeout( function () { _this.inprogress(); }, 1000);
+	},
+	purge: function () {
+		this.loader.style.opacity = 0;
+		var _this = this;
+		setTimeout( function () { _this.loader.remove() }, 500);
+	}
 }
 /*** --- Гененирует основное меню
 Input:
@@ -197,29 +239,20 @@ Output:
 function Dashboard_Load()
 {
 	CHECK_stop = false;
-    var body = document.body;
-	body.style.opacity = "0";
-    var loader = CreateLoader(body, 1);    
-	setTimeout(function (){
-		ClearBody();
-		body.style.opacity = "";
-        document.body.appendChild(loader);
-		loader.style.opacity = "1";
+	var loader = new PreLoader();
+	loader.before = function () { ClearBody(); }
+	loader.inprogress = function () {
 		var query = new Request("/Application/Views/Skeletons/Main_Dashboard.html");
 		query.callback = function (Response) {
-			setTimeout(function () {
-				loader.style.opacity = "";
-				body.style.opacity = "0";
-				setTimeout(function () {
-					loader.remove();
-					body.style.opacity = "";
-					body.innerHTML = Response;
-					Dashboard_CHECK();
-				}, 600);
-			}, 600);
+			var temp = document.createElement("div"); // заглушка, поскольку innerHTML += вызывает перезагрузку DOM элементов,
+			temp.innerHTML = Response; // что приводит к потере контроля за PreLoader
+			document.body.appendChild(temp.children[0]); // TODO: найти более удачный способ решения
+			Dashboard_CHECK();
+			loader.purge();
     	}
 		query.do();
-	}, 600);
+	}
+	loader.create();
 }
 /*** --- Генерирует меню выбора группы
 Input:
@@ -232,61 +265,51 @@ function GroupChoice()
 	CHECK_stop = true;
 	delVar("group");
     var body = document.body;
-    var loader = CreateLoader(body, 1);
-    body.appendChild(loader);
-    setTimeout( function() {
-        loader.style.opacity = "1";
-        setTimeout( function() {
-            if (document.getElementById("main-container") != undefined)
-                document.getElementById("main-container").remove();
-			var query = new Request("/dashboard/groups/get_list");
-			query.callback = function (Response) {
-				var answer = JSON.parse(Response);
-				var div_container = document.createElement("div");
-				div_container.id = "container-gr";
-				var div_header = document.createElement("div");
-				div_header.id = "header";
-				div_header.innerHTML = "Пожалуйста, выберите группу";
-				div_container.appendChild(div_header);
-				for (var i = 1; i <= 4; i++)
-					{
-						var div_list = document.createElement("div");
-						div_list.className = "grade-list";
-						var p_temp = document.createElement("p");
-						p_temp.innerHTML = i + " курс";
-						div_list.appendChild(p_temp);
-						var ul_temp = document.createElement("ul");
-						div_list.appendChild(ul_temp);
-						if (answer[i] != null)
-							{
-								var j = 0;
-								while (answer[i][j] != null)
-									{
-										var li_temp = document.createElement("li");
-										li_temp.innerHTML = answer[i][j];
-										ul_temp.appendChild(li_temp);
-										j++;
-									}
-							}
-						div_container.appendChild(div_list);
-					}
-				loader.style.opacity = "";
-				setTimeout( function () {
-					loader.remove();
-					body.appendChild(div_container);
-					for (var i =0; i< document.getElementsByTagName("ul").length; i++)
-							document.getElementsByTagName("ul")[i].onclick = function(e) {
-										setTimeout(function() {
-											setVar("group", e.target.innerHTML);
-											setTimeout(Dashboard_Load(), 600);
-										}, 600);
-							};
-				}, 600);
-			}
-			query.do();
-        }, 600);
-    }, 200);
-
+	var loader = new PreLoader();
+	loader.before = function () { ClearBody(); }
+	loader.inprogress = function () {
+		var query = new Request("/dashboard/groups/get_list");
+		query.callback = function (Response) {
+			var answer = JSON.parse(Response);
+			var div_container = document.createElement("div");
+			div_container.id = "container-gr";
+			var div_header = document.createElement("div");
+			div_header.id = "header";
+			div_header.innerHTML = "Пожалуйста, выберите группу";
+			div_container.appendChild(div_header);
+			for (var i = 1; i <= 4; i++)
+				{
+					var div_list = document.createElement("div");
+					div_list.className = "grade-list";
+					var p_temp = document.createElement("p");
+					p_temp.innerHTML = i + " курс";
+					div_list.appendChild(p_temp);
+					var ul_temp = document.createElement("ul");
+					div_list.appendChild(ul_temp);
+					if (answer[i] != null)
+						{
+							var j = 0;
+							while (answer[i][j] != null)
+								{
+									var li_temp = document.createElement("li");
+									li_temp.innerHTML = answer[i][j];
+									ul_temp.appendChild(li_temp);
+									j++;
+								}
+						}
+					div_container.appendChild(div_list);
+				}
+				body.appendChild(div_container);
+				for (var i =0; i< document.getElementsByTagName("ul").length; i++)
+						document.getElementsByTagName("ul")[i].onclick = function(e) {
+										setVar("group", e.target.innerHTML);
+										setTimeout(Dashboard_Load(), 10);
+						}
+				loader.purge();
+		}
+		query.do();
+	}
+	loader.create();
 }
 
 /*** --- Создает объект

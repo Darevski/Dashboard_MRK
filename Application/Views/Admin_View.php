@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="./css/loader.css">
     <title>АдминПанель</title>
 </head>
-<body onload="DoOnLoad()">
+<body>
 <script type="text/javascript" src="./js/less.min.js"></script>
 <script type="text/javascript" src="./js/handler-main.js"></script>
 <script type="text/javascript" src="./js/handler-admin.js"></script>

@@ -18,7 +18,7 @@
     <link rel="stylesheet" type="text/css" href="./css/loader.css">
     <title>Расписание МГВРК</title>
 </head>
-<body onload="DoOnLoad()">
+<body>
 <script type="text/javascript" src="./js/handler-main.js"></script>
 <script type="text/javascript" src="./js/handler-dashboard.js"></script>
 </body>

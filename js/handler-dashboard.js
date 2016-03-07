@@ -1,6 +1,8 @@
 var CHECK_stop = false; /*	Создает и устанавливает значение необходимости остановки опроса изменения значний у сервера	*/
 var TIME_difference;
 var base_check_inprogress;
+window.onload = DoOnLoad;
+
 /*** --- Выполняет проверку необходимости обновления блока расписания
 Input:
 	none

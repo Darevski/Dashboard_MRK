@@ -1,6 +1,8 @@
 var TIME_difference;
 var professorslist, lessonlist;
 var notificationlist;
+window.onload = DoOnLoad;
+
 function LOAD_SkeletonsFullscreen(route, callback)
 {
 	try {

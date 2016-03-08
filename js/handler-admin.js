@@ -3,6 +3,10 @@ var professorslist, lessonlist;
 var notificationlist;
 window.onload = DoOnLoad;
 
+/** Загружает скелет, вызывает callback после загрузки
+* @param {string} route адрес скелета
+* @param {function} callback callback-функция
+*/
 function LOAD_SkeletonsFullscreen(route, callback)
 {
 	try {
@@ -33,6 +37,10 @@ function LOAD_SkeletonsFullscreen(route, callback)
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Выполнятеся по загрузке страницы
+*
+*/
 function DoOnLoad()
 {
 	try {
@@ -40,6 +48,10 @@ function DoOnLoad()
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Загружает главное меню администратора
+*
+*/
 function LOAD_AdminDash()
 {
 	try {
@@ -47,6 +59,10 @@ function LOAD_AdminDash()
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Загружает модуль множественной отправки уведомлений
+* @throws Исключения, вызванные ошибками отправки, обработки; загрузки и изменения контента
+*/
 function LOAD_Message()
 {
 	try {
@@ -117,6 +133,12 @@ function LOAD_Message()
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Удаляет уведомление
+* @param {number} ident ID удаляемого уведомления
+* @param {DOM-Element} el Элемент страницы, указывающий на удаляемое уведомление
+* @throws Исключения, вызванные ошибками удаления, редактирования контента
+*/
 function DELETE_message(ident, el)
 {
 	try {
@@ -150,6 +172,12 @@ function DELETE_message(ident, el)
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Создает экземпляр элемента li для модуля удаления уведомлений
+* @param {object} input Входные данные уведомления (тип, текст, дата начала/окончания)
+* @return {DOM-Element} li Возвращает строку для модуля удаления уведомлений
+* @throws Исключения, вызванные чтением входных данных, создания элемента
+*/
 function create_li_notification(input)
 {
 	try {
@@ -209,18 +237,26 @@ function create_li_notification(input)
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Сортирует уведомления в модуле удаления
+* @param {string} str Метод сортировки
+* @throws Исключения, вызванные ошибками сортировки, изменения контента
+*/
 function message_sort(str)
 {
+	/** @private */
 	function compare_number (a, b)
 	{
 		return a.group_number - b.group_number;
 	}
+	/** @private */
 	function compare_date_start (a, b)
 	{
 		var first = new Date(a.starting_date);
 		var second = new Date(b.starting_date);
 		return first - second;
 	}
+	/** @private */
 	function compare_date_end (a, b)
 	{
 		var first = new Date(a.ending_date);
@@ -260,6 +296,10 @@ function message_sort(str)
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Загружает модуль удаления уведомлений
+*
+*/
 function LOAD_Message_manager()
 {
 	try {
@@ -293,6 +333,14 @@ function LOAD_Message_manager()
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Отправляет уведомления
+* @param {Object} options Параметры уведомления
+* @param {string} text Текст уведомления
+* @param {number} number Номер уведомления при множественной отправке
+* @callback callback
+* @throws Исключения, вызванные ошибками отправки, изменения контента
+*/
 function SEND_message(options, text, number, callback)
 {
 	try {
@@ -300,14 +348,10 @@ function SEND_message(options, text, number, callback)
 		var answer = {};
 		answer.state = "fail";
 		
-		if ((text == "") || (text == void(0)))
-			answer.message = "Не введен текст уведомления";
-		else if ((options.type == "") || (options.type == void(0)))
-				answer.message = "Не указан тип уведомления";
-		else if ((options.ending_date == "") || (options.ending_date == void(0)))
-				answer.message = "Не указана дата окончания";
-		else if ((options.target == "") || (options.target == void(0)))
-				answer.message = "Нет получателей";
+		((text == "") || (text == void(0))) && (answer.message = "Не введен текст уведомления");
+		((options.type == "") || (options.type == void(0))) && (answer.message = "Не указан тип уведомления");
+		((options.ending_date == "") || (options.ending_date == void(0))) && (answer.message = "Не указана дата окончания");
+		((options.target == "") || (options.target == void(0))) && (answer.message = "Нет получателей");
 		
 		if (answer.message != void(0))
 			callback(answer, number);
@@ -325,6 +369,10 @@ function SEND_message(options, text, number, callback)
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Загружает список получателей уведомления
+*
+*/
 function LOAD_whom_sent()
 {
 	function Result_find(elem)
@@ -378,6 +426,10 @@ function LOAD_whom_sent()
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Подготавливает к отправке уведомления из модуля множественной отправки
+*
+*/
 function SEND_premessage_full()
 {
 	try {
@@ -529,6 +581,10 @@ function SEND_premessage_full()
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Показывает возможные типы уведомлений в малом окне отправки
+*
+*/
 function SHOW_message_types()
 {
 	try {
@@ -541,6 +597,10 @@ function SHOW_message_types()
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Устанавливает тип отправляемого уведомления в малом окне отправки
+* @param {string} value Тип уведомления
+*/
 function SET_message_type(value)
 {
 	try {
@@ -565,6 +625,10 @@ function SET_message_type(value)
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
+
+/** Подготавливает уведомление к отправке в малом окне
+*
+*/
 function SEND_message_small()
 {
 	try {

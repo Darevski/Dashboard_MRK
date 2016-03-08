@@ -1,14 +1,11 @@
-var CHECK_stop = false; /*	Создает и устанавливает значение необходимости остановки опроса изменения значний у сервера	*/
+var CHECK_stop = false;
 var TIME_difference;
 var base_check_inprogress;
 window.onload = DoOnLoad;
 
-/*** --- Выполняет проверку необходимости обновления блока расписания
-Input:
-	none
-Output:
-	none
-***/
+/**  Проверяет необходимость обновления блока расписания
+*
+*/
 function CHECK_Shedule()
 {
 	try {
@@ -38,12 +35,9 @@ function CHECK_Shedule()
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Выполняет обновление блока расписания на основе полученных данных
-Input:
-	ANSWER - строка JSON, полученная в CHECK_Shedule
-Output:
-	none
-***/
+/** Обновляет блок расписания
+* @param {string} answer JSON строка новых данных
+*/
 function LOAD_Shedule(answer)
 {
 	try {
@@ -153,12 +147,9 @@ function LOAD_Shedule(answer)
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Открывает/закрывает створку сегодня/завтра
-Input:
-	ID - указатель направления створки
-Output:
-	none
-***/
+/** Toggle расписания сегодня/завтра
+* @param {string} id Указатель переключения
+*/
 function Open_Shedule(id)
 {
 	try {
@@ -178,12 +169,9 @@ function Open_Shedule(id)
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Загружает информацию о текущей паре
-Input:
-	LESSON_NUM - указатель пары, информацию о которой необходимо получить
-Output:
-	none
-***/
+/** Загружает информацию о текущем занятии
+* @param {string} lesson_num Номер текущей пары
+*/
 function LOAD_Professor_BASIC(lesson_num)
 {
 	try {
@@ -292,12 +280,9 @@ function LOAD_Professor_BASIC(lesson_num)
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Выполняет проверку необходимости обновления блока уведомлений
-Input:
-	none
-Output:
-	none
-***/
+/**  Проверяет необходимости обновления блока уведомлений
+*
+*/
 function CHECK_alerts()
 {
 	try {
@@ -327,12 +312,9 @@ function CHECK_alerts()
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Обновляет блок уведомлений на основе полученных данных
-Input:
-	ANSWER - JSON строка, полученная в CHECK_alerts()
-Output:
-	none
-***/
+/** Обновляет блок уведолмений
+* @param {string} answer JSON строка новых данных
+*/
 function LOAD_alerts(answer)
 {
 	try {
@@ -373,12 +355,9 @@ function LOAD_alerts(answer)
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Выполяется при первоначальной загрузке страницы, выбирает необходимый блок загрузки
-Input:
-	none
-Output:
-	none
-***/
+/** Выполнятеся по загрузке страницы
+*
+*/
 function DoOnLoad()
 {
 	try {
@@ -388,12 +367,9 @@ function DoOnLoad()
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Получает время сервера
-Input:
-	none
-Output:
-	none
-***/
+/** Получает время сервера
+*
+*/
 function GET_time()
 {
 	try {		
@@ -444,12 +420,9 @@ function GET_time()
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Выполняет загрузку информации в скелет главного меню, запускает циклические проверки
-Input:
-	none
-Output:
-	none
-***/
+/** Загружает информацию в скелет главного меню, запускает проверки обновления
+*
+*/
 function Dashboard_CHECK()
 {
 	try {
@@ -489,12 +462,9 @@ function Dashboard_CHECK()
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Загружает полное расписание группы на экран
-Input:
-	none
-Output:
-	none
-***/
+/** Загружает расписание
+*
+*/
 function LOAD_fullShedule()
 {
 	try {
@@ -620,12 +590,9 @@ function LOAD_fullShedule()
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Загружает скелет преподавателей на экран
-Input:
-	ID - желаемый ID преподователя для вывода, при его null, выводится первый в списке
-Output:
-	none
-***/
+/** Загружает скелет раздела преподавателях
+* @param {string} id ID желаемого для отображения преподавателя
+*/
 function LOAD_Professors(id)
 {
 	try {
@@ -693,12 +660,9 @@ function LOAD_Professors(id)
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Загружает информацию конкретного преподавателя в скелет
-Input:
-	ID - идентификатор преподавателя
-Output:
-	none
-***/
+/** Загружает информацию о преподавателе
+* @param {string} id ID преподавателя
+*/
 function LOAD_Professor(id)
 {
 	try {
@@ -852,12 +816,9 @@ function LOAD_Professor(id)
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Загружает окно авторизации
-Input:
-	none
-Output:
-	none
-***/
+/** Загружает окно авторизации
+*
+*/
 function AuthLoad()
 {
 	try {
@@ -888,12 +849,9 @@ function AuthLoad()
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Проверяет авторизацию, авторизирует в случае успеха
-Input:
-	none - получает данные из элементов
-Output:
-	none
-***/
+/** Выполняет авторизацию
+*
+*/
 function AuthTry()
 {
 	try {

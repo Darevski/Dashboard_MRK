@@ -1,51 +1,44 @@
-/*** --- Очищает BODY
-Input:
-	none
-Output:
-	none
-***/
+window.onerror = function (message, url, linenum) {
+	CreateEx(message);
+	console.error(message,linenum);
+}
+
+/** Очищает страницу
+*
+*/
 function ClearBody()
 {
     document.body.innerHTML = "";
 }
 
-/*** --- Возвращает COOKIE
-Input:
-	NAME - параметр COOKIE
-Output:
-	VALUE of NAME ::: FALSE
-***/
+/** Возвращает информацию из хранилища
+* @param {string} name Имя ключа в хранилище
+* @return {string} item В случае существования возвращает значение, иначе false
+*/
 function getVar(name) {
 	var item = localStorage.getItem(name);
   	return item!=null ? item : false;
 }
 
-/*** --- Устанавливает COOKIE
-Input:
-	NAME - параметр COOKIE
-	VALUE - значение COOKIE
-	OPTIONS - свойства -> истечение, путь, домен, secure
-Output:
-	none
-***/
+/** Сохраняет информацию в хранилище
+* @param {string} name Имя ключа
+* @param {string} value Значение
+*
+*/
 function setVar(name, value) { localStorage.setItem(name, value); }
 
-/*** --- Удаляет COOKIE
-Input:
-	NAME - паарметр COOKIE
-Output:
-	none
-***/
+/** Удаляет информацию из хранилища
+* @param {string} name Имя ключа
+*/
 function delVar(name) { delete localStorage[name]; }
 
-/*** --- Создает новый запрос
-Input:
-	ROUTE - адрес запроса
-	BODY - ТЕЛО ЗАПРОСА
-	CALLBACK - возвращение значения в функцию
-Output:
-	CALLBACK - возвращение значения в функцию
-***/
+/** Класс запроса - реализует функцию отправки и обработки запросов
+* @class
+* @param {string} route Адрес запроса
+* @param {Object} body Тело запроса
+* @this {Request} Экземпляр класса
+* @callback
+*/
 function Request(route, body)
 {
 	this.body = body;
@@ -54,6 +47,7 @@ function Request(route, body)
 	this.callback = function () {};
 }
 Request.prototype = {
+	/** @private */
 	do: function () {
 		try {
 			var callback = this.callback;
@@ -107,12 +101,9 @@ Request.prototype = {
 	}
 }
 
-/*** --- Удаляет сообщение JS
-Input:
-	E - ELEMENT
-Output:
-	none
-***/
+/** Удаляет информационное окно
+* @param {DOM-Element} e Элемент для удаления
+*/
 function RemoveEx(e)
 {
 	CHECK_stop = false;
@@ -120,12 +111,9 @@ function RemoveEx(e)
 	setTimeout(function () { e.parentNode.remove(); }, 520);
 }
 
-/*** --- Создает сообщение JS
-Input:
-	MESSAGE - сообщение
-Output:
-	none
-***/
+/** Создает информационное окно
+* @param {string} message Сообщение об ошбике
+*/
 function CreateEx(message)
 {
 	try {
@@ -148,6 +136,12 @@ function CreateEx(message)
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
+/** Класс загрузчика - реализует PreLoader и управление им
+* @class
+* @param {DOM-Element} block Желаемый блок для закрытия
+* @this {PreLoader} Экземпляр класса
+* @callback inprogress
+*/
 function PreLoader(block)
 {
 	this.fullscreen = true;
@@ -209,12 +203,10 @@ PreLoader.prototype = {
 		catch (ex) { console.error(ex); CreateEx(ex.message); }
 	}
 }
-/*** --- Гененирует основное меню
-Input:
-	none
-Output:
-	none
-***/
+
+/** Загружает основное меню пользователя
+*
+*/
 function Dashboard_Load()
 {
 	try {
@@ -244,12 +236,10 @@ function Dashboard_Load()
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
-/*** --- Генерирует меню выбора группы
-Input:
-	none
-Output:
-	setVar
-***/
+
+/** Загружает меню выбора группы
+*
+*/
 function GroupChoice()
 {
 	try {
@@ -325,16 +315,15 @@ function GroupChoice()
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
 }
 
-/*** --- Создает объект
-Input:
-	NAME_TYPE - тип создаваемого объекта
-	NAME_ID - ID создаваемого объекта
-	NAME_CLASS - класс создаваемого объекта
-	NAME_ONCLICK - аттрибут OnClick
-	NAME_INNER - innerHTML создаваемого объекта
-Output:
-	elem - объект типа DOM.ELEMENT
-***/
+/** Создает элемент
+* @param {string} name_type Тип объекта
+* @param {string} name_id ID объекта
+* @param {string} name_class Класс объекта
+* @param {string} name_onclick Событие по клику
+* @param {string} name_inner innerHTML объекта
+* @return {DOM-Element} Созданный элемент
+* @todo Переписать функцию как класс
+*/
 function CreateElem(name_type, name_id, name_class, name_onclick, name_inner)
 {
 	try {
@@ -348,8 +337,4 @@ function CreateElem(name_type, name_id, name_class, name_onclick, name_inner)
 	return elem;
 	}
 	catch (ex) { console.error(ex); CreateEx(ex.message); }
-}
-window.onerror = function (message, url, linenum) {
-	CreateEx(message);
-	console.error(message,linenum);
 }

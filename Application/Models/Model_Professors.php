@@ -73,12 +73,83 @@ class Model_Professors extends Model_Dashboard
      * @return array уникальный id,professor(ФИО),depart_name(кафедра)
      */
     function get_professors_list(){
-        $query = "SELECT prof.id,prof.professor,dep_list.depart_name FROM professors as prof,departments_list as dep_list
+        $query = "SELECT prof.id,prof.name,dep_list.depart_name FROM professors as prof,departments_list as dep_list
                   WHERE prof.department_code = dep_list.code";
         $result=$this->database->getALL($query);
         $result['state']='success';
         return $result;
     }
+
+    /** Возвращает всех преподавателей с id, код кафедры, фио
+     * @return array
+     */
+    private function get_professors_thin_list(){
+        $professors_query = "SELECT professors.id as professor_id,professors.department_code,professors.name FROM professors";
+        $professors = $this->database->getAll($professors_query);
+        return $professors;
+    }
+
+
+    /**
+     * Создает массив со списком преподавателей и предметов (кафедры преподавателя)
+     * @return mixed
+     */
+    function get_list_professors_with_lessons(){
+        //Получение общего списка предметов id, name, dep_code
+        $Model_Lessons = new Model_Lessons();
+        $lessons = $Model_Lessons->get_list_lessons();
+        // Получение списка преподавателей id, фио, dep code
+        $professors = $this->get_professors_thin_list();
+
+        $lessons_ordered = array();
+        //Перекомпановка массива предметов под каждую кафедру
+        foreach ($lessons as $value)
+            $lessons_ordered[$value['department_code']][] = $value;
+
+        unset ($value);
+
+        $result = array();
+        // Создание результирующего массива вида преподаватель [предметы его ЦК]
+        foreach ($professors as $value){
+            $value['lessons'] =null;
+            if (isset($lessons_ordered[$value['department_code']]))
+                $value['lessons'] = $lessons_ordered[$value['department_code']];
+
+            $result[] = $value;
+        }
+        return $result;
+    }
+
+    /**
+     * Создает массив предметов с преподавателями кафедры на котором ведется предмет
+     * @return mixed
+     */
+    function get_list_lessons_with_professors(){
+        //Получение общего списка предметов id, name, dep_code
+        $model_lessons = new Model_Lessons();
+        $lessons = $model_lessons->get_list_lessons();
+        // Получение списка преподавателей id, фио, dep code
+        $professors = $this->get_professors_thin_list();
+
+        $professors_ordered = array();
+        //Перекомпановка массива преподавателей под каждую кафедру
+        foreach ($professors as $value)
+            $professors_ordered[$value['department_code']][] = $value;
+
+        unset ($value);
+
+        $result = array();
+        // Создание результирующего массива вида преподаватель [предметы его ЦК]
+        foreach ($lessons as $value){
+            $value['professors'] =null;
+            if (isset($professors_ordered[$value['department_code']]))
+                $value['professors'] = $professors_ordered[$value['department_code']];
+
+            $result[] = $value;
+        }
+        return $result;
+    }
+
 
     /**
      * Возвращает рассписание преподавателя на неделю
@@ -98,6 +169,20 @@ class Model_Professors extends Model_Dashboard
         $result['state'] = 'success';
 
         return $result;
+    }
+
+    /**
+     * Проверяет существование преподавателя по указанному id
+     * @param integer $id
+     * @return bool
+     */
+    public function isset_professor($id){
+        $query = 'SELECT * FROM professors WHERE id = ?s';
+        $result = $this->database->query($query,$id);
+        if ($this->database->numRows($result) > 0)
+            return true;
+        else
+            return false;
     }
 
     /**
@@ -158,12 +243,11 @@ class Model_Professors extends Model_Dashboard
      * @return array [professor] [depart_name] [photo_url]
      */
     private function get_professor_info($professor_id){
-        $query = "SELECT prof.professor,dep_list.depart_name,photo_url FROM professors as prof,departments_list as dep_list
+        $query = "SELECT prof.name,dep_list.depart_name,photo_url FROM professors as prof,departments_list as dep_list
                   WHERE prof.department_code = dep_list.code and prof.id=?s";
         $result=$this->database->getRow($query,$professor_id);
         return $result;
     }
-
     /**
      * Создание рассписания преподавателя на неделю с учетом нумератора недели
      * @param integer $professor_id
@@ -189,17 +273,5 @@ class Model_Professors extends Model_Dashboard
         return $result;
     }
 
-    /**
-     * Проверяет существование преподавателя по указанному id
-     * @param integer $id
-     * @return bool
-     */
-    public function isset_professor($id){
-        $query = 'SELECT * FROM professors WHERE id = ?s';
-        $result = $this->database->query($query,$id);
-        if ($this->database->numRows($result) > 0)
-            return true;
-        else
-            return false;
-    }
+
 }

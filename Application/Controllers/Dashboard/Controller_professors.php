@@ -81,6 +81,37 @@ class Controller_professors extends Controller_dashboard
     }
 
     /**
+     * Вывод JSON строки содержащей список преподавателей с предметами кафедры преподавателя
+     * professor_id преподавателя
+     * name имя
+     * department_code код кафердры
+     * lessons
+     * [ id ид предмета
+     *   department_code код кафедры
+     *   name название предмета
+     * ]
+     */
+    function action_get_list_professors_with_lessons(){
+        $professors = $this->professor_model->get_list_professors_with_lessons();
+        $this->view->output_json($professors);
+    }
+
+    /**
+     * Вывод Json строки содеращей список предметов с преподавателями кафедры на котором ведется предмет
+     * id предмета
+     * name название предмета
+     * department_code код кафердры
+     * professor
+     * [ professor_id ид преподавателя
+     *   department_code код кафедры
+     *   name имя
+     * ]
+     */
+    function action_get_list_lessons_with_professors(){
+        $lessons = $this->professor_model->get_list_lessons_with_professors();
+        $this->view->output_json($lessons);
+    }
+    /**
      * Вывод Json строки, содержающей списки преподавателей
      *
      * Cо следующей структурой: уникальный id,professor(ФИО),depart_name(кафедра)

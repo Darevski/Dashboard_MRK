@@ -19,6 +19,70 @@ use Application\Exceptions\Models_Processing_Except;
  */
 class Model_TimeTable extends Model_Dashboard
 {
+    //ADMIN start!
+    /**
+     * Заносит в БД рассписание на определенный день
+     * @param $group_number integer - номер групппы
+     * @param $numerator string - нумератор недели "ch/zn/all"
+     * @param $day_number integer - номер дня недели
+     * @param $timetable array рассписани на день структура: [num_lesson:[prof_id,lesson_id]]
+     * @throws Models_Processing_Except
+     */
+    function set_timetable_for_day($group_number,$numerator,$day_number,$timetable){
+        // Проверка входных данных на валидность
+        $groups_model = new Model_List_Groups();
+        if (!is_int($group_number))
+            throw new Models_Processing_Except("Номер группы - $group_number не является числом");
+
+        else if (!$groups_model->isset_group($group_number))
+            throw new Models_Processing_Except("Группы - $group_number не существует");
+
+        else if ($numerator != 'all' && $numerator != 'zn' && $numerator != 'ch')
+            throw new Models_Processing_Except("$numerator не может быть нумератором недели");
+        // при не существовании дня недели
+        else if (!is_int($day_number) || $day_number<0 || $day_number>6)
+            throw new Models_Processing_Except("Значение $day_number не является днем недели");
+
+        // Проверка массива рассписания на валидность значений
+        $professors_model = new Model_Professors();
+        $lessons_model = new Model_Lessons();
+        foreach ($timetable as $item){
+            if (!is_int($item['num_lesson']) || $item['num_lesson']<0 || $item['num_lesson']>8)
+                throw new Models_Processing_Except("Не верное значение номера пары - ".$item['num_lesson']);
+            else if (!is_int($item['prof_id']))
+                throw new Models_Processing_Except("Идентификатор преподавателя ".$item['prof_id']." не являтся числом");
+            else if (!is_int($item['lesson_id']))
+                throw new Models_Processing_Except("Идентификатор предмета ".$item['lesson_id']." не являтся числом");
+            else if (!$professors_model->isset_professor($item['prof_id']))
+                throw new Models_Processing_Except("Преподавателя с индентификатором ".$item['prof_id']." не существует");
+            else if (!$lessons_model->is_lesson_set($item['lesson_id']))
+                throw new Models_Processing_Except("Предмета с идентификатором ".$item['lesson_id']." не существует");
+        }
+
+        //Удаление записей рассписания на указанный день
+
+        //при нумераторе all удаляются все нумераторы
+        if ($numerator == 'all'){
+            $delete_query = "DELETE FROM groups WHERE group_number=?i and day_number=?i";
+            $this->database->query($delete_query,$group_number,$day_number);
+        }
+        // при знаменателе или числителе удаляются только соответсвующие нумератору
+        else{
+            $delete_query = "DELETE FROM groups WHERE group_number=?i and numerator=?s and day_number=?i";
+            $this->database->query($delete_query,$group_number,$numerator,$day_number);
+        }
+
+        $insert_query = "INSERT INTO groups (group_number,day_number,lesson_number,professor_id,lesson_id,numerator)
+                          VALUES (?i,?i,?i,?i,?i,?s)";
+        foreach ($timetable as $lesson)
+            $this->database->query($insert_query,$group_number,$day_number,$lesson['num_lesson'],
+                $lesson['prof_id'],$lesson['lesson_id'],$numerator);
+
+        $result['state'] = 'success';
+        return $result;
+    }
+    //ADMIN end!
+
     /**
      * По ввведеным данным(номер группы, номер пары), выводит информацию о паре
      * @param integer $number_group

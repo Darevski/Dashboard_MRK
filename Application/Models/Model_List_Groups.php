@@ -181,8 +181,11 @@ class Model_List_Groups extends Model_Dashboard
      * Проверяет существование группы по указанному id
      * @param integer $id
      * @return bool
+     * @throws Models_Processing_Except
      */
     public function isset_group($id){
+        if (!is_int($id))
+            throw new Models_Processing_Except("Номер группы $id не является числом");
         $query = 'SELECT * FROM groups_list WHERE group_number = ?s';
         $result = $this->database->query($query,$id);
         if ($this->database->numRows($result) > 0)

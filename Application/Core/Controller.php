@@ -91,7 +91,7 @@ class Controller {
         foreach ($array as &$value){
             if (is_array($value))
                 $value=$this->secure_array($value);
-            else {
+            else if (!is_int($value)){
                 $value=htmlentities($value);
                 $value=strip_tags($value);
             }

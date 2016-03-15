@@ -29,4 +29,21 @@ class Model_Lessons extends Model_Dashboard{
         return $lessons;
     }
 
+    /**
+     * Проверяет существование предмета с указанным ID
+     * @param $lesson_id int
+     * @return bool true - существует, false - нет
+     * @throws Models_Processing_Except
+     */
+    public function is_lesson_set($lesson_id){
+        if (!is_int($lesson_id))
+            throw new Models_Processing_Except("Идентификатор предмета $lesson_id не является числом");
+        $search_query = "Select * From lessons_list WHERE id = ?i";
+        $result_query =$this->database->getAll($search_query,$lesson_id);
+        if (count($result_query)>0)
+            return true;
+        else
+            return false;
+    }
+
 }

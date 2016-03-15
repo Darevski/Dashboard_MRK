@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Хост: localhost
--- Время создания: Мар 15 2016 г., 22:30
+-- Время создания: Мар 15 2016 г., 23:29
 -- Версия сервера: 5.5.47-0ubuntu0.14.04.1
 -- Версия PHP: 5.6.19-1+deb.sury.org~trusty+1
 
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
   KEY `professor_id` (`professor_id`),
   KEY `professor_id_2` (`professor_id`),
   KEY `lesson_id` (`lesson_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=26 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=34 ;
 
 --
 -- Дамп данных таблицы `groups`
@@ -120,13 +120,7 @@ INSERT INTO `groups` (`id`, `group_number`, `day_number`, `lesson_number`, `prof
 (1, 32494, 1, 4, 1, 3, '201', 'all'),
 (2, 32494, 1, 5, 2, 3, '201', 'all'),
 (3, 32494, 1, 6, 1, 3, '201', 'all'),
-(4, 32494, 2, 4, 1, 3, '201', 'zn'),
-(5, 32494, 2, 4, 1, 3, '201', 'ch'),
 (6, 32494, 1, 7, 1, 3, '201', 'all'),
-(7, 32494, 2, 5, 1, 3, '201', 'zn'),
-(8, 32494, 2, 5, 1, 3, '201', 'ch'),
-(9, 32494, 2, 6, 1, 3, '201', 'all'),
-(10, 32494, 2, 7, 1, 3, '201', 'all'),
 (11, 32494, 3, 4, 1, 3, '201', 'ch'),
 (12, 32494, 3, 5, 1, 3, '201', 'ch'),
 (13, 32494, 3, 6, 1, 3, '201', 'all'),
@@ -141,7 +135,8 @@ INSERT INTO `groups` (`id`, `group_number`, `day_number`, `lesson_number`, `prof
 (22, 32494, 5, 5, 4, 3, '201', 'zn'),
 (23, 32494, 5, 6, 4, 3, '117', 'all'),
 (24, 32494, 6, 3, 1, 3, '201', 'all'),
-(25, 32494, 6, 4, 2, 3, '201', 'all');
+(25, 32494, 6, 4, 2, 3, '201', 'all'),
+(33, 32494, 2, 5, 3, 4, '', 'all');
 
 -- --------------------------------------------------------
 
@@ -203,7 +198,7 @@ INSERT INTO `holidays` (`id`, `group_number`, `date`, `type`) VALUES
 
 CREATE TABLE IF NOT EXISTS `lessons_list` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` text COLLATE utf8_unicode_ci NOT NULL,
+  `lesson_name` text COLLATE utf8_unicode_ci NOT NULL,
   `department_code` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `department_code` (`department_code`)
@@ -213,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `lessons_list` (
 -- Дамп данных таблицы `lessons_list`
 --
 
-INSERT INTO `lessons_list` (`id`, `name`, `department_code`) VALUES
+INSERT INTO `lessons_list` (`id`, `lesson_name`, `department_code`) VALUES
 (3, 'ФИЗРа', 7),
 (4, 'Физ Культура', 7);
 
@@ -250,7 +245,7 @@ INSERT INTO `notification` (`id`, `state`, `group_number`, `text`, `starting_dat
 
 CREATE TABLE IF NOT EXISTS `professors` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` text COLLATE utf8_unicode_ci NOT NULL,
+  `professor_name` text COLLATE utf8_unicode_ci NOT NULL,
   `department_code` int(11) DEFAULT NULL,
   `photo_url` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
@@ -262,7 +257,7 @@ CREATE TABLE IF NOT EXISTS `professors` (
 -- Дамп данных таблицы `professors`
 --
 
-INSERT INTO `professors` (`id`, `name`, `department_code`, `photo_url`) VALUES
+INSERT INTO `professors` (`id`, `professor_name`, `department_code`, `photo_url`) VALUES
 (1, 'Дерман У.В.', 7, ''),
 (2, 'Чикун Е.О.', 6, ''),
 (3, 'Смолер И. Г.', 1, ''),

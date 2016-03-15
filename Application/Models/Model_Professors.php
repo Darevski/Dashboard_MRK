@@ -61,7 +61,7 @@ class Model_Professors extends Model_Dashboard
 
         $result['photo_url'] = $prof_info['photo_url'];
         $result['department'] = $prof_info['depart_name'];
-        $result['name'] = $prof_info['professor'];
+        $result['name'] = $prof_info['professor_name'];
 
         $result['state'] = 'success';
 
@@ -73,7 +73,7 @@ class Model_Professors extends Model_Dashboard
      * @return array уникальный id,professor(ФИО),depart_name(кафедра)
      */
     function get_professors_list(){
-        $query = "SELECT prof.id,prof.name,dep_list.depart_name FROM professors as prof,departments_list as dep_list
+        $query = "SELECT prof.id,prof.professor_name,dep_list.depart_name FROM professors as prof,departments_list as dep_list
                   WHERE prof.department_code = dep_list.code";
         $result=$this->database->getALL($query);
         $result['state']='success';
@@ -84,7 +84,7 @@ class Model_Professors extends Model_Dashboard
      * @return array
      */
     private function get_professors_thin_list(){
-        $professors_query = "SELECT professors.id as professor_id,professors.department_code,professors.name FROM professors";
+        $professors_query = "SELECT professors.id as professor_id,professors.department_code,professors.professor_name FROM professors";
         $professors = $this->database->getAll($professors_query);
         return $professors;
     }
@@ -200,8 +200,9 @@ class Model_Professors extends Model_Dashboard
         $min_dif = 7; // минимальная разница между следующей и текущей парой
 
         // Получение пар преподавателя на сегодня
-        $query = "SELECT group_number, lesson_number,lesson_name,classroom FROM groups WHERE
-                  professor_id=?s and day_number=?s and (numerator='all' or numerator =?s)";
+        $query = "SELECT group_number, lesson_number,lesson_name,classroom FROM groups,lessons_list WHERE
+                  professor_id=?s and day_number=?s and (numerator='all' or numerator =?s)
+                  and groups.lesson_id=lessons_list.id";
         $result_of_query = $this->database->getAll($query, $professor_id, $day, $week_numerator);
 
         foreach ($result_of_query as $value){  // Поиск совпадений между парами преподавателя и текущей парой
@@ -243,7 +244,7 @@ class Model_Professors extends Model_Dashboard
      * @return array [professor] [depart_name] [photo_url]
      */
     private function get_professor_info($professor_id){
-        $query = "SELECT prof.name,dep_list.depart_name,photo_url FROM professors as prof,departments_list as dep_list
+        $query = "SELECT prof.professor_name,dep_list.depart_name,photo_url FROM professors as prof,departments_list as dep_list
                   WHERE prof.department_code = dep_list.code and prof.id=?s";
         $result=$this->database->getRow($query,$professor_id);
         return $result;
@@ -255,7 +256,8 @@ class Model_Professors extends Model_Dashboard
      * @return array Номер дня, номер пары, название предмета, номер группы у которой ведет преподаватель
      */
     private function week_professor_parse($professor_id,$numerator){
-        $query = "SELECT * FROM groups WHERE professor_id=?s and (numerator = 'all' or numerator= ?s)";
+        $query = "SELECT * FROM groups,lessons_list WHERE professor_id=?s AND groups.lesson_id=lessons_list.id
+                  and (numerator = 'all' or numerator= ?s)";
         $result_of_query=$this->database->getAll($query,$professor_id,$numerator);
         $result = null;
         for ($i=1;$i<=6;$i++)

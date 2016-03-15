@@ -113,9 +113,9 @@ class Model_TimeTable extends Model_Dashboard
         $today = $this->date_time_model->get_day()['today'];
         $numerator = $this->date_time_model->get_week_numerator();
 
-        $query = "SELECT * FROM groups,professors,departments_list WHERE groups.professor_id=professors.id AND
-        professors.department_code = departments_list.code AND group_number=?s AND day_number=?s AND lesson_number=?s
-        AND (numerator='all' OR numerator=?s)";
+        $query = "SELECT * FROM groups,professors,departments_list,lessons_list WHERE groups.professor_id=professors.id AND
+                  professors.department_code = departments_list.code AND groups.lesson_id=lessons_list.id
+                   AND group_number=?s AND day_number=?s AND lesson_number=?s AND (numerator='all' OR numerator=?s)";
         $result_of_query = $this->database->getALL($query, $number_group, $today, $lesson_number, $numerator);
 
         //Разбор полученного запроса (преподаватели, которые ведут у группы одновремеенно)
@@ -129,14 +129,14 @@ class Model_TimeTable extends Model_Dashboard
             if (count($result_of_query) > 1) {
                 $result['professor_id'][] = $value['professor_id'];
                 $result['classroom'][] = $value['classroom'];
-                $result['professor'][] = $value['professor'];
+                $result['professor'][] = $value['professor_name'];
                 $result['multiple'] = true;
             }
             else {
                 // если преподавателей = 1 или 0 то выводится его параметры или null для всех свойств
                 $result['professor_id'] = $value['professor_id'];
                 $result['classroom'] = $value['classroom'];
-                $result['professor'] = $value['professor'];
+                $result['professor'] = $value['professor_name'];
                 $result['photo_url'] = $value['photo_url'];
                 $result['multiple'] = false;
             }
@@ -208,8 +208,8 @@ class Model_TimeTable extends Model_Dashboard
 
         $numerator = $this->date_time_model->get_week_numerator(); // получение значения нумератора для текущей недели
 
-        $query = "SELECT * FROM groups,professors WHERE groups.professor_id=professors.id AND group_number=?s
-                                                        AND day_number=?s AND (numerator=?s OR numerator='all')";
+        $query = "SELECT * FROM groups,professors,lessons_list WHERE groups.professor_id=professors.id AND group_number=?s
+                            AND groups.lesson_id=lessons_list.id AND day_number=?s AND (numerator=?s OR numerator='all')";
 
         //Получение дней на сегодня и завтра
         $day = $this->date_time_model->get_day();
@@ -273,9 +273,10 @@ class Model_TimeTable extends Model_Dashboard
      * }
      */
     private function week_timetable($group_number,$numerator){
-        $query = "SELECT * FROM groups,professors WHERE groups.professor_id=professors.id AND group_number=?s AND (numerator=?s OR numerator='all') ";
+        $query = "SELECT * FROM groups,professors,lessons_list WHERE groups.lesson_id=lessons_list.id AND
+                  groups.professor_id=professors.id AND group_number=?s AND (numerator=?s OR numerator='all')";
         $query_week = $this->database->getAll($query,$group_number,$numerator);
-
+        $week = array();
         for ($i=1;$i<=6;$i++)
             $week[$i]=array();
 
@@ -313,7 +314,7 @@ class Model_TimeTable extends Model_Dashboard
         foreach ($dashboard as $value) {
             $num = $value['lesson_number'];
             $result[$num]['lesson_name'] = $value['lesson_name'];
-            $result[$num]['professor'] = $value['professor'];
+            $result[$num]['professor'] = $value['professor_name'];
             if ($isweek == false) {         // если рассписание не на неделю, требуется состояние пар
                 //Определяет идет ли сейчас пара
                 $is_lesson_going = $this->is_lesson_going($num);

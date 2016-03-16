@@ -210,14 +210,14 @@ function LOAD_Professor_BASIC(lesson_num)
 												if (answer.multiple)
 													div_info.style.width = "100%";
 												if (answer.multiple)
-													for (var i=0; i< answer.professor.length; i++)
+													for (var i=0; i< answer.professor_name.length; i++)
 														{
-															professor_list += '<a onclick="LOAD_Professors(' + answer.professor_id[i] + ')">' + answer.professor[i] + '</a>';
-															if (i + 1 != answer.professor.length)
+															professor_list += '<a onclick="LOAD_Professors(' + answer.professor_id[i] + ')">' + answer.professor_name[i] + '</a>';
+															if (i + 1 != answer.professor_name.length)
 																professor_list += ", ";
 														}
 												else
-													professor_list = answer.professor;
+													professor_list = answer.professor_name;
 
 												div_info.appendChild(CreateElem("div", "professor-name", null, null, professor_list));
 												div_info.appendChild(CreateElem("div", "professor-department", null, null, answer.department));
@@ -518,7 +518,7 @@ function LOAD_fullShedule()
 												var cell = row.insertCell(-1);
 												if (answer.even[i][j] != null)
 													{
-														var temp = CreateElem("div", null, "more-info", null, answer.even[i][j].professor);
+														var temp = CreateElem("div", null, "more-info", null, answer.even[i][j].professor_name);
 														cell.appendChild(temp);
 														cell.innerHTML += answer.even[i][j].lesson_name;
 													}
@@ -557,7 +557,7 @@ function LOAD_fullShedule()
 												var cell = row.insertCell(-1);
 												if (answer.uneven[i][j] != null)
 													{
-														var temp = CreateElem("div", null, "more-info", null, answer.uneven[i][j].professor);
+														var temp = CreateElem("div", null, "more-info", null, answer.uneven[i][j].professor_name);
 														cell.appendChild(temp);
 														cell.innerHTML += answer.uneven[i][j].lesson_name;
 													}
@@ -623,8 +623,8 @@ function LOAD_Professors(id)
 							var i = 0;
 							while (answer[i] != null)
 								{
-									var temp_li = CreateElem("li", null, null, null, answer[i].professor);
-									temp_li.setAttribute("number", answer[i].id);
+									var temp_li = CreateElem("li", null, null, null, answer[i].professor_name);
+									temp_li.setAttribute("number", answer[i].professor_id);
 									temp_ul.appendChild(temp_li);
 									i++;
 								}
@@ -636,7 +636,7 @@ function LOAD_Professors(id)
 							screen.appendChild(div_right);
 
 							if ((id == undefined) || (id == null))
-								id = answer[0].id;
+								id = answer[0].professor_id;
 							body.appendChild(div_button);
 							body.appendChild(header);
 							body.appendChild(screen);
@@ -698,7 +698,7 @@ function LOAD_Professor(id)
 
 
 									var teacher_info = CreateElem("div", "teacher-info");
-									teacher_info.appendChild(CreateElem("p", "teacher-name", null, null, answer.name));
+									teacher_info.appendChild(CreateElem("p", "teacher-name", null, null, answer.professor_name));
 									teacher_info.appendChild(CreateElem("p", "teacher-dep", null, null, answer.department));
 									teacher_info.appendChild(CreateElem("p", "teacher-now", null, null, "Апанасевич С.А. сегодня не преподает"));
 

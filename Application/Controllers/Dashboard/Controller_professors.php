@@ -24,7 +24,7 @@ class Controller_professors extends Controller_dashboard
      * Входной параметр через JSON строку(POST) integer 'professor_id'
      *
      * Структура:
-     * lesson_num,name,department
+     * lesson_num,lesson_name,department
      * state = now/next/false
      *  now - на текущий момент времени идет пара
      *  next - возвращена следующая пара
@@ -83,13 +83,14 @@ class Controller_professors extends Controller_dashboard
     /**
      * Вывод JSON строки содержащей список преподавателей с предметами кафедры преподавателя
      * professor_id преподавателя
-     * name имя
+     * professor_name имя
      * department_code код кафердры
      * lessons
-     * [ id ид предмета
+     * [ lesson_id ид предмета
      *   department_code код кафедры
-     *   name название предмета
+     *   lesson_name название предмета
      * ]
+     * [state] = 'success' || [state] = 'fail' && [message] = string ...
      */
     function action_get_list_professors_with_lessons(){
         $professors = $this->professor_model->get_list_professors_with_lessons();
@@ -98,14 +99,15 @@ class Controller_professors extends Controller_dashboard
 
     /**
      * Вывод Json строки содеращей список предметов с преподавателями кафедры на котором ведется предмет
-     * id предмета
+     * lesson_id предмета
      * name название предмета
      * department_code код кафердры
-     * professor
+     * professor_name
      * [ professor_id ид преподавателя
      *   department_code код кафедры
-     *   name имя
+     *   lesson_name имя
      * ]
+     * [state] = 'success' || [state] = 'fail' && [message] = string ...
      */
     function action_get_list_lessons_with_professors(){
         $lessons = $this->professor_model->get_list_lessons_with_professors();
@@ -114,8 +116,8 @@ class Controller_professors extends Controller_dashboard
     /**
      * Вывод Json строки, содержающей списки преподавателей
      *
-     * Cо следующей структурой: уникальный id,professor(ФИО),depart_name(кафедра)
-     * [state] = 'success'
+     * Cо следующей структурой: уникальный professor_id,professor_name(ФИО),depart_name(кафедра)
+     * [state] = 'success' || [state] = 'fail' && [message] = string ...
      * @api
      */
     function action_get_list(){

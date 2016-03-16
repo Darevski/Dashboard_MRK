@@ -13,7 +13,7 @@ use Application\Exceptions\UFO_Except;
 
 /**
  * Class Controller_timetable
- * Отвечает за расписание, его редоктирование удаление и т.д.
+ * Отвечает за расписание, его редактирование удаление и т.д.
  * @package Application\Controllers\Admin
  */
 class Controller_timetable extends Controller_admin{
@@ -23,13 +23,14 @@ class Controller_timetable extends Controller_admin{
      * group_number integer - номер групппы
      * numerator string - нумератор недели "ch/zn/all"
      * day_number integer - номер дня недели
-     * timetable array рассписани на день структура: [{prof_id,lesson_id,num_lesson}]
+     * timetable array расписание на день структура: [{prof_id,lesson_id,num_lesson}]
+     * [state] = 'success' || [state] = 'fail' && [message] = string ...
      * @throws UFO_Except
      * @throws \Application\Exceptions\Models_Processing_Except
      * @api
      */
     public function action_set_timetable_for_day(){
-        $_POST['json_input'] = '{"group_number":"32494","numerator":"all","day_number":"2","timetable":[{"prof_id":3,"lesson_id":4,"num_lesson":5}]}';
+        //$_POST['json_input'] = '{"group_number":"32494","numerator":"all","day_number":"2","timetable":[{"prof_id":3,"lesson_id":4,"num_lesson":5}]}';
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
             // Удаление запрещенных символов

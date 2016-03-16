@@ -24,7 +24,7 @@ class Model_Lessons extends Model_Dashboard{
      * @return array
      */
     public function get_list_lessons(){
-        $lessons_query = "SELECT lessons_list.id ,lessons_list.name,lessons_list.department_code FROM lessons_list";
+        $lessons_query = "SELECT lessons_list.id as lesson_id,lessons_list.lesson_name,lessons_list.department_code FROM lessons_list";
         $lessons = $this->database->getAll($lessons_query);
         return $lessons;
     }

@@ -25,7 +25,7 @@ class Model_TimeTable extends Model_Dashboard
      * @param $group_number integer - номер групппы
      * @param $numerator string - нумератор недели "ch/zn/all"
      * @param $day_number integer - номер дня недели
-     * @param $timetable array рассписани на день структура: [num_lesson:[prof_id,lesson_id]]
+     * @param $timetable array расписание на день структура: [{prof_id,lesson_id,num_lesson}]
      * @throws Models_Processing_Except
      */
     function set_timetable_for_day($group_number,$numerator,$day_number,$timetable){
@@ -129,14 +129,14 @@ class Model_TimeTable extends Model_Dashboard
             if (count($result_of_query) > 1) {
                 $result['professor_id'][] = $value['professor_id'];
                 $result['classroom'][] = $value['classroom'];
-                $result['professor'][] = $value['professor_name'];
+                $result['professor_name'][] = $value['professor_name'];
                 $result['multiple'] = true;
             }
             else {
                 // если преподавателей = 1 или 0 то выводится его параметры или null для всех свойств
                 $result['professor_id'] = $value['professor_id'];
                 $result['classroom'] = $value['classroom'];
-                $result['professor'] = $value['professor_name'];
+                $result['professor_name'] = $value['professor_name'];
                 $result['photo_url'] = $value['photo_url'];
                 $result['multiple'] = false;
             }
@@ -314,7 +314,7 @@ class Model_TimeTable extends Model_Dashboard
         foreach ($dashboard as $value) {
             $num = $value['lesson_number'];
             $result[$num]['lesson_name'] = $value['lesson_name'];
-            $result[$num]['professor'] = $value['professor_name'];
+            $result[$num]['professor_name'] = $value['professor_name'];
             if ($isweek == false) {         // если рассписание не на неделю, требуется состояние пар
                 //Определяет идет ли сейчас пара
                 $is_lesson_going = $this->is_lesson_going($num);

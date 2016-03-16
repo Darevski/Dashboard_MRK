@@ -37,7 +37,7 @@ class Model_Professors extends Model_Dashboard
         if (!is_int($professor_id))
             throw new Models_Processing_Except("Идентификатор $professor_id не является числом");
         else if (!$this->isset_professor($professor_id))
-            throw new Models_Processing_Except("Преподавателя с индентификатором - $professor_id не существует");
+            throw new Models_Processing_Except("Преподавателя с идентификатором - $professor_id не существует");
 
         $day = $this->date_time_model->get_day()['today'];
         // Если сегодня воскресенье
@@ -61,7 +61,7 @@ class Model_Professors extends Model_Dashboard
 
         $result['photo_url'] = $prof_info['photo_url'];
         $result['department'] = $prof_info['depart_name'];
-        $result['name'] = $prof_info['professor_name'];
+        $result['professor_name'] = $prof_info['professor_name'];
 
         $result['state'] = 'success';
 
@@ -70,17 +70,17 @@ class Model_Professors extends Model_Dashboard
     }
 
     /** Получение списка преподавателей
-     * @return array уникальный id,professor(ФИО),depart_name(кафедра)
+     * @return array уникальный professor_id ,professor_name(ФИО),depart_name(кафедра)
      */
     function get_professors_list(){
-        $query = "SELECT prof.id,prof.professor_name,dep_list.depart_name FROM professors as prof,departments_list as dep_list
-                  WHERE prof.department_code = dep_list.code";
+        $query = "SELECT professors.id as professor_id,professors.professor_name,departments_list.depart_name
+                  FROM professors,departments_list WHERE professors.department_code = departments_list.code";
         $result=$this->database->getALL($query);
         $result['state']='success';
         return $result;
     }
 
-    /** Возвращает всех преподавателей с id, код кафедры, фио
+    /** Возвращает всех преподавателей с professor_id, department_code (код кафедры), фио
      * @return array
      */
     private function get_professors_thin_list(){
@@ -95,7 +95,7 @@ class Model_Professors extends Model_Dashboard
      * @return mixed
      */
     function get_list_professors_with_lessons(){
-        //Получение общего списка предметов id, name, dep_code
+        //Получение общего списка предметов id, lesson_name, dep_code
         $Model_Lessons = new Model_Lessons();
         $lessons = $Model_Lessons->get_list_lessons();
         // Получение списка преподавателей id, фио, dep code
@@ -117,6 +117,7 @@ class Model_Professors extends Model_Dashboard
 
             $result[] = $value;
         }
+        $result['state'] = 'success';
         return $result;
     }
 
@@ -125,10 +126,10 @@ class Model_Professors extends Model_Dashboard
      * @return mixed
      */
     function get_list_lessons_with_professors(){
-        //Получение общего списка предметов id, name, dep_code
+        //Получение общего списка предметов id, lesson_name, dep_code
         $model_lessons = new Model_Lessons();
         $lessons = $model_lessons->get_list_lessons();
-        // Получение списка преподавателей id, фио, dep code
+        // Получение списка преподавателей id, professor_name, dep code
         $professors = $this->get_professors_thin_list();
 
         $professors_ordered = array();
@@ -147,6 +148,7 @@ class Model_Professors extends Model_Dashboard
 
             $result[] = $value;
         }
+        $result['state'] = 'success';
         return $result;
     }
 
@@ -175,8 +177,11 @@ class Model_Professors extends Model_Dashboard
      * Проверяет существование преподавателя по указанному id
      * @param integer $id
      * @return bool
+     * @throws Models_Processing_Except
      */
     public function isset_professor($id){
+        if (!is_int($id))
+            throw new Models_Processing_Except("идентификатор $id преподавателя не является числом");
         $query = 'SELECT * FROM professors WHERE id = ?s';
         $result = $this->database->query($query,$id);
         if ($this->database->numRows($result) > 0)
@@ -245,7 +250,7 @@ class Model_Professors extends Model_Dashboard
      */
     private function get_professor_info($professor_id){
         $query = "SELECT prof.professor_name,dep_list.depart_name,photo_url FROM professors as prof,departments_list as dep_list
-                  WHERE prof.department_code = dep_list.code and prof.id=?s";
+                  WHERE prof.department_code = dep_list.code and prof.id=?i";
         $result=$this->database->getRow($query,$professor_id);
         return $result;
     }

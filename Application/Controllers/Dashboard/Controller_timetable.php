@@ -93,7 +93,7 @@ class Controller_timetable extends Controller_dashboard
      * - classroom,
      * - lesson_name,
      * - department - кафдера преподавателя,
-     * - professor - фио преподавателя,
+     * - professor_name - фио преподавателя,
      * - professor_id - id преподавателя,
      * - photo_url - url фото преподавателя,
      * - time - время в которое идет пара}
@@ -102,7 +102,7 @@ class Controller_timetable extends Controller_dashboard
      * @api
      */
     function action_get_lesson_info(){
-        //$_POST['json_input'] = '{"group_number":32494,"lesson_number":4}';
+        //$_POST['json_input'] = '{"group_number":32494,"lesson_number":6}';
         if (isset($_POST['json_input'])) {
             $data = json_decode($_POST['json_input'], JSON_UNESCAPED_UNICODE);
             $data = $this->secure_array($data);

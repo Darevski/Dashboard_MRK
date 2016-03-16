@@ -410,7 +410,7 @@ function GET_time()
 									document.getElementById("time-now").innerHTML += str_time[i];
 							}
 					}
-					catch (ex) { console.error(ex); CreateEx(ex.message); }
+					catch (ex) { clearInterval(DASHBOARD_TIME); console.error(ex); CreateEx(ex.message); }
 				}, 10000);
 			}
 			catch (ex) { console.error(ex); CreateEx(ex.message); }

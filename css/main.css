@@ -51,7 +51,7 @@
     background-color: rgba(160, 160, 160, .2);
 }
 .js-ex-close {
-    line-height: 35px;
+    line-height: 40px;
     position: fixed;
     top: calc( 50% + 30px);
     left: calc( 50% + 140px);

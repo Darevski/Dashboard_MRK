@@ -1,6 +1,6 @@
 window.onerror = function (message, url, linenum) {
 	CreateEx(message);
-	console.error(message,linenum);
+	console.error(message);
 }
 
 /** Очищает страницу
